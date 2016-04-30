@@ -1,0 +1,44 @@
+<% if @filter %>
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <h4>
+      <%= link_to 'All', application_reports_path(@application) %> >
+      <%= link_to_if @transaction_metric, @filter, application_reports_path(@application, :filter => @filter) %>
+      <% if @transaction_metric %>
+      > <%= @transaction_metric.id %>
+      <% end %>
+    </h4>
+  </div>
+</div>
+
+<% end %>
+<div class="row">
+
+
+  <div class="small-12 medium-12 large-12 columns">
+    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
+
+    <% if @transaction_metric_samples.present? %>
+    <%= @transaction_metric_samples.inspect %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-6 medium-6 large-6 columns">
+    <h6>Memory Usage</h6>
+    <div id="memory_physical_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "memory_physical", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
+  </div>
+
+  <div class="small-6 medium-6 large-6 columns">
+    <h6>GC Total Objects</h6>
+    <div id="gc_total_objects_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "gc_total_objects", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
+  </div>
+</div>
+

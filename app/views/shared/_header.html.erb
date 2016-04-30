@@ -1,0 +1,12 @@
+<div class="top-bar">
+  <div class="top-bar-left">
+    <ul class="dropdown menu" data-dropdown-menu>
+      <li class="menu-text">AppPerf</li>
+      <% if @current_user %>
+        <li><%= link_to "Dashboard", dashboard_path %></li>
+        <li><%= link_to "Applications", applications_path %></li>
+        <li><%= link_to 'Logout', user_session_path, :method => :delete %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>

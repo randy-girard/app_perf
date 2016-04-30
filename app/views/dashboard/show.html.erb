@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <table>
+      <% @applications.each do |application| %>
+      <tr>
+        <td><%= link_to application.name, application_reports_path(application) %></td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

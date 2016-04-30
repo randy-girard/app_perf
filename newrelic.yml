@@ -1,0 +1,25 @@
+common: &default_settings
+  license_key: '19509de2-d07d-470f-a8f5-aab940569d84'
+  app_name: AppPerf
+  log_level: debug
+  host: 127.0.0.1
+  port: 9292
+  ssl: false
+  enabled: true
+  apdex_t: 1.0
+  capture_params: true
+  transaction_tracer:
+    enabled: true
+    transaction_threshold: 0.5#apdex_f
+    record_sql: obfuscated
+    stack_trace_threshold: 0.5
+  error_collector:
+    enabled: true
+    ignore_errors: NewRelic::TestHelpers::Exceptions::IgnoredError
+  slow_query:
+    enabled: true
+    record_sql: obfuscated
+  
+development:
+  <<: *default_settings
+  developer: true

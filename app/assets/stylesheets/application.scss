@@ -1,0 +1,12 @@
+// Place all the styles related to the Applications controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+@import "foundation_and_overrides";
+@import "font-awesome";
+
+.dynamic-chart {
+  border: 1px solid #ccc;
+  text-align: center;
+  margin: 0 auto;
+}

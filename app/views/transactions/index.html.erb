@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <table>
+      <tbody>
+        <% @transactions.each do |transaction| %>
+          <tr>
+            <td><%= link_to transaction.name, application_reports_path(:filter => transaction.name, :transaction_metric_id => @filter ? transaction.id : nil) %></td>
+            <td><%= transaction.average_duration %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

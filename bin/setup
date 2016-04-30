@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+require 'pathname'
+
+# path to your application root.
+APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
+
+Dir.chdir APP_ROOT do
+  # This script is a starting point to setup your application.
+  # Add necessary setup steps to this file:
+
+  puts "== Installing dependencies =="
+  system "gem install bundler --conservative"
+  system "bundle check || bundle install"
+
+  # puts "\n== Copying sample files =="
+  unless File.exist?("config/database.yml")
+    system "cp config/database.yml.sample config/database.yml"
+  end
+
+  puts "\n== Preparing database =="
+  system "rm -rf public/system"
+  system "rm -rf public/uploads"
+  system "rm -rf db/development"
+  
+  system "bin/setup_database"
+
+  puts "\n== Removing old logs and tempfiles =="
+  system "rm -f log/*"
+  system "rm -rf tmp/cache"
+  
+  if RUBY_PLATFORM =~ /darwin/
+    system("which nginx || brew install homebrew/nginx/nginx-full --with-mp4-h264-module")
+  end
+end
