@@ -1,28 +1,21 @@
-== README
+== AppPerf (Application Performance Monitoring)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+<b>NOTE: This application is in extremely beginning stages and I am still working out flows and learning the data model. I will be cleaning code up as I go.</b>
 
-Things you may want to cover:
+This is a application monitoring app that, currently, uses the NewRelic agents to read the data and generate visuals. I am trying to build a two phase app here:
 
-* Ruby version
+1. Create the web app/ui to display charts and analytics for analyzing performance using existing NewRelic agent.
+2. Create a custom agent that will report data to this web app directly.
+  
+  
+=== Setup
 
-* System dependencies
+Setup should be striaghtforward and easy. We use foreman to manage processes. Begin by running the setup script:
 
-* Configuration
+  /bin/setup
+  
+This should create and setup the database and any other needed services/apps. Then to start everything up, run foreman:
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+  bundle exec foreman start
+  
+Navigate to http://localhost:9292. This application is setup to report to itself so you can begin seeing information immediatetly!
