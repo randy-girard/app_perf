@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  application_id: 
+  name: MyString
+  scope: MyString
+  timestamp: 2016-05-01 13:49:36
+  value: 1.5
+  raw_data: MyText
+
+two:
+  application_id: 
+  name: MyString
+  scope: MyString
+  timestamp: 2016-05-01 13:49:36
+  value: 1.5
+  raw_data: MyText

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
 
   get '/users/sign_in' => 'sessions#new', :as => :new_user_session
   post '/users/sign_in' => 'sessions#create', :as => :user_sessions

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160430172042) do
+ActiveRecord::Schema.define(version: 20160501174936) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,21 @@ ActiveRecord::Schema.define(version: 20160430172042) do
 
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
 
+  create_table "metrics", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "raw_datum_id"
+    t.string   "name"
+    t.string   "scope"
+    t.datetime "timestamp"
+    t.float    "value"
+    t.text     "raw_data"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "metrics", ["application_id"], name: "index_metrics_on_application_id", using: :btree
+  add_index "metrics", ["raw_datum_id"], name: "index_metrics_on_raw_datum_id", using: :btree
+
   create_table "raw_data", force: :cascade do |t|
     t.integer  "application_id"
     t.string   "method"
@@ -36,6 +51,7 @@ ActiveRecord::Schema.define(version: 20160430172042) do
 
   create_table "transaction_metric_samples", force: :cascade do |t|
     t.integer  "application_id"
+    t.integer  "raw_datum_id"
     t.integer  "transaction_id"
     t.integer  "transaction_metric_id"
     t.text     "backtrace"
@@ -44,11 +60,13 @@ ActiveRecord::Schema.define(version: 20160430172042) do
   end
 
   add_index "transaction_metric_samples", ["application_id"], name: "index_transaction_metric_samples_on_application_id", using: :btree
+  add_index "transaction_metric_samples", ["raw_datum_id"], name: "index_transaction_metric_samples_on_raw_datum_id", using: :btree
   add_index "transaction_metric_samples", ["transaction_id"], name: "index_transaction_metric_samples_on_transaction_id", using: :btree
   add_index "transaction_metric_samples", ["transaction_metric_id"], name: "index_transaction_metric_samples_on_transaction_metric_id", using: :btree
 
   create_table "transaction_metrics", force: :cascade do |t|
     t.integer  "transaction_id"
+    t.integer  "raw_datum_id"
     t.integer  "application_id"
     t.string   "name"
     t.datetime "timestamp"
@@ -63,14 +81,20 @@ ActiveRecord::Schema.define(version: 20160430172042) do
     t.datetime "updated_at",        null: false
   end
 
+  add_index "transaction_metrics", ["application_id"], name: "index_transaction_metrics_on_application_id", using: :btree
+  add_index "transaction_metrics", ["raw_datum_id"], name: "index_transaction_metrics_on_raw_datum_id", using: :btree
+  add_index "transaction_metrics", ["transaction_id"], name: "index_transaction_metrics_on_transaction_id", using: :btree
+
   create_table "transactions", force: :cascade do |t|
     t.integer  "application_id"
+    t.integer  "raw_datum_id"
     t.string   "name"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
   end
 
   add_index "transactions", ["application_id"], name: "index_transactions_on_application_id", using: :btree
+  add_index "transactions", ["raw_datum_id"], name: "index_transactions_on_raw_datum_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
@@ -80,8 +104,15 @@ ActiveRecord::Schema.define(version: 20160430172042) do
   end
 
   add_foreign_key "applications", "users"
+  add_foreign_key "metrics", "applications"
+  add_foreign_key "metrics", "raw_data"
   add_foreign_key "transaction_metric_samples", "applications"
+  add_foreign_key "transaction_metric_samples", "raw_data"
   add_foreign_key "transaction_metric_samples", "transaction_metrics"
   add_foreign_key "transaction_metric_samples", "transactions"
+  add_foreign_key "transaction_metrics", "applications"
+  add_foreign_key "transaction_metrics", "raw_data"
+  add_foreign_key "transaction_metrics", "transactions"
   add_foreign_key "transactions", "applications"
+  add_foreign_key "transactions", "raw_data"
 end

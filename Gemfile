@@ -38,6 +38,8 @@ gem "groupdate"
 gem "pg"
 gem 'foundation-rails'
 gem "font-awesome-rails"
+gem 'sinatra', :require => nil
+gem "sidekiq"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

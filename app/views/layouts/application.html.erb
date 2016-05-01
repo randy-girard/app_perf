@@ -20,7 +20,7 @@
         <%= yield %>
       </div>
 
-      <% if @current_user && @application %>
+      <% if @current_user && @application && @application.persisted? %>
         <div class="medium-2 large-1 medium-pull-10 large-pull-11 columns">
           <%= render "shared/menu" %>
         </div>

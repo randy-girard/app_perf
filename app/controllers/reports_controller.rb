@@ -26,28 +26,13 @@ class ReportsController < ApplicationController
   def index
     @filter = params[:filter]
     if @filter
-      @transaction_filter = @application.transactions.where(:name => @filter).first
+      @transaction_metrics = @application.transaction_metrics.where(:name => @filter)
     end
 
     @transaction_metric_id = params[:transaction_metric_id]
     if @transaction_metric_id
       @transaction_metric = @application.transaction_metrics.where(:id => @transaction_metric_id).first
-
       @transaction_metric_samples = @transaction_metric.transaction_metric_samples
-    end
-
-
-    if params.include?(:report_type)
-      case params[:report_type]
-      when "average_duration"
-        @report_data = @application.transaction_metrics
-        if @transaction_metric
-          @report_data = @report_data.where(:id => @transaction_metric)
-        else
-          @report_data = @report_data.where(:transaction_id => @transaction_filter) if @transaction_filter
-          @report_data = @report_data.group(:name).group_by_minute(:timestamp, range: @range).average(:duration)
-        end
-      end
     end
   end
 
@@ -60,14 +45,14 @@ class ReportsController < ApplicationController
     @transaction_metric_id = params[:transaction_metric_id]
     if @transaction_metric_id
       @transaction_metric = @application.transaction_metrics.where(:id => @transaction_metric_id).first
+      @range = (@transaction_metric.timestamp - 5.minutes)..(@transaction_metric.timestamp + 5.minutes)
     end
 
     case params[:id]
     when "average_duration"
       @report_data = @application.transaction_metrics
       if @transaction_metric
-        range = (@transaction_metric.timestamp - 5.minutes)..(@transaction_metric.timestamp + 5.minutes)
-        @report_data = @report_data.where(:id => @transaction_metric).group(:name).group_by_minute(:timestamp, range: range).average(:duration)
+        @report_data = @report_data.where(:id => @transaction_metric).group(:name).group_by_minute(:timestamp, range: @range).average(:duration)
       else
         @report_data = @report_data.where(:transaction_id => @transaction_filter) if @transaction_filter
         @report_data = @report_data.group_by_minute(:timestamp, range: @range)
@@ -84,30 +69,10 @@ class ReportsController < ApplicationController
       end
       render :layout => false
     when "memory_physical"
-      raw_data = @application.raw_data.where(:method => "metric_data").all
-      memory_physical = raw_data.map(&:memory_physical)
-      memory_physical = memory_physical.map {|i| [i[:start_at].to_f, i[:value]] }.to_h
-      step = 60.seconds
-      @report_data = []
-      (30.minutes.ago..61.seconds.ago).step(step) do |time|
-        memory_physical_value = 0
-        memory_physical_tmp = memory_physical.select {|k, v| k >= time.to_f && k < time.to_f + step }
-        memory_physical_value = memory_physical_tmp.values.sum / memory_physical_tmp.values.size if memory_physical_tmp.present?
-        @report_data << [time.to_f, memory_physical_value]
-      end
+      @report_data = @application.metrics.where(:name => "Memory/Physical").group_by_minute(:timestamp, range: @range).average(:value)
       render :layout => false
     when "gc_total_objects"
-      raw_data = @application.raw_data.where(:method => "metric_data").all
-      gc_total_allocated_objects = raw_data.map(&:gc_total_allocated_objects)
-      gc_total_allocated_objects = gc_total_allocated_objects.map {|i| [i[:start_at].to_f, i[:value]] }.to_h
-      step = 60.seconds
-      @report_data = []
-      (30.minutes.ago..61.seconds.ago).step(step) do |time|
-        gc_total_allocated_objects_value = 0
-        gc_total_allocated_objects_tmp = gc_total_allocated_objects.select {|k, v| k >= time.to_f && k < time.to_f + step }
-        gc_total_allocated_objects_value = gc_total_allocated_objects_tmp.values.sum / gc_total_allocated_objects_tmp.values.size if gc_total_allocated_objects_tmp.present?
-        @report_data << [time.to_f, gc_total_allocated_objects_value]
-      end
+      @report_data = @application.metrics.where(:name => "RubyVM/GC/total_allocated_object").group_by_minute(:timestamp, range: @range).average(:value)
       render :layout => false
     else
       render :json => @raw_datum

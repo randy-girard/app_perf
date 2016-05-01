@@ -1,6 +1,13 @@
-class DataParser
+class DataParserWorker < ActiveJob::Base
+  queue_as :app_perf
+
+  def perform(id)
+    self.id = id
+    execute
+  end
 
   def self.delete_all
+    Metric.delete_all
     TransactionMetricSample.delete_all
     TransactionMetric.delete_all
     Transaction.delete_all
@@ -8,7 +15,7 @@ class DataParser
 
   def self.process_all
     RawDatum.find_each do |raw_data|
-      new(raw_data.id).execute
+      DataParserWorker.perform_later(raw_data.id)
     end
   end
 
@@ -17,14 +24,10 @@ class DataParser
     process_all
   end
 
-  def initialize(id)
-    self.id = id
-  end
-
   def execute
     case raw_datum.method
     when "metric_data"
-      #parse_metric_data
+      parse_metric_data
     when "analytics_event_data"
       parse_analytics_event_data
     when "transaction_sample_data"
@@ -49,18 +52,19 @@ class DataParser
     data.map { |item|
       hash = {}
       name = item[0]["name"]
-      metric_data = item[1]
-      if name == "RubyVM/GC/runs"
-        hash = {
-          "application_id" => raw_datum.application_id,
-          "name" => name,
-          "timestamp" => Time.at(delta).utc,
-          "duration" => (end_at - start_at)
-        }
+      scope = item[0]["scope"]
 
-        #transaction = raw_datum.application.transactions.where(:name => hash["name"]).first_or_create
-        #transaction.transaction_metrics.create(hash)
-      end
+      hash = {
+        "application_id" => raw_datum.application_id,
+        "raw_datum_id" => raw_datum.id,
+        "name" => name,
+        "scope" => scope,
+        "timestamp" => Time.at(delta).utc,
+        "value" => item[1][1],
+        "raw_data" => item[1]
+      }
+
+      raw_datum.application.metrics.create(hash)
     }
   end
 
@@ -73,6 +77,7 @@ class DataParser
 
       hash = {
         "application_id" => raw_datum.application_id,
+        "raw_datum_id" => raw_datum.id,
         "name" => transaction_data["name"],
         "timestamp" => Time.at(transaction_data["timestamp"]).utc,
         "duration" => transaction_data["duration"],
@@ -84,8 +89,10 @@ class DataParser
         "code" => http_data["httpResponseCode"]
       }
 
-      transaction = raw_datum.application.transactions.where(:name => hash["name"]).first_or_create
-      transaction.transaction_metrics.where("name" => hash["name"], "timestamp" => hash["timestamp"]).first_or_initialize.update_attributes!(hash)
+      transaction = raw_datum.application.transactions.where(:name => hash["name"]).first_or_create do |t|
+        t.raw_datum = raw_datum
+      end
+      transaction.transaction_metrics.where("name" => hash["name"], "timestamp" => Time.at(transaction_data["timestamp"]).utc).first_or_initialize.update_attributes!(hash)
     }
   end
 
@@ -97,10 +104,17 @@ class DataParser
 
       transaction = raw_datum.application.transactions.where(:name => transaction_name).first_or_create
       if transaction
-        transaction_metric = transaction.transaction_metrics.where(:name => transaction_name, :timestamp => Time.at(transaction_data[0]).utc).first_or_create
+        transaction_metric = transaction.transaction_metrics.where(
+          :application_id => raw_datum.application_id,
+          :name => transaction_name,
+          :timestamp => Time.at(transaction_data[0]).utc
+        ).first_or_create do |transaction_metric|
+          transaction_metric.raw_datum = raw_datum
+        end
         if transaction_metric
           hash = {
             "application_id" => raw_datum.application_id,
+            "raw_datum_id" => raw_datum.id,
             "transaction_id" => transaction.id,
             "transaction_metric_id" => transaction_metric.id,
             "backtrace" => transaction_data

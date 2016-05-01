@@ -1,8 +1,9 @@
 class CreateTransactionMetrics < ActiveRecord::Migration
   def change
     create_table :transaction_metrics do |t|
-      t.references :transaction
-      t.references :application
+      t.references :transaction, index: true, foreign_key: true
+      t.references :raw_datum, index: true, foreign_key: true
+      t.references :application, index: true, foreign_key: true
       t.string :name
       t.datetime :timestamp
       t.boolean :error

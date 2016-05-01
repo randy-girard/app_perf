@@ -1,10 +1,15 @@
 class RawDatum < ActiveRecord::Base
   belongs_to :application
 
+  has_many :transactions
+  has_many :transaction_metrics
+  has_many :transaction_metric_samples
+  has_many :metrics
+
   serialize :body
 
   after_commit do |record|
-    DataParser.new(record.id).execute
+    DataParserWorker.perform_async(record.id)
   end
 
   def memory_physical

@@ -5,6 +5,7 @@ class Application < ActiveRecord::Base
   has_many :transaction_metrics
   has_many :transaction_metric_samples
   has_many :raw_data
+  has_many :metrics
 
   before_validation do |record|
     record.license_key ||= SecureRandom.uuid
