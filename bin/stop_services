@@ -1,0 +1,2 @@
+nginx -s stop -p `pwd` -c config/nginx/development.conf
+pg_ctl stop -D db/development

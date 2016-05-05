@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160501174936) do
+ActiveRecord::Schema.define(version: 20160504131253) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,19 @@ ActiveRecord::Schema.define(version: 20160501174936) do
     t.text     "body"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+  end
+
+  create_table "system_metrics", force: :cascade do |t|
+    t.string   "name",               null: false
+    t.datetime "started_at",         null: false
+    t.string   "transaction_id"
+    t.text     "payload"
+    t.float    "duration",           null: false
+    t.float    "exclusive_duration", null: false
+    t.integer  "request_id"
+    t.integer  "parent_id"
+    t.string   "action",             null: false
+    t.string   "category",           null: false
   end
 
   create_table "transaction_metric_samples", force: :cascade do |t|

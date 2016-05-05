@@ -1,0 +1,230 @@
+body {
+  color: #555555;
+  font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
+  font-size: 75%;
+  line-height: 150%;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+a:hover {
+  color: #0099FF;
+}
+
+a:visited {
+  color: #004C99;
+}
+
+a {
+  color: #0066CC;
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #555555;
+  font-weight: bold;
+}
+img{
+}
+
+#container {
+  height: 100%;
+  margin-bottom: -46px;
+  min-height: 100%;
+}
+
+#top {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+#bd {
+  padding-bottom: 46px;
+  position: relative;
+  top: 40px;
+  background-color: #FAFCFF;
+}
+
+#content {
+  padding: 20px;
+}
+
+tr {
+  height: 45px;
+}
+
+thead tr {
+  color: #667495;
+}
+
+div.clear {
+  clear: both;
+}
+
+#hd {
+  font-size: 20px;
+
+  clear: both;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  z-index: 2;
+  background: url("../../images/system_metrics/gradient.png") repeat-x scroll 0 -58px transparent;
+  text-align: right;
+  border-top: 2px solid #F8BC59;
+}
+
+#hd h1 {
+  color: #F8BC59;
+  font-size: 2em;
+  position: absolute;
+  left: 75px;
+  text-shadow: 0 1px 0 black;
+}
+
+#hd ul {
+  border: 0 none;
+  font-size: 18px;
+  clear: both;
+  margin: 0 1.622%;
+  overflow: hidden;
+  padding: 0;
+  text-shadow: 0 1px 0 black;
+}
+
+#hd ul li {
+  color: #000;
+  font-size: 85%;
+  cursor: pointer;
+  margin: 6px 0.5em 0;
+  padding: 0;
+  display: inline-block;
+  list-style-image: none;
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  vertical-align: middle;
+  white-space: nowrap;
+  -moz-box-orient: vertical;
+}
+
+#hd ul li a {
+  color: inherit;
+
+  cursor: inherit;
+  line-height: 28px;
+  padding: 0.5em 1em;
+  text-decoration: inherit;
+}
+
+#hd ul li.active {
+  background-color: #fff;
+  color: #F6A828;
+  -moz-border-radius: 25px 25px 25px 25px;
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) inset, 0 -1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+
+#hd ul li:hover {
+  color: #000;
+}
+
+#title-bar {
+  background: #EFEFEF;
+  border-bottom: 1px solid #EDEDED;
+  color: #5E6469;
+  font-size: 1em;
+  font-weight: bold;
+  line-height: 140%;
+  padding: 10px 30px ;
+  margin-top: 25px;
+  position: relative;
+  text-shadow: 0 1px 0 white;
+  -moz-box-shadow: 0 1px 2px #AAAAAA;
+  -webkit-box-shadow: 0 1px 2px #AAAAAA;
+  box-shadow: 0 1px 2px #AAAAAA;
+}
+
+#title-bar h2 {
+  font-size: 2.6em;
+  font-weight: bold;
+  margin: 12px 0 10px;
+}
+
+#title-bar h4 {
+  margin-bottom: 0.25em;
+  font-weight: normal;
+}
+
+#ft {
+  background-color: #FAD08A;
+  border-top: 1px solid #F8BC59;
+  color: #B17107;
+  height: 45px;
+  line-height: 44px;
+  text-align: center;
+  text-shadow: 0 -1px 0 #FBDAA2;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 2;
+  -moz-box-shadow: 0 1px 0 #FCE3BB inset;
+}
+
+#menu-bar {
+  margin-bottom: 10px;
+}
+
+#menu-bar form {
+  float: right;
+}
+
+#metric-details {
+  border-right: 1px solid #EFEFEF;
+  float: left;
+  padding-right: 20px;
+  width: 37%;
+}
+
+#metric-details h2 {
+  font-size: 500%;
+  line-height: normal;
+  margin-bottom: 20px;
+  color: #323537;
+  text-align: center;
+}
+
+#metric-children {
+  float: right;
+  width: 60%;
+}
+
+div.payload {
+  border-left: 1px solid #EFEFEF;
+  padding-left: 10px;
+}
+
+div.portlet {
+  position: relative;
+  float: left;
+  width: 45em;
+  border: 1px solid #EDEDED;
+  padding: 10px;
+  margin: 0 20px 20px 0;
+  -moz-box-shadow: 1px 1px 1px #AAA;
+  -webkit-box-shadow: 1px 1px 1px #AAA;
+  box-shadow: 1px 1px 1px #AAA;
+}
+
+.hbar {
+  display: block;
+  background: #0A0;
+  height: 10px;
+}
+
+.hbar.slow {
+  background: #A00;
+}

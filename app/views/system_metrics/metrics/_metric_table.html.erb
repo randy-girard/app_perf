@@ -1,0 +1,24 @@
+<% longest_duration = metrics.first.try(:duration) -%>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <% if columns.include?(:name) %><th>Name</th><% end %>
+      <% if columns.include?(:identifier) %><th>Identifier</th><% end %>
+      <% if columns.include?(:action) %><th>Action</th><% end %>
+      <% if columns.include?(:when) %><th>When</th><% end %>
+      <% if columns.include?(:duration) %><th>Duration (ms)</th><% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% for metric in metrics -%>
+      <%= render :partial => 'metric_row', :locals => {
+        :indent => 0,
+        :columns => columns,
+        :metric => metric,
+        :longest_duration => longest_duration,
+        :include_children => include_children
+      } %>
+    <% end -%>
+  </tbody>
+</table>

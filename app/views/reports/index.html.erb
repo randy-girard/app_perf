@@ -4,8 +4,8 @@
     <h4>
       <%= link_to 'All', application_reports_path(@application) %> >
       <%= link_to_if @transaction_metric, @filter, application_reports_path(@application, :filter => @filter) %>
-      <% if @transaction_metric %>
-      > <%= @transaction_metric.id %>
+      <% if @metric_id %>
+      > <%= @metric_id %>
       <% end %>
     </h4>
   </div>
@@ -16,37 +16,53 @@
   <div class="small-8 medium-8 large-8 columns">
     <div class="row">
       <div class="small-12 medium-12 large-12 columns">
-        <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+        <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :filter => @filter, :metric_id => @metric_id) %>" data-duration="15000">
           <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
       </div>
     </div>
 
+    <% if @transaction_metric_samples.present? %>
+    <div class="row">
+      <div class="small-12 medium-12 large-12 columns">
+        <% @transaction_metric_samples.each do |transaction_metric| %>
+          <hr />
+          <% transaction_metric.payload.each do |key, value| -%>
+            <dt><%= key.to_s.titleize %></dt>
+            <dd><%= value.kind_of?(String) ? value : value.inspect %></dd>
+          <% end -%>
+        <% end %>
+      </div>
+    </div>
+    <% end %>
+
+    <% if false %>
     <div class="row">
       <div class="small-6 medium-6 large-6 columns">
         <h6>Memory Usage</h6>
-        <div id="memory_physical_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "memory_physical", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+        <div id="memory_physical_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "memory_physical", :filter => @filter, :metric_id => @metric_id) %>" data-duration="15000">
           <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
       </div>
 
       <div class="small-6 medium-6 large-6 columns">
         <h6>GC Total Objects</h6>
-        <div id="gc_total_objects_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "gc_total_objects", :filter => @filter, :transaction_metric_id => @transaction_metric) %>" data-duration="15000">
+        <div id="gc_total_objects_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "gc_total_objects", :filter => @filter, :metric_id => @metric_id) %>" data-duration="15000">
           <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
       </div>
     </div>
+    <% end %>
   </div>
   <div class="small-4 medium-4 large-4 columns">
-    <% if @filter && @transaction_metric.nil? %>
+    <% if @transaction_metrics && @transaction_metric.nil? %>
       <div class="row">
         <div class="small-12 medium-12 large-12 columns">
           <table>
             <tbody>
               <% @transaction_metrics.each do |transaction_metric| %>
                 <tr>
-                  <td><%= link_to transaction_metric.name, application_reports_path(:filter => transaction_metric.name, :transaction_metric_id => @filter ? transaction_metric.id : nil) %></td>
+                  <td><%= link_to transaction_metric.category, application_reports_path(:filter => transaction_metric.category, :metric_id => @filter ? transaction_metric.id : nil) %></td>
                   <td><%= transaction_metric.duration %></td>
                 </tr>
               <% end %>
@@ -54,10 +70,6 @@
           </table>
         </div>
       </div>
-    <% end %>
-
-    <% if @transaction_metric.present? && @transaction_metric_samples.present? %>
-    <%= @transaction_metric_samples.inspect %>
     <% end %>
   </div>
 </div>

@@ -25,48 +25,54 @@ class ReportsController < ApplicationController
 
   def index
     @filter = params[:filter]
-    if @filter
-      @transaction_metrics = @application.transaction_metrics.where(:name => @filter)
-    end
+    @metric_id = params[:metric_id]
 
-    @transaction_metric_id = params[:transaction_metric_id]
-    if @transaction_metric_id
-      @transaction_metric = @application.transaction_metrics.where(:id => @transaction_metric_id).first
-      @transaction_metric_samples = @transaction_metric.transaction_metric_samples
+    if @metric_id
+      @transaction_metrics = SystemMetrics::Metric.where(:id => @metric_id)
+      @transaction_metric_samples = SystemMetrics::Metric.where(:parent_id => @metric_id)
+    elsif @filter
+      @transaction_metrics = SystemMetrics::Metric.where(:category => @filter)
+    else
+      @transaction_metrics = SystemMetrics::Metric
+        .group(:category)
+        .select("system_metrics.category, AVG(duration) AS duration")
     end
   end
 
   def show
     @filter = params[:filter]
-    if @filter
-      @transaction_filter = @application.transactions.where(:name => params[:filter]).first
-    end
 
-    @transaction_metric_id = params[:transaction_metric_id]
-    if @transaction_metric_id
-      @transaction_metric = @application.transaction_metrics.where(:id => @transaction_metric_id).first
-      @range = (@transaction_metric.timestamp - 5.minutes)..(@transaction_metric.timestamp + 5.minutes)
+    @metric_id = params[:metric_id]
+    if @metric_id
+      @transaction_metric = SystemMetrics::Metric.where(:id => @metric_id).first
+      @range = (@transaction_metric.started_at - 5.minutes)..(@transaction_metric.started_at + 5.minutes)
     end
 
     case params[:id]
     when "average_duration"
-      @report_data = @application.transaction_metrics
-      if @transaction_metric
-        @report_data = @report_data.where(:id => @transaction_metric).group(:name).group_by_minute(:timestamp, range: @range).average(:duration)
-      else
-        @report_data = @report_data.where(:transaction_id => @transaction_filter) if @transaction_filter
-        @report_data = @report_data.group_by_minute(:timestamp, range: @range)
 
-        database_duration = @report_data.average(:database_duration)
-        gc_duration = @report_data.average(:gc_duration)
-        view_duration = @report_data.average("(duration - (database_duration + gc_duration))")
+      @report_data = SystemMetrics::Metric
+      @report_data = @report_data.where(:category => @filter) if @filter
+      @report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
+      @report_data = @report_data.group(:category).group_by_minute(:started_at, range: @range).average(:duration)
 
-        @report_data = [
-          { name: "Garbage Collection", data: gc_duration  },
-          { name: "Database Duration", data: database_duration },
-          { name: "View Duration", data: view_duration }
-        ]
-      end
+      #@report_data = @application.transaction_metrics
+      #if @transaction_metric
+      #  @report_data = @report_data.where(:id => @transaction_metric).group(:name).group_by_minute(:timestamp, range: @range).average(:duration)
+      #else
+      #  @report_data = @report_data.where(:transaction_id => @transaction_filter) if @transaction_filter
+      #  @report_data = @report_data.group_by_minute(:timestamp, range: @range)
+
+      #  database_duration = @report_data.average(:database_duration)
+      #  gc_duration = @report_data.average(:gc_duration)
+      #  view_duration = @report_data.average("(duration - (database_duration + gc_duration))")
+
+      #  @report_data = [
+      #    { name: "Garbage Collection", data: gc_duration  },
+      #    { name: "Database Duration", data: database_duration },
+      #    { name: "View Duration", data: view_duration }
+      #  ]
+      #end
       render :layout => false
     when "memory_physical"
       @report_data = @application.metrics.where(:name => "Memory/Physical").group_by_minute(:timestamp, range: @range).average(:value)

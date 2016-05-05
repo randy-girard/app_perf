@@ -1,0 +1,9 @@
+<% set_title 'System Metrics Dashboard' -%>
+<% set_page_title 'Dashboard' -%>
+<% @category_metrics.each do |category, metrics| -%>
+  <%= render :partial => "portlet", :locals => {:category => category, :metrics => metrics} %>
+<% end -%>
+<% if @category_metrics.empty? -%>
+  <p>No metrics found</p>
+<% end -%>
+<div class="clear"></div>

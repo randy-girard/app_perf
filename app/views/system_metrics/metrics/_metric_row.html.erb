@@ -1,0 +1,19 @@
+<tr>
+  <td><%= link_to metric.id, metric_path(metric) %></td>
+  <% if columns.include?(:name) %><td><%= ('&rarr; ' * indent).html_safe %><%= metric.name %></td><% end %>
+  <% if columns.include?(:identifier) %><td><%= identifier(metric) %></td><% end %>
+  <% if columns.include?(:action) %><td><%= metric.action %></td><% end %>
+  <% if columns.include?(:when) %><td><%= distance_of_time_in_words_to_now metric.started_at %> ago</td><% end %>
+  <% if columns.include?(:duration) %><td><span class="hbar<%= metric.duration > slow_threshold(metric) ? ' slow' : '' %>" style="width: <%= metric.duration / longest_duration * 100 %>%"></span><%= metric.duration %></td><% end %>
+</tr>
+<% if include_children -%>
+<% for child_metric in metric.children -%>
+  <%= render :partial => 'metric_row',:locals => {
+    :indent => indent + 1,
+    :columns => columns,
+    :metric => child_metric,
+    :longest_duration => longest_duration,
+    :include_children => include_children
+  } %>
+<% end -%>
+<% end -%>

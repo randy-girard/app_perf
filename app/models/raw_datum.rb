@@ -9,7 +9,7 @@ class RawDatum < ActiveRecord::Base
   serialize :body
 
   after_commit do |record|
-    DataParserWorker.perform_async(record.id)
+    #DataParserWorker.perform_async(record.id)
   end
 
   def memory_physical

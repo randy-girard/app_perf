@@ -1,0 +1,8 @@
+<ul >
+  <li class="active"><%= link_to 'Dashboard', metrics_path %></li>
+<% for metric in SystemMetrics::Metric.select('DISTINCT(category)').order('category ASC') -%>
+  <li><%= link_to metric.category.titleize, system_metrics_category_path(metric.category) %></li>
+<% end -%>
+  <li>|</li>
+  <li><%= link_to 'Administration', system_metrics_admin_path %></li>
+</ul>

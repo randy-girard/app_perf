@@ -2,10 +2,10 @@
   <div class="small-12 medium-12 large-12 columns">
     <table>
       <tbody>
-        <% @transactions.each do |transaction| %>
+        <% @transactions.each_pair do |endpoint, transactions| %>
           <tr>
-            <td><%= link_to transaction.name, application_reports_path(:filter => transaction.name, :transaction_metric_id => @filter ? transaction.id : nil) %></td>
-            <td><%= transaction.average_duration %></td>
+            <td><%= link_to endpoint, application_reports_path(:filter => transactions.first.category, :transaction_metric_id => @filter ? transactions.first.id : nil) %></td>
+            <td><%= transactions.first.duration %></td>
           </tr>
         <% end %>
       </tbody>

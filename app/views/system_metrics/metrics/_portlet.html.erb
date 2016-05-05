@@ -1,0 +1,18 @@
+<div class >
+  <h2 class="table table-striped table-responsive"><%= category.titleize %></h2>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Action</th><th>Identifier</th><th>Duration</th></tr>
+    </thead>
+    <tbody>
+      <% for metric in metrics -%>
+        <tr>
+          <td><%= link_to metric.id, metric_path(metric) %></td>
+          <td><%= metric.action %></td>
+          <td><%= identifier(metric) %></td>
+          <td><%= metric.duration %></td>
+        </tr>
+      <% end -%>
+    </tbody>
+  </table>
+</div>
