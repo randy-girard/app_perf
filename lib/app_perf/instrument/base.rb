@@ -1,4 +1,4 @@
-module SystemMetrics
+module AppPerf
   module Instrument
 
     # Base class for System Metric instruments. The default implementations
@@ -6,7 +6,7 @@ module SystemMetrics
     # that is matched against a pattern. Custom intruments that simply need
     # to match against a notfication name can easily extend this class like:
     #
-    #   class SearchInstrument < SystemMetrics::Instrument::Base
+    #   class SearchInstrument < AppPerf::Instrument::Base
     #     def initialize
     #       super /search$/
     #     end

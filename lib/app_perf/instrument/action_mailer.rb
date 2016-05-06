@@ -1,6 +1,6 @@
-module SystemMetrics
+module AppPerf
   module Instrument
-    class ActionMailer < SystemMetrics::Instrument::Base
+    class ActionMailer < AppPerf::Instrument::Base
 
       def initialize
         super /\.action_mailer$/

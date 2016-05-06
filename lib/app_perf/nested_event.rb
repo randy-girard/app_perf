@@ -1,6 +1,6 @@
 require 'active_support/notifications'
 
-module SystemMetrics
+module AppPerf
   class NestedEvent < ActiveSupport::Notifications::Event
     attr_reader :action, :category
 

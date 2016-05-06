@@ -4,33 +4,33 @@ module SystemMetrics
 
     def index
       @category_metrics = {}
-      categories = SystemMetrics::Metric.select('DISTINCT(category)').order('category ASC').map(&:category)
+      categories = Metric.select('DISTINCT(category)').order('category ASC').map(&:category)
       categories.each do |category|
-        @category_metrics[category] = SystemMetrics::Metric.where(:category => category, :started_at => date_range).order('duration DESC').limit(limit(10))
+        @category_metrics[category] = Metric.where(:category => category, :started_at => date_range).order('duration DESC').limit(limit(10))
       end
     end
 
     def show
-      @metric = SystemMetrics::Metric.find(params[:id])
+      @metric = Metric.find(params[:id])
     end
 
     def destroy
       category = params[:id]
       if category == 'all'
-        SystemMetrics::Metric.delete_all
+        Metric.delete_all
       else
-        SystemMetrics::Metric.where(:category => category).delete_all
+        Metric.where(:category => category).delete_all
       end
 
       redirect_to system_metrics_admin_path
     end
 
     def category
-      @metrics = SystemMetrics::Metric.where(:category => params[:category], :started_at => date_range).order('duration DESC').limit(limit)
+      @metrics = Metric.where(:category => params[:category], :started_at => date_range).order('duration DESC').limit(limit)
     end
 
     def admin
-      @categories = SystemMetrics::Metric.select('category, count(category) as count').order('category ASC').group('category')
+      @categories = Metric.select('category, count(category) as count').order('category ASC').group('category')
     end
 
     private

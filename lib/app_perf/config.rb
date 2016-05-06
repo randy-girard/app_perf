@@ -1,17 +1,17 @@
-module SystemMetrics
+module AppPerf
   class Config
-    attr_accessor :store, :instruments, :notification_exclude_patterns, :path_exclude_patterns
+    attr_accessor :store, :instruments, :notification_exclude_patterns, :path_exclude_patterns, :options
 
     def initialize
-      #self.store = SystemMetrics::AsyncStore.new
-      self.store = SystemMetrics::Store.new
+      #self.store = AppPerf::AsyncStore.new
+      self.store = AppPerf::Store.new
       self.notification_exclude_patterns = []
       self.path_exclude_patterns = [/system\/metrics/, /system_metrics/]
       self.instruments = [
-        SystemMetrics::Instrument::ActionController.new,
-        SystemMetrics::Instrument::ActionView.new,
-        SystemMetrics::Instrument::ActiveRecord.new,
-        SystemMetrics::Instrument::Rack.new
+        AppPerf::Instrument::ActionController.new,
+        AppPerf::Instrument::ActionView.new,
+        AppPerf::Instrument::ActiveRecord.new,
+        AppPerf::Instrument::Rack.new
       ]
     end
 

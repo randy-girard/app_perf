@@ -1,6 +1,6 @@
-module SystemMetrics
+module AppPerf
   module Instrument
-    class ActionController < SystemMetrics::Instrument::Base
+    class ActionController < AppPerf::Instrument::Base
 
       def initialize
         super /\.action_controller$/

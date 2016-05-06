@@ -1,6 +1,6 @@
-module SystemMetrics
+module AppPerf
   module Instrument
-    class ActiveRecord < SystemMetrics::Instrument::Base
+    class ActiveRecord < AppPerf::Instrument::Base
 
       def initialize
         super /\.active_record$/

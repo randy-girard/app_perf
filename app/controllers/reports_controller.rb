@@ -28,14 +28,14 @@ class ReportsController < ApplicationController
     @metric_id = params[:metric_id]
 
     if @metric_id
-      @transaction_metrics = SystemMetrics::Metric.where(:id => @metric_id)
-      @transaction_metric_samples = SystemMetrics::Metric.where(:parent_id => @metric_id)
+      @transaction_metrics = @application.metrics.where(:id => @metric_id)
+      @transaction_metric_samples = @application.metrics.where(:parent_id => @metric_id)
     elsif @filter
-      @transaction_metrics = SystemMetrics::Metric.where(:category => @filter)
+      @transaction_metrics = @application.metrics.where(:category => @filter)
     else
-      @transaction_metrics = SystemMetrics::Metric
+      @transaction_metrics = @application.metrics
         .group(:category)
-        .select("system_metrics.category, AVG(duration) AS duration")
+        .select("metrics.category, AVG(duration) AS duration")
     end
   end
 
@@ -44,14 +44,14 @@ class ReportsController < ApplicationController
 
     @metric_id = params[:metric_id]
     if @metric_id
-      @transaction_metric = SystemMetrics::Metric.where(:id => @metric_id).first
+      @transaction_metric = @application.metrics.where(:id => @metric_id).first
       @range = (@transaction_metric.started_at - 5.minutes)..(@transaction_metric.started_at + 5.minutes)
     end
 
     case params[:id]
     when "average_duration"
 
-      @report_data = SystemMetrics::Metric
+      @report_data = @application.metrics
       @report_data = @report_data.where(:category => @filter) if @filter
       @report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
       @report_data = @report_data.group(:category).group_by_minute(:started_at, range: @range).average(:duration)

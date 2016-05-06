@@ -1,9 +1,9 @@
-module SystemMetrics
+module AppPerf
   class Store
 
     def save(events)
       return unless events.present?
-      root_event = SystemMetrics::NestedEvent.arrange(events, :presort => false)
+      root_event = AppPerf::NestedEvent.arrange(events, :presort => false)
       dispatch_events(root_event)
     end
 
@@ -16,11 +16,25 @@ module SystemMetrics
         end
       end
 
+      def url
+        @url ||= [
+          AppPerf.config["ssl"] ? "https" : "http",
+          "://",
+          AppPerf.config["host"],
+          ":",
+          AppPerf.config["port"],
+          "/agent_listener"
+        ].join
+      end
+
       def dispatch_events(events_to_dispatch)
         Thread.new {
-          uri = URI('http://localhost:9291/agent_listener')
+          uri = URI(url)
           req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
-          req.body = {"metric" => events_to_dispatch}.to_json
+          req.body = {
+            "license_key" => AppPerf.config["license_key"],
+            "events" => events_to_dispatch
+          }.to_json
           res = Net::HTTP.start(uri.hostname, uri.port) do |http|
             http.read_timeout = 5
             http.request(req)
@@ -29,7 +43,7 @@ module SystemMetrics
       end
 
       def create_metric(event, merge_params={})
-        SystemMetrics::Metric.create(event.to_hash.merge(merge_params))
+        AppPerf::Metric.create(event.to_hash.merge(merge_params))
       end
 
   end

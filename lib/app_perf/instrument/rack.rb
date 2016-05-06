@@ -1,6 +1,6 @@
-module SystemMetrics
+module AppPerf
   module Instrument
-    class Rack < SystemMetrics::Instrument::Base
+    class Rack < AppPerf::Instrument::Base
 
       def initialize
         super /^request\.rack$/

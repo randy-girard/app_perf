@@ -1,4 +1,4 @@
-module SystemMetrics
+module AppPerf
   class Middleware
     def initialize(app, collector, path_exclude_patterns)
       @app = app

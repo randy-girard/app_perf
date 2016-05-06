@@ -1,7 +1,7 @@
 require 'thread'
 require 'net/http'
 
-module SystemMetrics
+module AppPerf
   class AsyncStore
 
     # An instrumenter that does not send notifications. This is used in the
@@ -37,7 +37,7 @@ module SystemMetrics
       def consume
         events_to_dispatch = []
         while events = @queue.pop
-          root_event = SystemMetrics::NestedEvent.arrange(events, :presort => false)
+          root_event = AppPerf::NestedEvent.arrange(events, :presort => false)
           #root_model = create_metric(root_event)
           #root_model.update_attributes(:request_id => root_model.id)
           #save_tree(root_event.children, root_model.id, root_model.id)
@@ -67,7 +67,7 @@ module SystemMetrics
       end
 
       def create_metric(event, merge_params={})
-        SystemMetrics::Metric.create(event.to_hash.merge(merge_params))
+        AppPerf::Metric.create(event.to_hash.merge(merge_params))
       end
 
   end

@@ -1,4 +1,4 @@
-module SystemMetrics
+module AppPerf
   class Collector
     attr_reader :store
 
@@ -8,18 +8,18 @@ module SystemMetrics
     end
 
     def collect_event(event)
-      events.push event if SystemMetrics.collecting?
+      events.push event if AppPerf.collecting?
     end
 
     def collect
       events.clear
-      SystemMetrics.collection_on
+      AppPerf.collection_on
       result = yield
-      SystemMetrics.collection_off
+      AppPerf.collection_off
       dispatch_events
       result
     ensure
-      SystemMetrics.collection_off
+      AppPerf.collection_off
       events.clear
     end
 
@@ -33,7 +33,7 @@ module SystemMetrics
       end
 
       def events
-        Thread.current[:system_metrics_events] ||= []
+        Thread.current[:app_perf_events] ||= []
       end
 
   end

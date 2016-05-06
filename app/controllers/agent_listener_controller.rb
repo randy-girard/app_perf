@@ -7,27 +7,21 @@ class AgentListenerController < ApplicationController
   skip_before_action :verify_authenticity_token, :authenticate_user!
 
   def create
-    #raise metric_params.inspect
-    MetricWorker.perform_later(metric_params)
+    license_key = params.delete(:license_key)
+    host = params.delete(:license_key)
+    params = events_params
+    params.merge!(
+      :license_key => license_key,
+      :host => host
+    )
+
+    EventsWorker.perform_later(params)
 
     render :text => "", :status => :ok
   end
 
-  def metric_params
-    params.require(:metric).permit!
-    #params.require(:agent_listener).permit(
-    #  :metric,
-    #  array: [
-    #    :name,
-    #    :action,
-    #    :category,
-    #    :started_at,
-    #    :transaction_id,
-    #    :payload,
-    #    :duration,
-    #    :exclusive_duration
-    #  ]
-    #)
+  def events_params
+    params.require(:events).permit!
   end
 
   def invoke_raw_method
