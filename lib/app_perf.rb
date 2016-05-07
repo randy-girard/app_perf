@@ -1,3 +1,5 @@
+require 'socket'
+
 module AppPerf
   autoload :Collector,      'app_perf/collector'
   autoload :Config,         'app_perf/config'
@@ -9,6 +11,10 @@ module AppPerf
 
   def self.config
     @config ||= YAML.load_file(Rails.root.join("app_perf.yml"))[Rails.env]
+  end
+
+  def self.host
+    @host ||= Socket.gethostname
   end
 
   def self.collection_on

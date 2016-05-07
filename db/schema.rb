@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160504131253) do
+ActiveRecord::Schema.define(version: 20160507124206) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,14 +26,28 @@ ActiveRecord::Schema.define(version: 20160504131253) do
 
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
 
+  create_table "hosts", force: :cascade do |t|
+    t.integer  "application_id"
+    t.string   "name"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "hosts", ["application_id"], name: "index_hosts_on_application_id", using: :btree
+
   create_table "metrics", force: :cascade do |t|
     t.integer  "application_id"
+    t.integer  "host_id"
+    t.string   "end_point"
     t.string   "name"
     t.datetime "started_at"
     t.string   "transaction_id"
     t.text     "payload"
     t.float    "duration"
     t.float    "exclusive_duration"
+    t.float    "db_duration"
+    t.float    "view_duration"
+    t.float    "gc_duration"
     t.integer  "request_id"
     t.integer  "parent_id"
     t.string   "action"
@@ -42,6 +56,7 @@ ActiveRecord::Schema.define(version: 20160504131253) do
 
   create_table "raw_data", force: :cascade do |t|
     t.integer  "application_id"
+    t.integer  "host_id"
     t.string   "method"
     t.text     "body"
     t.datetime "created_at",     null: false
@@ -56,4 +71,5 @@ ActiveRecord::Schema.define(version: 20160504131253) do
   end
 
   add_foreign_key "applications", "users"
+  add_foreign_key "hosts", "applications"
 end

@@ -27,15 +27,18 @@ class ReportsController < ApplicationController
     @filter = params[:filter]
     @metric_id = params[:metric_id]
 
+    @hosts = @application.hosts
+
     if @metric_id
       @transaction_metrics = @application.metrics.where(:id => @metric_id)
       @transaction_metric_samples = @application.metrics.where(:parent_id => @metric_id)
     elsif @filter
-      @transaction_metrics = @application.metrics.where(:category => @filter)
+      @transaction_metrics = @application.metrics.where(:end_point => @filter)
     else
       @transaction_metrics = @application.metrics
-        .group(:category)
-        .select("metrics.category, AVG(duration) AS duration")
+        .group(:end_point)
+        .where(:started_at => @range)
+        .select("metrics.end_point, AVG(duration) AS duration")
     end
   end
 
@@ -52,9 +55,9 @@ class ReportsController < ApplicationController
     when "average_duration"
 
       @report_data = @application.metrics
-      @report_data = @report_data.where(:category => @filter) if @filter
+      @report_data = @report_data.where(:end_point => @filter) if @filter
       @report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
-      @report_data = @report_data.group(:category).group_by_minute(:started_at, range: @range).average(:duration)
+      @report_data = @report_data.order(:category).group(:category).group_by_minute(:started_at, range: @range).average(:duration)
 
       #@report_data = @application.transaction_metrics
       #if @transaction_metric

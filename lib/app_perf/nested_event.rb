@@ -27,6 +27,10 @@ module AppPerf
       @exclusive_duration ||= duration - children.inject(0.0) { |sum, child| sum + child.duration }
     end
 
+    def gc_duration
+      @gc_duration ||= 0
+    end
+
     def started_at
       self.time
     end
@@ -58,6 +62,7 @@ module AppPerf
         :payload => payload,
         :duration => duration,
         :exclusive_duration => exclusive_duration,
+        :end_point => payload[:end_point]
       }
       h.merge!(:children_attributes => children) if children.present?
       h

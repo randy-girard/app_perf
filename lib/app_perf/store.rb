@@ -1,10 +1,26 @@
+require 'zlib'
+
 module AppPerf
   class Store
 
+    def initialize
+      @start_time = Time.now
+      @queue = []
+    end
+
     def save(events)
-      return unless events.present?
-      root_event = AppPerf::NestedEvent.arrange(events, :presort => false)
-      dispatch_events(root_event)
+      return if events.empty?
+
+      @queue.push AppPerf::NestedEvent.arrange(events, :presort => false)
+    end
+
+
+    def dispatch
+      if Time.now > @start_time + 60.seconds
+        dispatch_events(@queue.dup)
+        @queue.clear
+        @start_time = Time.now
+      end
     end
 
     private
@@ -27,13 +43,14 @@ module AppPerf
         ].join
       end
 
-      def dispatch_events(events_to_dispatch)
+      def dispatch_events(events)
         Thread.new {
           uri = URI(url)
-          req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+          req = Net::HTTP::Post.new(uri, { "Content-Type" => "application/json", "Accept-Encoding" => "gzip", "User-Agent" => "gzip" })
           req.body = {
+            "host" => AppPerf.host,
             "license_key" => AppPerf.config["license_key"],
-            "events" => events_to_dispatch
+            "events" => events
           }.to_json
           res = Net::HTTP.start(uri.hostname, uri.port) do |http|
             http.read_timeout = 5

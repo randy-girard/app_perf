@@ -6,7 +6,7 @@ module AppPerf
       #self.store = AppPerf::AsyncStore.new
       self.store = AppPerf::Store.new
       self.notification_exclude_patterns = []
-      self.path_exclude_patterns = [/system\/metrics/, /system_metrics/]
+      self.path_exclude_patterns = []
       self.instruments = [
         AppPerf::Instrument::ActionController.new,
         AppPerf::Instrument::ActionView.new,

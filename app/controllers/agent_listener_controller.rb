@@ -7,21 +7,20 @@ class AgentListenerController < ApplicationController
   skip_before_action :verify_authenticity_token, :authenticate_user!
 
   def create
+    params.permit!
     license_key = params.delete(:license_key)
-    host = params.delete(:license_key)
-    params = events_params
-    params.merge!(
-      :license_key => license_key,
-      :host => host
-    )
+    host = params.delete(:host)
+    events = params.delete(:events)
 
-    EventsWorker.perform_later(params)
+    hash = {
+      :license_key => license_key,
+      :host => host,
+      :events => events
+    }
+
+    EventsWorker.perform_later(hash)
 
     render :text => "", :status => :ok
-  end
-
-  def events_params
-    params.require(:events).permit!
   end
 
   def invoke_raw_method
@@ -90,9 +89,7 @@ class AgentListenerController < ApplicationController
   def parse_body(request)
     request.body.rewind
     body = request.body.read
-    if request.env["HTTP_CONTENT_ENCODING"] == "deflate"
-      body = Zlib::Inflate.inflate(body)
-    end
+    body = Zlib::Inflate.inflate(body)
     JSON.parse body
   end
 end

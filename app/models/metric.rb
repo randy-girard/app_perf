@@ -3,6 +3,7 @@ class Metric < ActiveRecord::Base
   accepts_nested_attributes_for :children
 
   belongs_to :application
+  belongs_to :host
   belongs_to :parent, :class_name => self.name
   serialize :payload
 

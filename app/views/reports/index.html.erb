@@ -3,7 +3,7 @@
   <div class="small-12 medium-12 large-12 columns">
     <h4>
       <%= link_to 'All', application_reports_path(@application) %> >
-      <%= link_to_if @transaction_metric, @filter, application_reports_path(@application, :filter => @filter) %>
+      <%= link_to_if @metric_id, @filter, application_reports_path(@application, :filter => @filter) %>
       <% if @metric_id %>
       > <%= @metric_id %>
       <% end %>
@@ -43,6 +43,9 @@
                 <div class="progress-meter" style="width: <%= transaction_metric.duration / total_duration * 100.to_f %>%"></div>
               </div>
             </td>
+            <td>
+              <%= transaction_metric.exclusive_duration %>
+            </td>
           </tr>
         <% end %>
         </table>
@@ -69,6 +72,19 @@
     <% end %>
   </div>
   <div class="small-4 medium-4 large-4 columns">
+    <div class="row">
+      <div class="small-12 medium-12 large-12 columns">
+        <table>
+          <tbody>
+            <% @hosts.each do |host| %>
+              <tr>
+                <td><%= host.name %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <% if @transaction_metrics && @transaction_metric.nil? %>
       <div class="row">
         <div class="small-12 medium-12 large-12 columns">
@@ -76,7 +92,7 @@
             <tbody>
               <% @transaction_metrics.each do |transaction_metric| %>
                 <tr>
-                  <td><%= link_to transaction_metric.category, application_reports_path(:filter => transaction_metric.category, :metric_id => @filter ? transaction_metric.id : nil) %></td>
+                  <td><%= link_to transaction_metric.end_point, application_reports_path(:filter => transaction_metric.end_point, :metric_id => @filter ? transaction_metric.id : nil) %></td>
                   <td><%= transaction_metric.duration %></td>
                 </tr>
               <% end %>

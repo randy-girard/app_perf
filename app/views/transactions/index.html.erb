@@ -2,10 +2,10 @@
   <div class="small-12 medium-12 large-12 columns">
     <table>
       <tbody>
-        <% @transactions.each_pair do |endpoint, transactions| %>
+        <% @transactions.each_pair do |end_point, transactions| %>
           <tr>
-            <td><%= link_to endpoint, application_reports_path(:filter => transactions.first.category, :transaction_metric_id => @filter ? transactions.first.id : nil) %></td>
-            <td><%= transactions.first.duration %></td>
+            <td><%= link_to end_point, application_reports_path(:filter => transactions.first.end_point, :transaction_metric_id => @filter ? transactions.first.id : nil) %></td>
+            <td><%= transactions.sum(&:duration) / transactions.size%></td>
           </tr>
         <% end %>
       </tbody>
