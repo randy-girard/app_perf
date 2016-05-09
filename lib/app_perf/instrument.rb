@@ -6,5 +6,6 @@ module AppPerf
     autoload :ActionView,         'app_perf/instrument/action_view'
     autoload :ActiveRecord,       'app_perf/instrument/active_record'
     autoload :Rack,               'app_perf/instrument/rack'
+    autoload :RubyVm,             'app_perf/instrument/ruby_vm'
   end
 end

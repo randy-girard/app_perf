@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     resources :reports, :only => [:index, :show, :new]
   end
 
+  post "/api/listener/:protocol_version/:license_key/:method" => "agent_listener#create"
+
   get "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
   post "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
 

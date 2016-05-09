@@ -23,6 +23,10 @@ module AppPerf
       @action, @category = name.split('.')
     end
 
+    def duration=(d)
+      @duration = d
+    end
+
     def exclusive_duration
       @exclusive_duration ||= duration - children.inject(0.0) { |sum, child| sum + child.duration }
     end

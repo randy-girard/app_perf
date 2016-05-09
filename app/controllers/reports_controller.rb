@@ -54,10 +54,20 @@ class ReportsController < ApplicationController
     case params[:id]
     when "average_duration"
 
-      @report_data = @application.metrics
-      @report_data = @report_data.where(:end_point => @filter) if @filter
-      @report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
-      @report_data = @report_data.order(:category).group(:category).group_by_minute(:started_at, range: @range).average(:duration)
+      #@report_data = @application.metrics
+      #@report_data = @report_data.where(:end_point => @filter) if @filter
+      #@report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
+      #@report_data = @report_data.order(:category).group(:category).group_by_minute(:started_at, range: @range).average(:duration)
+
+      data = @application.event_data
+      database_data = data.where(:name => "Databases")
+      view_data = data.where(:name => "Views")
+      gc_data = data.where(:name => "GC Execution")
+
+      @report_data = []
+      @report_data.push({ :name => "GC Execution", :data => gc_data.group_by_minute(:timestamp, range: @range).average(:value) }) if gc_data.present?
+      @report_data.push({ :name => "Databases", :data => database_data.group_by_minute(:timestamp, range: @range).average(:value) }) if database_data.present?
+      @report_data.push({ :name => "Views", :data => view_data.group_by_minute(:timestamp, range: @range).average(:value) }) if view_data.present?
 
       #@report_data = @application.transaction_metrics
       #if @transaction_metric

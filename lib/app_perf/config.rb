@@ -11,7 +11,8 @@ module AppPerf
         AppPerf::Instrument::ActionController.new,
         AppPerf::Instrument::ActionView.new,
         AppPerf::Instrument::ActiveRecord.new,
-        AppPerf::Instrument::Rack.new
+        AppPerf::Instrument::Rack.new,
+        AppPerf::Instrument::RubyVm.new
       ]
     end
 

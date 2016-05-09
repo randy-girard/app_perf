@@ -1,1 +1,1 @@
-<%= area_chart @report_data, { :id => "#{params[:id]}_chart", :height => "100%" } %>
+<%= area_chart @report_data, { :id => "#{params[:id]}_chart", :height => "100%", library: {legend: {position: "bottom"}} } %>

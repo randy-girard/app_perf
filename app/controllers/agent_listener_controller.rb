@@ -11,8 +11,10 @@ class AgentListenerController < ApplicationController
     license_key = params.delete(:license_key)
     host = params.delete(:host)
     events = params.delete(:events)
+    method = params.delete(:method)
 
     hash = {
+      :method => method,
       :license_key => license_key,
       :host => host,
       :events => events

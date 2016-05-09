@@ -15,16 +15,11 @@ module AppPerf
       AppPerf.collection_on
       result = yield
       AppPerf.collection_off
-      store.save events.dup
-      store.dispatch
       result
     ensure
       AppPerf.collection_off
-      #if events.present?
-      #  if root_event = store.arrange(events.dup)
-      #    all_events.push(root_event)
-      #  end
-      #end
+      store.save events.dup
+      store.dispatch
       events.clear
     end
 
