@@ -7,5 +7,6 @@ module AppPerf
     autoload :ActiveRecord,       'app_perf/instrument/active_record'
     autoload :Rack,               'app_perf/instrument/rack'
     autoload :RubyVm,             'app_perf/instrument/ruby_vm'
+    autoload :Memory,             'app_perf/instrument/memory'
   end
 end

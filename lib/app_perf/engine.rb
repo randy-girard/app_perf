@@ -22,6 +22,7 @@ module AppPerf
     #initializer "app_perf.add_middleware", :before => :load_environment_config do |app|
       Rails.application.config.middleware.use AppPerf::Middleware::Base, collector, smc.path_exclude_patterns
       Rails.application.config.middleware.use AppPerf::Middleware::RubyVm, collector, smc.path_exclude_patterns
+      Rails.application.config.middleware.use AppPerf::Middleware::Memory, collector, smc.path_exclude_patterns
     #end
 
     def process_event(event)

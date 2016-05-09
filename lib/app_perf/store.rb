@@ -56,7 +56,7 @@ module AppPerf
                 data << {
                   :name => name,
                   :timestamp => events_by_time.started_at,
-                  :value => events_by_time.duration
+                  :value => events_by_time.exclusive_duration
                 }
               end
             end
@@ -67,12 +67,16 @@ module AppPerf
 
       def event_name(event)
         case event.category
+        when "action_controller"
+          "Ruby"
         when "active_record"
-          "Databases"
+          "Database"
         when "action_view"
-          "Views"
+          "Ruby"
         when "gc"
           "GC Execution"
+        when "memory"
+          "Memory Usage"
         else
           nil
         end

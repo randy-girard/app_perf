@@ -44,6 +44,7 @@ class ReportsController < ApplicationController
 
   def show
     @filter = params[:filter]
+    @report_data = []
 
     @metric_id = params[:metric_id]
     if @metric_id
@@ -53,42 +54,21 @@ class ReportsController < ApplicationController
 
     case params[:id]
     when "average_duration"
-
-      #@report_data = @application.metrics
-      #@report_data = @report_data.where(:end_point => @filter) if @filter
-      #@report_data = @report_data.where(:id => @transaction_metric) if @transaction_metric
-      #@report_data = @report_data.order(:category).group(:category).group_by_minute(:started_at, range: @range).average(:duration)
-
       data = @application.event_data
-      database_data = data.where(:name => "Databases")
-      view_data = data.where(:name => "Views")
+      database_data = data.where(:name => "Database")
+      ruby_data = data.where(:name => "Ruby")
       gc_data = data.where(:name => "GC Execution")
 
-      @report_data = []
       @report_data.push({ :name => "GC Execution", :data => gc_data.group_by_minute(:timestamp, range: @range).average(:value) }) if gc_data.present?
-      @report_data.push({ :name => "Databases", :data => database_data.group_by_minute(:timestamp, range: @range).average(:value) }) if database_data.present?
-      @report_data.push({ :name => "Views", :data => view_data.group_by_minute(:timestamp, range: @range).average(:value) }) if view_data.present?
+      @report_data.push({ :name => "Database", :data => database_data.group_by_minute(:timestamp, range: @range).average(:value) }) if database_data.present?
+      @report_data.push({ :name => "Ruby", :data => ruby_data.group_by_minute(:timestamp, range: @range).average(:value) }) if ruby_data.present?
+      @report_colors = ["#4E4318", "#EECC45", "#A5FFFF"]
 
-      #@report_data = @application.transaction_metrics
-      #if @transaction_metric
-      #  @report_data = @report_data.where(:id => @transaction_metric).group(:name).group_by_minute(:timestamp, range: @range).average(:duration)
-      #else
-      #  @report_data = @report_data.where(:transaction_id => @transaction_filter) if @transaction_filter
-      #  @report_data = @report_data.group_by_minute(:timestamp, range: @range)
-
-      #  database_duration = @report_data.average(:database_duration)
-      #  gc_duration = @report_data.average(:gc_duration)
-      #  view_duration = @report_data.average("(duration - (database_duration + gc_duration))")
-
-      #  @report_data = [
-      #    { name: "Garbage Collection", data: gc_duration  },
-      #    { name: "Database Duration", data: database_duration },
-      #    { name: "View Duration", data: view_duration }
-      #  ]
-      #end
       render :layout => false
     when "memory_physical"
-      @report_data = @application.metrics.where(:name => "Memory/Physical").group_by_minute(:timestamp, range: @range).average(:value)
+      data = @application.event_data.where(:name => "Memory Usage")
+      @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).average(:value) }) if data.present?
+      @report_colors = ["#A5FFFF"]
       render :layout => false
     when "gc_total_objects"
       @report_data = @application.metrics.where(:name => "RubyVM/GC/total_allocated_object").group_by_minute(:timestamp, range: @range).average(:value)
@@ -99,7 +79,7 @@ class ReportsController < ApplicationController
   end
 
   def new
-    data = @application.raw_data.select("pg_sleep(5)").first
+    data = Application.select("pg_sleep(5)").first
 
     render :json => data
   end

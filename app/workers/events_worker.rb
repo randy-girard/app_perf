@@ -1,24 +1,27 @@
 class EventsWorker < ActiveJob::Base
   queue_as :app_perf
 
-  attr_accessor :license_key, :host, :method, :events, :application
+  attr_accessor :license_key, :host, :method, :events, :application, :protocol_version
 
   def perform(params)
-    self.license_key = params.fetch(:license_key)
-    self.host        = params.fetch(:host)
-    self.method      = params.fetch(:method)
-    self.events      = Array(params.fetch(:events))
+    self.license_key      = params.fetch(:license_key)
+    self.protocol_version = params.fetch(:protocol_version)
+    self.host             = params.fetch(:host)
+    self.method           = params.fetch(:method)
+    self.events           = Array(params.fetch(:events))
 
     self.application = Application.find_by_license_key(license_key)
     if application
       self.host = application.hosts.where(:name => host).first_or_create
 
-      case method
-      when "event_data"
-        process_event_data(events)
-      else
-        process_data(events)
-        Rails.logger.info "Unknown method."
+      if protocol_version.to_i.eql?(1)
+        case method
+        when "event_data"
+          process_event_data(events)
+        else
+          process_data(events)
+          Rails.logger.info "Unknown method."
+        end
       end
     end
   end
