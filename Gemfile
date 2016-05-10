@@ -38,6 +38,7 @@ gem "groupdate"
 gem "pg"
 gem 'foundation-rails'
 gem "font-awesome-rails"
+gem "highcharts-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
 

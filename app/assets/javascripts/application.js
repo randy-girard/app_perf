@@ -14,6 +14,8 @@
 //= require jquery_ujs
 //= require jquery.turbolinks
 //= require foundation
+//= require highcharts
+//= require highcharts/highcharts-more
 //= require chartkick
 //= require turbolinks
 //= require_tree .
