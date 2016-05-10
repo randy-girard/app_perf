@@ -23,6 +23,7 @@ module AppPerf
       Rails.application.config.middleware.use AppPerf::Middleware::Base, collector, smc.path_exclude_patterns
       Rails.application.config.middleware.use AppPerf::Middleware::RubyVm, collector, smc.path_exclude_patterns
       Rails.application.config.middleware.use AppPerf::Middleware::Memory, collector, smc.path_exclude_patterns
+      Rails.application.config.middleware.use AppPerf::Middleware::Errors, collector, smc.path_exclude_patterns
     #end
 
     def process_event(event)

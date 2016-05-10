@@ -13,7 +13,8 @@ module AppPerf
         AppPerf::Instrument::ActiveRecord.new,
         AppPerf::Instrument::Rack.new,
         AppPerf::Instrument::RubyVm.new,
-        AppPerf::Instrument::Memory.new
+        AppPerf::Instrument::Memory.new,
+        AppPerf::Instrument::Errors.new
       ]
     end
 

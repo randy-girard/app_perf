@@ -32,7 +32,7 @@ module AppPerf
 
 
     def dispatch
-      if Time.now > @start_time + 5.seconds
+      if Time.now > @start_time + 15.seconds
 
         events = process_data(@queue.dup)
         dispatch_events(:event_data, events)
@@ -48,21 +48,35 @@ module AppPerf
         data = []
         events.group_by {|e| event_name(e) }.each_pair do |name, events_by_name|
           if name
-            events_by_name.each do |events_by_time|
-              #num = events_by_time.size
-              #val = events_by_time.map(&:duration).sum
-              #avg = num > 0 ? val.to_f / num.to_f : 0
-              if events_by_time.duration > 0
-                data << {
-                  :name => name,
-                  :timestamp => events_by_time.started_at,
-                  :value => events_by_time.exclusive_duration
-                }
-              end
+            events_by_name.group_by {|e| round_time(e.started_at, 5).to_s }.each_pair do |timestamp, events_by_time|
+              num = events_by_time.size
+              val = events_by_time.map(&:exclusive_duration).sum
+              avg = num > 0 ? val.to_f / num.to_f : 0
+              data << {
+                :name => name,
+                :num => num,
+                :timestamp => timestamp,
+                :value => val,
+                :avg => avg
+              }
             end
           end
         end
         data
+      end
+
+      def round_time(t, sec = 1)
+        down = t - (t.to_i % sec)
+        up = down + sec
+
+        difference_down = t - down
+        difference_up = up - t
+
+        if (difference_down < difference_up)
+          return down
+        else
+          return up
+        end
       end
 
       def event_name(event)
@@ -77,6 +91,8 @@ module AppPerf
           "GC Execution"
         when "memory"
           "Memory Usage"
+        when "error"
+          "Error"
         else
           nil
         end

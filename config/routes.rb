@@ -17,7 +17,11 @@ Rails.application.routes.draw do
   resources :applications do
     resources :transactions, :only => [:index]
     resources :raw_data, :only => [:index, :show]
-    resources :reports, :only => [:index, :show, :new]
+    resources :reports, :only => [:index, :show, :new, :error] do
+      collection do
+        get :error
+      end
+    end
   end
 
   post "/api/listener/:protocol_version/:license_key/:method" => "agent_listener#create"

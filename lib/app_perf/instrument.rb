@@ -8,5 +8,6 @@ module AppPerf
     autoload :Rack,               'app_perf/instrument/rack'
     autoload :RubyVm,             'app_perf/instrument/ruby_vm'
     autoload :Memory,             'app_perf/instrument/memory'
+    autoload :Errors,             'app_perf/instrument/errors'
   end
 end

@@ -35,6 +35,7 @@ gem 'puma'
 gem 'kaminari'
 gem "chartkick"
 gem "groupdate"
+gem 'calculate-all'
 gem "pg"
 gem 'foundation-rails'
 gem "font-awesome-rails"
