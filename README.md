@@ -1,4 +1,4 @@
-== AppPerf (Application Performance Monitoring)
+## AppPerf (Application Performance Monitoring)
 
 ![Screenshot](/doc/screenshot.png?raw=true "Screenshot")
 
@@ -6,19 +6,23 @@
 
 This is a application monitoring app. I am trying to build an open source, easy to setup, performance monitoring tool that will follow this roadmap:
 
-1. Create the web app/ui to display charts and analytics for analyzing performance using its own Agent.
-2. Develop additional agents for other languages, hopefully from open source contribution.
-3. Create ability to import data from other agents, such as NewRelic down the road.
+1.  Create the web app/ui to display charts and analytics for analyzing performance using its own Agent.
+2.  Develop additional agents for other languages, hopefully from open source contribution.
+3.  Create ability to import data from other agents, such as NewRelic down the road.
   
   
-=== Setup
+### Setup
 
 Setup should be striaghtforward and easy. We use foreman to manage processes. Begin by running the setup script:
 
-  /bin/setup
+```
+/bin/setup
+```
   
 This should create and setup the database and any other needed services/apps. Then to start everything up, run foreman:
 
-  bundle exec foreman start
-  
+```
+bundle exec foreman start
+```
+
 Navigate to http://localhost:9291. This application is setup to report to itself so you can begin seeing information immediatetly!
