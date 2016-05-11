@@ -7,6 +7,7 @@ module AppPerf
 
     #initializer "app_perf.initialize", :before => "app_perf.start_subscriber" do |app|
       self.smc = Rails.application.config.app_perf
+      self.smc.store.initialize_dispatcher
       raise ArgumentError.new(smc.errors) if smc.invalid?
       self.collector = AppPerf::Collector.new(smc.store)
     #end
@@ -21,10 +22,12 @@ module AppPerf
 
     #initializer "app_perf.add_middleware", :before => :load_environment_config do |app|
       Rails.application.config.middleware.use AppPerf::Middleware::Base, collector, smc.path_exclude_patterns
-      Rails.application.config.middleware.use AppPerf::Middleware::RubyVm, collector, smc.path_exclude_patterns
-      Rails.application.config.middleware.use AppPerf::Middleware::Memory, collector, smc.path_exclude_patterns
-      Rails.application.config.middleware.use AppPerf::Middleware::Errors, collector, smc.path_exclude_patterns
+      #Rails.application.config.middleware.use AppPerf::Middleware::RubyVm, collector, smc.path_exclude_patterns
+      #Rails.application.config.middleware.use AppPerf::Middleware::Memory, collector, smc.path_exclude_patterns
+      #Rails.application.config.middleware.use AppPerf::Middleware::Errors, collector, smc.path_exclude_patterns
     #end
+
+    #private
 
     def process_event(event)
       instrument = smc.instruments.find { |instrument| instrument.handles?(event) }
@@ -39,4 +42,3 @@ module AppPerf
     end
   end
 end
-

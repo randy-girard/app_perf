@@ -3,49 +3,61 @@ require 'zlib'
 module AppPerf
   class Store
 
+    class VoidInstrumenter < ::ActiveSupport::Notifications::Instrumenter
+      def instrument(name, payload={})
+        yield(payload) if block_given?
+      end
+    end
+
     def initialize
-      @start_time = Time.now
-      @queue = []
-      @database_events = []
-      @view_events = []
-      @gc_events = []
+      @queue = Queue.new
     end
 
     def save(events)
       return if events.empty?
-
-      @queue += events
-
-      #root_event = AppPerf::NestedEvent.arrange(events, :presort => false)
-      #@queue.push root_event
+      @queue << events
     end
 
-    def collect_events(name, category, events)
-      events.map do |event|
-        {
-          :name => name,
-          :timestamp => event.started_at,
-          :value => event.duration
-        }
+    def initialize_dispatcher
+      thread = Thread.new do
+        set_void_instrumenter
+        start_time = Time.now
+        loop do
+          begin
+            if Time.now > start_time + 15.seconds && !@queue.empty?
+              process_data
+              dispatch_events(:event_data)
+              data.clear
+              @queue.clear
+              start_time = Time.now
+            end
+          rescue => ex
+            Rails.logger.error "ERROR: #{ex.inspect}"
+          end
+          Rails.logger.flush
+          sleep 15
+        end
       end
-    end
-
-
-    def dispatch
-      if Time.now > @start_time + 15.seconds
-
-        events = process_data(@queue.dup)
-        dispatch_events(:event_data, events)
-
-        @queue.clear
-        @start_time = Time.now
-      end
+      thread.abort_on_exception = true
     end
 
     private
 
-      def process_data(events)
-        data = []
+    def set_void_instrumenter
+      Thread.current[:"instrumentation_#{notifier.object_id}"] = VoidInstrumenter.new(notifier)
+    end
+
+    def data
+      Thread.current[:app_perf_data] ||= []
+    end
+
+    def notifier
+      ActiveSupport::Notifications.notifier
+    end
+
+    def process_data
+      while @queue.size > 0
+        events = @queue.pop
         events.group_by {|e| event_name(e) }.each_pair do |name, events_by_name|
           if name
             events_by_name.group_by {|e| round_time(e.started_at, 5).to_s }.each_pair do |timestamp, events_by_time|
@@ -62,80 +74,68 @@ module AppPerf
             end
           end
         end
-        data
       end
+    end
 
-      def round_time(t, sec = 1)
-        down = t - (t.to_i % sec)
-        up = down + sec
+    def round_time(t, sec = 1)
+      down = t - (t.to_i % sec)
+      up = down + sec
 
-        difference_down = t - down
-        difference_up = up - t
+      difference_down = t - down
+      difference_up = up - t
 
-        if (difference_down < difference_up)
-          return down
-        else
-          return up
-        end
+      if (difference_down < difference_up)
+        return down
+      else
+        return up
       end
+    end
 
-      def event_name(event)
-        case event.category
-        when "action_controller"
-          "Ruby"
-        when "active_record"
-          "Database"
-        when "action_view"
-          "Ruby"
-        when "gc"
-          "GC Execution"
-        when "memory"
-          "Memory Usage"
-        when "error"
-          "Error"
-        else
-          nil
-        end
+    def event_name(event)
+      case event.category
+      when "action_controller"
+        "Ruby"
+      when "active_record"
+        "Database"
+      when "action_view"
+        "Ruby"
+      when "gc"
+        "GC Execution"
+      when "memory"
+        "Memory Usage"
+      when "error"
+        "Error"
+      else
+        nil
       end
+    end
 
-      def save_tree(events, request_id, parent_id)
-        events.each do |event|
-          model = create_metric(event, :request_id => request_id, :parent_id => parent_id)
-          save_tree(event.children, request_id, model.id)
-        end
+    def url(method)
+      @url ||= [
+        AppPerf.config["ssl"] ? "https" : "http",
+        "://",
+        AppPerf.config["host"],
+        ":",
+        AppPerf.config["port"],
+        "/api/listener/1/#{AppPerf.config["license_key"]}/#{method}"
+      ].join
+    end
+
+    def dispatch_events(method)
+      if data.present?
+        #Thread.new {
+          uri = URI(url(method))
+          req = Net::HTTP::Post.new(uri, { "Content-Type" => "application/json", "Accept-Encoding" => "gzip", "User-Agent" => "gzip" })
+          req.body = {
+            "host" => AppPerf.host,
+            "events" => data
+          }.to_json
+          res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+            http.read_timeout = 5
+            http.request(req)
+          end
+        #}
       end
-
-      def url(method)
-        @url ||= [
-          AppPerf.config["ssl"] ? "https" : "http",
-          "://",
-          AppPerf.config["host"],
-          ":",
-          AppPerf.config["port"],
-          "/api/listener/1/#{AppPerf.config["license_key"]}/#{method}"
-        ].join
-      end
-
-      def dispatch_events(method, events)
-        if events.present?
-          Thread.new {
-            uri = URI(url(method))
-            req = Net::HTTP::Post.new(uri, { "Content-Type" => "application/json", "Accept-Encoding" => "gzip", "User-Agent" => "gzip" })
-            req.body = {
-              "host" => AppPerf.host,
-              "events" => events
-            }.to_json
-            res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-              http.read_timeout = 5
-              http.request(req)
-            end
-          }
-        end
-      end
-
-      def create_metric(event, merge_params={})
-        AppPerf::Metric.create(event.to_hash.merge(merge_params))
-      end
-
+    end
   end
 end

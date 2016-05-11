@@ -3,7 +3,6 @@ module AppPerf
     attr_accessor :store, :instruments, :notification_exclude_patterns, :path_exclude_patterns, :options
 
     def initialize
-      #self.store = AppPerf::AsyncStore.new
       self.store = AppPerf::Store.new
       self.notification_exclude_patterns = []
       self.path_exclude_patterns = []

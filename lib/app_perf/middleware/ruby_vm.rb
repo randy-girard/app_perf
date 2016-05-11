@@ -14,8 +14,7 @@ module AppPerf
           @app.call(env)
         else
           @collector.collect do
-            response = notifications.instrument "ruby_vm.gc",
-              :path => env["PATH_INFO"], :method => env["REQUEST_METHOD"] do
+            response = notifications.instrument "ruby_vm.gc", :path => env["PATH_INFO"], :method => env["REQUEST_METHOD"] do
               @app.call(env)
             end
           end

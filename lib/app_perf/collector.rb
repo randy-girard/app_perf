@@ -19,7 +19,6 @@ module AppPerf
     ensure
       AppPerf.collection_off
       store.save events.dup
-      store.dispatch
       events.clear
     end
 
