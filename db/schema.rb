@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   create_table "event_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
+    t.integer  "transaction_id"
     t.string   "name"
     t.datetime "timestamp"
     t.integer  "num"

@@ -76,16 +76,19 @@ module AppPerf
         events.group_by {|e| event_name(e) }.each_pair do |name, events_by_name|
           if name
             events_by_name.group_by {|e| round_time(e.started_at, 5).to_s }.each_pair do |timestamp, events_by_time|
-              num = events_by_time.size
-              val = events_by_time.map(&:exclusive_duration).sum
-              avg = num > 0 ? val.to_f / num.to_f : 0
-              event_data << {
-                :name => name,
-                :num => num,
-                :timestamp => timestamp,
-                :value => val,
-                :avg => avg
-              }
+              events_by_time.group_by {|e| e.transaction_id }.each_pair do |tranasction_id, events_by_transaction_id|
+                num = events_by_transaction_id.size
+                val = events_by_transaction_id.map(&:exclusive_duration).sum
+                avg = num > 0 ? val.to_f / num.to_f : 0
+                event_data << {
+                  :name => name,
+                  :num => num,
+                  :tranaction_id => tranasction_id,
+                  :timestamp => timestamp,
+                  :value => val,
+                  :avg => avg
+                }
+              end
             end
           end
         end

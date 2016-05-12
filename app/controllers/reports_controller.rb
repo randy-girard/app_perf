@@ -4,15 +4,15 @@ class ReportsController < ApplicationController
 
   def index
     @filter = params[:filter]
-    @metric_id = params[:metric_id]
+    @transaction_id = params[:transaction_id]
 
     @hosts = @application.hosts
 
-    if @metric_id
-      @transaction_metrics = @application.transaction_data.where(:id => @metric_id)
-      @transaction_metric_samples = @application.transaction_data.where(:parent_id => @metric_id)
+    if @transaction_id
+      @transaction_metric = @application.transaction_data.where(:id => @transaction_id).first
+      @transaction_metric_samples = @application.transaction_data.where(:request_id => @transaction_metric.request_id)
     elsif @filter
-      @transaction_metrics = @application.transaction_data.where(:end_point => @filter)
+      @transaction_metrics = @application.transaction_data.where(:end_point => @filter, :started_at => @range)
     else
       @transaction_metrics = @application.transaction_data
         .group(:end_point)
@@ -25,9 +25,9 @@ class ReportsController < ApplicationController
     @filter = params[:filter]
     @report_data = []
 
-    @metric_id = params[:metric_id]
-    if @metric_id
-      @transaction_metric = @application.transaction_data.where(:id => @metric_id).first
+    @transaction_id = params[:transaction_id]
+    if @transaction_id
+      @transaction_metric = @application.transaction_data.where(:id => @transaction_id).first
       @range = (@transaction_metric.started_at - 5.minutes)..(@transaction_metric.started_at + 5.minutes)
     end
 
@@ -43,6 +43,11 @@ class ReportsController < ApplicationController
     case params[:id]
     when "average_duration"
       data = @application.event_data
+      data = data.where(:end_point => params[:filter]) if params[:filter]
+      if params[:transaction_id]
+
+
+      end
       database_data = data.where(:name => "Database")
       ruby_data = data.where(:name => "Ruby")
       gc_data = data.where(:name => "GC Execution")

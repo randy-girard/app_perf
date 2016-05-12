@@ -3,6 +3,7 @@ class CreateEventData < ActiveRecord::Migration
     create_table :event_data do |t|
       t.references :application, index: true, foreign_key: true
       t.references :host, index: true, foreign_key: true
+      t.integer :transaction_id
       t.string :name
       t.datetime :timestamp
       t.integer :num
