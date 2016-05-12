@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   resource :dashboard, :controller => "dashboard"
 
   resources :applications do
+    resources :errors, :only => [:index, :show]
     resources :transactions, :only => [:index]
     resources :raw_data, :only => [:index, :show]
     resources :reports, :only => [:index, :show, :new, :error] do

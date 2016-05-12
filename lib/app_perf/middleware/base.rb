@@ -16,10 +16,11 @@ module AppPerf
           @collector.collect do
             begin
               response = notifications.instrument "request.rack", :path => env["PATH_INFO"], :method => env["REQUEST_METHOD"] do
-                @app.call(env)
+                response = @app.call(env)
+                notifications.instrument "ruby.memory"
+                notifications.instrument "ruby_vm.gc"
+                response
               end
-              notifications.instrument "ruby.memory"
-              notifications.instrument "ruby_vm.gc"
             rescue Exception => e
               handle_exception(env, e)
             end
@@ -31,7 +32,7 @@ module AppPerf
       protected
 
       def handle_exception(env, exception)
-        notifications.instrument "ruby.error", :path => env["PATH_INFO"], :method => env["REQUEST_METHOD"], :error => exception
+        notifications.instrument "ruby.error", :path => env["PATH_INFO"], :method => env["REQUEST_METHOD"], :message => exception.message, :backtrace => exception.backtrace
         raise exception
       end
 

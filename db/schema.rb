@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160508182836) do
+ActiveRecord::Schema.define(version: 20160512004740) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,20 @@ ActiveRecord::Schema.define(version: 20160508182836) do
   end
 
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
+
+  create_table "error_data", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.integer  "transaction_id"
+    t.string   "message"
+    t.text     "backtrace"
+    t.datetime "timestamp"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "error_data", ["application_id"], name: "index_error_data_on_application_id", using: :btree
+  add_index "error_data", ["host_id"], name: "index_error_data_on_host_id", using: :btree
 
   create_table "event_data", force: :cascade do |t|
     t.integer  "application_id"
@@ -50,7 +64,16 @@ ActiveRecord::Schema.define(version: 20160508182836) do
 
   add_index "hosts", ["application_id"], name: "index_hosts_on_application_id", using: :btree
 
-  create_table "metrics", force: :cascade do |t|
+  create_table "raw_data", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.string   "method"
+    t.text     "body"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  create_table "transaction_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
     t.string   "end_point"
@@ -69,15 +92,6 @@ ActiveRecord::Schema.define(version: 20160508182836) do
     t.string   "category"
   end
 
-  create_table "raw_data", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.string   "method"
-    t.text     "body"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string   "email"
     t.string   "password_digest"
@@ -86,6 +100,8 @@ ActiveRecord::Schema.define(version: 20160508182836) do
   end
 
   add_foreign_key "applications", "users"
+  add_foreign_key "error_data", "applications"
+  add_foreign_key "error_data", "hosts"
   add_foreign_key "event_data", "applications"
   add_foreign_key "event_data", "hosts"
   add_foreign_key "hosts", "applications"

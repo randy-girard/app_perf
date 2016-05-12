@@ -1,6 +1,6 @@
-class CreateMetrics < ActiveRecord::Migration
+class CreateTransactionData < ActiveRecord::Migration
   def change
-    create_table :metrics, :force => true do |t|
+    create_table :transaction_data, :force => true do |t|
       t.references :application
       t.references :host
       t.string :end_point

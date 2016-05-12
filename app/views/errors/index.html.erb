@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <table>
+      <tr>
+        <th></th>
+        <th>Method</th>
+        <th>Host</th>
+        <th></th>
+      </tr>
+      <% @errors.each do |error_datum| %>
+        <tr>
+          <td><%= link_to 'View Error', application_error_path(@application, error_datum) %></td>
+          <td><%= error_datum.message %></td>
+          <td><%= error_datum.host.name if error_datum.host %></td>
+          <td><%= error_datum.timestamp %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

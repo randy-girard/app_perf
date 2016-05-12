@@ -3,11 +3,10 @@ module AppPerf
     class Errors < AppPerf::Instrument::Base
 
       def initialize
-        super /^ruby\.errors/
+        super /^ruby\.errors$/
       end
 
       def prepare(event)
-        Rails.logger.info "ERROR: #{event.inspect}"
       end
 
     end

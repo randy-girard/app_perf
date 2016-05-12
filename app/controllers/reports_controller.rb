@@ -1,24 +1,3 @@
-module RangeWithStepTime
-  def step(step_size = 1, &block)
-    return to_enum(:step, step_size) unless block_given?
-
-    # Defer to Range for steps other than durations on times
-    return super unless step_size.kind_of? ActiveSupport::Duration
-
-    # Advance through time using steps
-    time = self.begin
-    op = exclude_end? ? :< : :<=
-    while time.send(op, self.end)
-      yield time
-      time = step_size.parts.inject(time) { |t, (type, number)| t.advance(type => number) }
-    end
-
-    self
-  end
-end
-
-Range.prepend(RangeWithStepTime)
-
 class ReportsController < ApplicationController
 
   before_action :set_range
@@ -30,15 +9,15 @@ class ReportsController < ApplicationController
     @hosts = @application.hosts
 
     if @metric_id
-      @transaction_metrics = @application.metrics.where(:id => @metric_id)
-      @transaction_metric_samples = @application.metrics.where(:parent_id => @metric_id)
+      @transaction_metrics = @application.transaction_data.where(:id => @metric_id)
+      @transaction_metric_samples = @application.transaction_data.where(:parent_id => @metric_id)
     elsif @filter
-      @transaction_metrics = @application.metrics.where(:end_point => @filter)
+      @transaction_metrics = @application.transaction_data.where(:end_point => @filter)
     else
-      @transaction_metrics = @application.metrics
+      @transaction_metrics = @application.transaction_data
         .group(:end_point)
         .where(:started_at => @range)
-        .select("metrics.end_point, AVG(duration) AS duration")
+        .select("transaction_data.end_point, AVG(duration) AS duration")
     end
   end
 
@@ -48,7 +27,7 @@ class ReportsController < ApplicationController
 
     @metric_id = params[:metric_id]
     if @metric_id
-      @transaction_metric = @application.metrics.where(:id => @metric_id).first
+      @transaction_metric = @application.transaction_data.where(:id => @metric_id).first
       @range = (@transaction_metric.started_at - 5.minutes)..(@transaction_metric.started_at + 5.minutes)
     end
 
