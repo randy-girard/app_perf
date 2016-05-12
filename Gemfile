@@ -42,6 +42,7 @@ gem "font-awesome-rails"
 gem "highcharts-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
+gem "activerecord-import"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

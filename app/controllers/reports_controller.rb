@@ -43,7 +43,7 @@ class ReportsController < ApplicationController
     case params[:id]
     when "average_duration"
       data = @application.event_data
-      data = data.where(:end_point => params[:filter]) if params[:filter]
+      #data = data.where(:end_point => params[:filter]) if params[:filter]
       if params[:transaction_id]
 
 
