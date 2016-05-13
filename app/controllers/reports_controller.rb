@@ -3,15 +3,7 @@ class ReportsController < ApplicationController
   before_action :set_range
 
   def show
-    @filter = params[:filter]
     @report_data = []
-
-    @transaction_id = params[:transaction_id]
-    if @transaction_id
-      @transaction_metric = @application.transaction_data.where(:id => @transaction_id).first
-      @range = (@transaction_metric.started_at - 5.minutes)..(@transaction_metric.started_at + 5.minutes)
-    end
-
     @plot_lines = [
       {
         color: 'red',
@@ -30,14 +22,11 @@ class ReportsController < ApplicationController
     case params[:id]
     when "average_duration"
       data = @application.event_data
-      #data = data.where(:end_point => params[:filter]) if params[:filter]
-      if params[:transaction_id]
-
-
-      end
       database_data = data.where(:name => "Database")
       ruby_data = data.where(:name => "Ruby")
       gc_data = data.where(:name => "GC Execution")
+
+      @range = (data.first.timestamp - 5.minutes)..(data.first.timestamp + 5.minutes)
 
       @report_data.push({ :name => "Ruby", :data => ruby_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if ruby_data.present?
       @report_data.push({ :name => "Database", :data => database_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if database_data.present?
