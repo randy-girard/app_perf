@@ -42,16 +42,34 @@ class AppPerfAgentWorker < ActiveJob::Base
         raw_datum.method = datum[:name]
       end
 
-      #transaction_data << application.transaction_data.new(datum) do |transaction_datum|
-      #  transaction_datum.host = host
-      #end
-      application.transaction_data.create(datum) do |transaction_datum|
-        transaction_datum.host = host
-      end
+      children = datum.delete(:children)
+      # Hack right now to get the request_id. Ideally this would be
+      # part of the bulk load as well.
+      transaction_datum = application.transaction_data.new(datum)
+      transaction_datum.application = application
+      transaction_datum.host = host
+      transaction_datum.save
+      transaction_datum.request_id = transaction_datum.id
+      transaction_datum.save
+      process_transaction_data_children(transaction_data, transaction_datum, children)
     end
 
     RawDatum.import(raw_data)
-    #TransactionDatum.import(transaction_data)
+    TransactionDatum.import(transaction_data, recursive: true)
+  end
+
+  def process_transaction_data_children(transaction_data, transaction_datum, data, depth = 1)
+    if data.present?
+      data.each do |child_datum|
+        children = child_datum.delete(:children)
+        child = transaction_datum.children.build(child_datum)
+        child.application = application
+        child.host = host
+        child.request_id = transaction_datum.request_id || transaction_datum.id
+        process_transaction_data_children(transaction_data, child, children, depth + 1) if children.present?
+        transaction_data << child if depth.eql?(1)
+      end
+    end
   end
 
   def process_event_data(data)

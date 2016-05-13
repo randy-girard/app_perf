@@ -17,6 +17,7 @@ class CreateTransactionData < ActiveRecord::Migration
       t.integer :parent_id
       t.string :action
       t.string :category
+      t.timestamps null: false
     end
   end
 end

@@ -1,26 +1,11 @@
 class TransactionDatum < ActiveRecord::Base
-  has_many :children, :class_name => self.name, :foreign_key => :parent_id
-  accepts_nested_attributes_for :children
-
   belongs_to :application
   belongs_to :host
   belongs_to :parent, :class_name => self.name
-  serialize :payload
 
-  after_commit do
-    #if parent
-    #  self.parent_id = parent.id
-    #  self.request_id = parent.request_id
-    #else
-    #  self.request_id = self.id
-    #end
-    children.each do |transaction_datum|
-      transaction_datum.application_id = self.application_id
-      transaction_datum.parent_id = self.id
-      transaction_datum.request_id = self.request_id || self.id
-      transaction_datum.save
-    end
-  end
+  has_many :children, :inverse_of => :parent, :class_name => self.name, :foreign_key => :parent_id
+
+  serialize :payload
 
   def ancestors
     ancestors = []

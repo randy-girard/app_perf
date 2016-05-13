@@ -68,7 +68,7 @@ module AppPerf
         :exclusive_duration => exclusive_duration,
         :end_point => payload[:end_point]
       }
-      h.merge!(:children_attributes => children) if children.present?
+      h.merge!(:children => children) if children.present?
       h
     end
   end

@@ -3,7 +3,7 @@
     <table>
       <% @applications.each do |application| %>
       <tr>
-        <td><%= link_to application.name, application_reports_path(application) %></td>
+        <td><%= link_to application.name, application_overview_path(application) %></td>
       </tr>
       <% end %>
     </table>
