@@ -6,6 +6,10 @@ module AppPerf
         super /\.action_controller$/
       end
 
+      def active?
+        true
+      end
+
       def ignore?(event)
         event.name != 'process_action.action_controller'
       end

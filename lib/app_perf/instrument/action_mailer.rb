@@ -6,6 +6,10 @@ module AppPerf
         super /\.action_mailer$/
       end
 
+      def active?
+        true
+      end
+
       def prepare(event)
         event.payload.except!(:mail)
       end

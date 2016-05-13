@@ -6,6 +6,10 @@ module AppPerf
         super /^ruby\.errors$/
       end
 
+      def active?
+        true
+      end
+
       def prepare(event)
       end
 

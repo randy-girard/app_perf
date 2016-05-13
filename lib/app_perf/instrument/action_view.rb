@@ -6,6 +6,10 @@ module AppPerf
         super /\.action_view$/
       end
 
+      def active?
+        true
+      end
+
       def prepare(event)
         event.payload.each do |key, value|
           case value

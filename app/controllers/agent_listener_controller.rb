@@ -9,13 +9,13 @@ class AgentListenerController < ApplicationController
   def create
     params.permit!
 
-    EventsWorker.perform_later(params)
+    AppPerfAgentWorker.perform_later(params)
 
     render :text => "", :status => :ok
   end
 
   def invoke_raw_method
-    response = NewRelicWorker.new(params).execute
+    response = NewRelicAgentWorker.new(params).execute
 
     render :json => response, :status => :ok
   end

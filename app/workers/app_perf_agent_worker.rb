@@ -1,4 +1,4 @@
-class EventsWorker < ActiveJob::Base
+class AppPerfAgentWorker < ActiveJob::Base
   queue_as :app_perf
 
   attr_accessor :license_key, :host, :method, :data, :application, :protocol_version
@@ -72,7 +72,7 @@ class EventsWorker < ActiveJob::Base
   def process_error_data(data)
     error_data = []
     data.each do |datum|
-      event_data << application.error_data.new do |error_datum|
+      error_data << application.error_data.new do |error_datum|
         error_datum.host = host
         error_datum.transaction_id = datum[:transaction_id]
         error_datum.message = datum[:payload][:message]

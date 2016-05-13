@@ -6,6 +6,14 @@ module AppPerf
         super /^ruby\.memory$/
       end
 
+      def active?
+        true
+      end
+
+      def after
+        instrument "ruby.memory"
+      end
+
       def prepare(event)
         event.duration = `ps -o rss= -p #{Process.pid}`.to_i
       end

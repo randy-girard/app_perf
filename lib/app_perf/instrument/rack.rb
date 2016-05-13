@@ -6,6 +6,10 @@ module AppPerf
         super /^request\.rack$/
       end
 
+      def active?
+        true
+      end
+
     end
   end
 end

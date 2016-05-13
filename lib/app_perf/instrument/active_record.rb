@@ -6,6 +6,10 @@ module AppPerf
         super /\.active_record$/
       end
 
+      def active?
+        true
+      end
+
       def ignore?(event)
         event.payload[:sql] !~ /^(SELECT|INSERT|UPDATE|DELETE)/
       end

@@ -15,8 +15,10 @@ Rails.application.routes.draw do
   resource :dashboard, :controller => "dashboard"
 
   resources :applications do
+    resource :overview, :controller => "overview", :only => [:show]
     resources :errors, :only => [:index, :show]
     resources :transactions, :only => [:index]
+    resources :database, :controller => "database", :only => [:index]
     resources :raw_data, :only => [:index, :show]
     resources :reports, :only => [:index, :show, :new, :error] do
       collection do

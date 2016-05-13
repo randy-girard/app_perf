@@ -21,6 +21,20 @@ module AppPerf
         @pattern = pattern
       end
 
+      def active?
+        false
+      end
+
+      def before
+      end
+
+      def after
+      end
+
+      def instrument(*args)
+        ActiveSupport::Notifications.instrument(*args)
+      end
+
       # Holds the mapped paths used in prunning.
       def mapped_paths
         @mapped_paths ||= default_mapped_paths

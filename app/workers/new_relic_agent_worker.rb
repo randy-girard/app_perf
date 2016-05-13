@@ -1,4 +1,4 @@
-class NewRelicWorker
+class NewRelicAgentWorker
 
   def initialize(params)
     self.params = params
