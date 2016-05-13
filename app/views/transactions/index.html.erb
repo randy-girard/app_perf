@@ -4,7 +4,12 @@
       <tbody>
         <% @transactions.each_pair do |end_point, transactions| %>
           <tr>
-            <td><%= link_to end_point, application_reports_path(:filter => transactions.first.end_point, :transaction_metric_id => @filter ? transactions.first.id : nil) %></td>
+            <td>
+              <%= end_point %><br />
+              <% transactions.each do |transaction| %>
+              <%= link_to "#{transaction.duration}s", application_transaction_path(@application, transaction) %>
+              <% end %>
+            </td>
             <td><%= transactions.sum(&:duration) / transactions.size%></td>
           </tr>
         <% end %>

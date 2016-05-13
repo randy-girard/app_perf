@@ -1,6 +1,6 @@
 ## AppPerf (Application Performance Monitoring)
 
-![Screenshot](/doc/screenshot.png?raw=true "Screenshot")
+![Overview](/doc/overview.png?raw=true "Overview")
 
 <b>NOTE: This application is in extremely beginning stages and I am still working out flows and learning the data model. I will be cleaning code up as I go.</b>
 

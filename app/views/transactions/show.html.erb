@@ -1,0 +1,38 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <h4>
+      <%= link_to 'All', application_overview_path(@application) %> >
+      <%= link_to @transaction.end_point, application_transactions_path(@application, :filter => @transaction.end_point) %>
+      > <%= @transaction.id %>
+    </h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <% total_duration = @transaction_samples.sum(:duration) %>
+    <table>
+    <% @transaction_samples.sort_by(&:duration).reverse.each do |transaction_sample| %>
+      <tr>
+        <td class="small-4 medium-4 large-4">
+          <% if transaction_sample.action.eql?("sql") %>
+            <%= transaction_sample.payload["name"] %>
+          <% elsif transaction_sample.category.eql?("action_view") %>
+            <%= transaction_sample.payload["identifier"] %>
+          <% else %>
+            <%= transaction_sample.name %>
+          <% end %>
+        </td>
+        <td>
+          <div class="progress">
+            <div class="progress-meter" style="width: <%= transaction_sample.duration / total_duration * 100.to_f %>%"></div>
+          </div>
+        </td>
+        <td>
+          <%= transaction_sample.exclusive_duration %>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+</div>

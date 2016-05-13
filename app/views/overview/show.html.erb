@@ -1,17 +1,8 @@
-<% if @filter %>
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
-    <h4>
-      <%= link_to 'All', application_reports_path(@application) %> >
-      <%= link_to_if @transaction_id, @filter, application_reports_path(@application, :filter => @filter) %>
-      <% if @transaction_id %>
-      > <%= @transaction_id %>
-      <% end %>
-    </h4>
+    <h4>Overview</h4>
   </div>
 </div>
-
-<% end %>
 <div class="row">
   <div class="small-8 medium-8 large-8 columns">
     <div class="row">
@@ -22,37 +13,6 @@
         </div>
       </div>
     </div>
-
-    <% if @transaction_metric_samples.present? %>
-    <div class="row">
-      <div class="small-12 medium-12 large-12 columns">
-        <% total_duration = @transaction_metric_samples.sum(:duration) %>
-        <table>
-        <% @transaction_metric_samples.sort_by(&:duration).reverse.each do |transaction_metric| %>
-          <tr>
-            <td class="small-4 medium-4 large-4">
-              <% if transaction_metric.action.eql?("sql") %>
-                <%= transaction_metric.payload["name"] %>
-              <% elsif transaction_metric.category.eql?("action_view") %>
-                <%= transaction_metric.payload["identifier"] %>
-              <% else %>
-                <%= transaction_metric.name %>
-              <% end %>
-            </td>
-            <td>
-              <div class="progress">
-                <div class="progress-meter" style="width: <%= transaction_metric.duration / total_duration * 100.to_f %>%"></div>
-              </div>
-            </td>
-            <td>
-              <%= transaction_metric.exclusive_duration %>
-            </td>
-          </tr>
-        <% end %>
-        </table>
-      </div>
-    </div>
-    <% end %>
 
     <div class="row">
       <div class="small-8 medium-8 large-8 columns">
@@ -71,6 +31,7 @@
     </div>
   </div>
   <div class="small-4 medium-4 large-4 columns">
+    <% if false %>
     <div class="row">
       <div class="small-12 medium-12 large-12 columns">
         <table>
@@ -84,21 +45,25 @@
         </table>
       </div>
     </div>
-    <% if @transaction_metrics && @transaction_metric.nil? %>
-      <div class="row">
-        <div class="small-12 medium-12 large-12 columns">
-          <table>
-            <tbody>
-              <% @transaction_metrics.each do |transaction_metric| %>
-                <tr>
-                  <td><%= link_to transaction_metric.end_point, application_reports_path(:filter => transaction_metric.end_point, :transaction_id => @filter ? transaction_metric.id : nil) %></td>
-                  <td><%= transaction_metric.duration %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
     <% end %>
+    <div class="row">
+      <div class="small-12 medium-12 large-12 columns">
+        <table>
+          <tbody>
+            <% @transactions.each_pair do |end_point, transactions| %>
+              <tr>
+                <td>
+                  <%= end_point %><br />
+                  <% transactions.take(3).each do |transaction| %>
+                    <%= link_to "#{transaction.duration}s", application_transaction_path(@application, transaction) %>
+                  <% end %>
+                </td>
+                <td><%= transactions.sum(&:duration) / transactions.size %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

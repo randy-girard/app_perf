@@ -21,6 +21,12 @@ class ReportsController < ApplicationController
       }
     ]
 
+    @plot_options = {
+      :area => {
+        :stacking => "normal"
+      }
+    }
+
     case params[:id]
     when "average_duration"
       data = @application.event_data
