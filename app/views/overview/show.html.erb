@@ -50,15 +50,15 @@
       <div class="small-12 medium-12 large-12 columns">
         <table>
           <tbody>
-            <% @transactions.each_pair do |end_point, transactions| %>
+            <% @transaction_samples.each_pair do |end_point, transaction_samples| %>
               <tr>
                 <td>
                   <%= end_point %><br />
-                  <% transactions.take(3).each do |transaction| %>
-                    <%= link_to "#{transaction.duration}s", application_transaction_path(@application, transaction) %>
+                  <% transaction_samples.sort_by(&:started_at).reverse.take(3).each do |transaction_sample| %>
+                    <%= link_to "#{transaction_sample.duration}s", application_transaction_path(@application, transaction_sample) %>
                   <% end %>
                 </td>
-                <td><%= transactions.sum(&:duration) / transactions.size %></td>
+                <td><%= transaction_samples.sum(&:duration) / transaction_samples.size %></td>
               </tr>
             <% end %>
           </tbody>

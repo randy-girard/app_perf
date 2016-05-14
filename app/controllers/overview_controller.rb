@@ -5,8 +5,8 @@ class OverviewController < ApplicationController
   def show
     @hosts = @application.hosts
 
-    @transactions = @application
-      .transaction_data
+    @transaction_samples = @application
+      .transaction_sample_data
       .where(:started_at => @range)
       .reject {|t| t.payload[:end_point].blank? }
       .group_by {|t| t.payload[:end_point] }

@@ -1,9 +1,9 @@
 class DatabaseController < ApplicationController
 
   def index
-    @transactions = @application.transaction_data
+    @transaction_samples = @application.transaction_sample_data
       .where(:category => "active_record")
-      .group_by {|t| t.payload[:end_point] }
+      .group_by {|t| t.payload[:name] }
   end
 
 end

@@ -1,14 +1,16 @@
 class TransactionsController < ApplicationController
 
   def index
-    @transactions = @application.transaction_data
-      .where(:category => "action_controller")
-      .group_by {|t| t.payload[:end_point] }
+    @filter = params[:filter]
+
+    @transaction_samples = @application.transaction_sample_data.where(:category => "action_controller")
+    @transaction_samples = @transaction_samples.where(:end_point => @filter) if @filter
+    @transaction_samples = @transaction_samples.group_by {|t| t.payload[:end_point] }
   end
 
   def show
-    @transaction = @application.transaction_data.find(params[:id])
-    @transaction_samples = @application.transaction_data.where(:request_id => @transaction.request_id)
+    @transaction_sample = @application.transaction_sample_data.find(params[:id])
+    @transaction_samples = @application.transaction_sample_data.where(:request_id => @transaction_sample.request_id)
   end
 
 end

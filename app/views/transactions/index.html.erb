@@ -1,16 +1,37 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
+    <h4>
+      <%= link_to 'Overview', application_transactions_path(@application) %> >
+      <%= link_to_if @filter, 'All Transactions', application_transactions_path(@application) %>
+      <% if @filter %>
+      > <%= @filter %>
+      <% end %>
+    </h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <h6>Average Request Time</h6>
+    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :filter => @filter) %>" data-duration="15000">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
     <table>
       <tbody>
-        <% @transactions.each_pair do |end_point, transactions| %>
+        <% @transaction_samples.each_pair do |end_point, transaction_samples| %>
           <tr>
             <td>
-              <%= end_point %><br />
-              <% transactions.each do |transaction| %>
-              <%= link_to "#{transaction.duration}s", application_transaction_path(@application, transaction) %>
+              <%= link_to end_point, application_transactions_path(@application, :filter => end_point) %><br />
+              <% transaction_samples.sort_by(&:started_at).reverse.take(5).each do |transaction_sample| %>
+              <%= link_to "#{transaction_sample.duration}s", application_transaction_path(@application, transaction_sample) %>
               <% end %>
             </td>
-            <td><%= transactions.sum(&:duration) / transactions.size%></td>
+            <td><%= transaction_samples.sum(&:duration) / transaction_samples.size%></td>
           </tr>
         <% end %>
       </tbody>

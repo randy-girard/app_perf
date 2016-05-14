@@ -1,15 +1,21 @@
-<%= area_chart(@report_data, {
-  :id => "#{params[:id]}_chart",
-  :height => "100%",
-  :library => {
-    :colors => @report_colors,
-    :legend => {
-      :position => "bottom"
-    },
-    :animation => false,
-    :xAxis => {
-      :plotLines => @plot_lines
-    },
-    :plotOptions => @plot_options
+<%=
+  options = {
+    :id => "#{params[:id]}_chart",
+    :height => "100%",
+    :library => {
+      :colors => @report_colors,
+      :legend => {
+        :position => "bottom"
+      },
+      :animation => false,
+      :xAxis => {
+        :plotLines => @plot_lines
+      }
+    }
   }
-}) %>
+
+  options.merge!(:plotOptions => @plot_options) if @plot_options
+
+
+  area_chart(@report_data, options)
+%>

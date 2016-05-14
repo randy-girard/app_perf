@@ -2,10 +2,10 @@
   <div class="small-12 medium-12 large-12 columns">
     <table>
       <tbody>
-        <% @transactions.each_pair do |end_point, transactions| %>
+        <% @transaction_samples.each_pair do |name, transaction_samples| %>
           <tr>
-            <td><%= link_to end_point, application_reports_path(:filter => transactions.first.end_point, :transaction_metric_id => @filter ? transactions.first.id : nil) %></td>
-            <td><%= transactions.sum(&:duration) / transactions.size %></td>
+            <td><%= name %></td>
+            <td><%= transaction_samples.sum(&:duration) / transaction_samples.size %></td>
           </tr>
         <% end %>
       </tbody>

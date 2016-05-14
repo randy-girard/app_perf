@@ -13,40 +13,37 @@ class ReportsController < ApplicationController
       }
     ]
 
-    @plot_options = {
-      :area => {
-        :stacking => "normal"
-      }
-    }
-
     case params[:id]
     when "average_duration"
-      data = @application.event_data
+      data = @application.transaction_data
+      data = data.where(:end_point => params[:filter]) if params[:filter]
       database_data = data.where(:name => "Database")
       ruby_data = data.where(:name => "Ruby")
       gc_data = data.where(:name => "GC Execution")
 
-      @range = (data.first.timestamp - 5.minutes)..(data.first.timestamp + 5.minutes)
+      if params[:transaction_id]
+        @range = (data.first.timestamp - 5.minutes)..(data.first.timestamp + 5.minutes)
+      end
 
-      @report_data.push({ :name => "Ruby", :data => ruby_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if ruby_data.present?
-      @report_data.push({ :name => "Database", :data => database_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if database_data.present?
-      @report_data.push({ :name => "GC Execution", :data => gc_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if gc_data.present?
+      @report_data.push({ :name => "Ruby", :data => ruby_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") }) if ruby_data.present?
+      @report_data.push({ :name => "Database", :data => database_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(db_duration) / SUM(db_call_count)") }) if database_data.present?
+      @report_data.push({ :name => "GC Execution", :data => gc_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(gc_duration) / SUM(gc_call_count)") }) if gc_data.present?
       @report_colors = ["#A5FFFF", "#EECC45", "#4E4318"]
-
-      render :layout => false
+      @plot_options = {
+        :area => {
+          :stacking => "normal"
+        }
+      }
     when "memory_physical"
-      data = @application.event_data.where(:name => "Memory Usage")
-      @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(value) / SUM(num)") }) if data.present?
+      data = @application.transaction_data.where(:name => "Memory Usage")
+      @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") })
       @report_colors = ["#A5FFFF"]
-      render :layout => false
     when "errors"
-      data = @application.event_data.where(:name => "Error")
-      @report_data.push({ :name => "Errors", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(num)") }) if data.present?
+      data = @application.transaction_data.where(:name => "Error")
+      @report_data.push({ :name => "Errors", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(call_count)") })
       @report_colors = ["#D3DE00"]
-      render :layout => false
-    else
-      render :json => @raw_datum
     end
+    render :layout => false
   end
 
   def new

@@ -16,12 +16,12 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       if protocol_version.to_i.eql?(1)
         case method
-        when "event_data"
-          process_event_data(data)
-        when "error_data"
-          process_error_data(data)
         when "transaction_data"
           process_transaction_data(data)
+        when "transaction_sample_data"
+          process_transaction_sample_data(data)
+        when "error_data"
+          process_error_data(data)
         else
           Rails.logger.info "Unknown method."
         end
@@ -31,60 +31,60 @@ class AppPerfAgentWorker < ActiveJob::Base
 
   private
 
-  def process_transaction_data(data)
+  def process_transaction_sample_data(data)
     raw_data = []
-    transaction_data = []
+    transaction_sample_data = []
+
+    begin
+      data.each do |datum|
+        raw_data << application.raw_data.new do |raw_datum|
+          raw_datum.host = host
+          raw_datum.body = datum
+          raw_datum.method = datum[:name]
+        end
+        RawDatum.import(raw_data)
+      end
+    rescue
+    end
 
     data.each do |datum|
-      raw_data << application.raw_data.new do |raw_datum|
-        raw_datum.host = host
-        raw_datum.body = datum
-        raw_datum.method = datum[:name]
-      end
-
       children = datum.delete(:children)
       # Hack right now to get the request_id. Ideally this would be
       # part of the bulk load as well.
-      transaction_datum = application.transaction_data.new(datum)
-      transaction_datum.application = application
-      transaction_datum.host = host
-      transaction_datum.save
-      transaction_datum.request_id = transaction_datum.id
-      transaction_datum.save
-      process_transaction_data_children(transaction_data, transaction_datum, children)
+      transaction_sample_datum = application.transaction_sample_data.new(datum)
+      transaction_sample_datum.application = application
+      transaction_sample_datum.host = host
+      transaction_sample_datum.end_point = datum[:payload][:end_point]
+      transaction_sample_datum.save
+      transaction_sample_datum.request_id = transaction_sample_datum.id
+      transaction_sample_datum.save
+      process_transaction_sample_data_children(transaction_sample_data, transaction_sample_datum, children)
     end
 
-    RawDatum.import(raw_data)
-    TransactionDatum.import(transaction_data, recursive: true)
+    TransactionSampleDatum.import(transaction_sample_data, recursive: true)
   end
 
-  def process_transaction_data_children(transaction_data, transaction_datum, data, depth = 1)
+  def process_transaction_sample_data_children(transaction_sample_data, transaction_sample_datum, data, depth = 1)
     if data.present?
       data.each do |child_datum|
         children = child_datum.delete(:children)
-        child = transaction_datum.children.build(child_datum)
+        child = transaction_sample_datum.children.build(child_datum)
+        child.end_point = child_datum[:payload][:end_point]
         child.application = application
         child.host = host
-        child.request_id = transaction_datum.request_id || transaction_datum.id
-        process_transaction_data_children(transaction_data, child, children, depth + 1) if children.present?
-        transaction_data << child if depth.eql?(1)
+        child.request_id = transaction_sample_datum.request_id || transaction_sample_datum.id
+        process_transaction_sample_data_children(transaction_sample_data, child, children, depth + 1) if children.present?
+        transaction_sample_data << child if depth.eql?(1)
       end
     end
   end
 
-  def process_event_data(data)
+  def process_transaction_data(data)
     event_data = []
     data.each do |datum|
-      event_data << application.event_data.new do |event_datum|
-        event_datum.host = host
-        event_datum.name = datum[:name]
-        event_datum.timestamp = datum[:timestamp]
-        event_datum.num = datum[:num]
-        event_datum.value = datum[:value]
-        event_datum.avg = datum[:value].to_f / datum[:num].to_f
-      end
+      event_data << application.transaction_data.new(datum)
     end
-    EventDatum.import(event_data)
+    TransactionDatum.import(event_data)
   end
 
   def process_error_data(data)

@@ -26,8 +26,8 @@ module AppPerf
           begin
             if Time.now > start_time + 15.seconds && !@queue.empty?
               process_data
+              dispatch_events(:transaction_sample_data)
               dispatch_events(:transaction_data)
-              dispatch_events(:event_data)
               dispatch_events(:error_data)
               @queue.clear
               start_time = Time.now
@@ -49,12 +49,12 @@ module AppPerf
       Thread.current[:"instrumentation_#{notifier.object_id}"] = VoidInstrumenter.new(notifier)
     end
 
-    def transaction_data
-      Thread.current[:app_perf_transaction_data] ||= []
+    def transaction_sample_data
+      Thread.current[:app_perf_transaction_sample_data] ||= []
     end
 
-    def event_data
-      Thread.current[:app_perf_event_data] ||= []
+    def transaction_data
+      Thread.current[:app_perf_transaction_data] ||= []
     end
 
     def error_data
@@ -66,35 +66,44 @@ module AppPerf
     end
 
     def process_data
+      all_events = []
+
       while @queue.size > 0
         events = @queue.pop
 
+        end_point = nil
+        if (event = events.find {|e| e.payload[:end_point].present? })
+          end_point = event.payload[:end_point]
+        end
+        events.each {|e| e.payload[:end_point] = end_point }
+
         Rails.logger.info events.inspect
         Rails.logger.flush
-        transaction_data.push AppPerf::NestedEvent.arrange(events.dup, :presort => false)
-
-        events.group_by {|e| event_name(e) }.each_pair do |name, events_by_name|
-          if name
-            events_by_name.group_by {|e| round_time(e.started_at, 5).to_s }.each_pair do |timestamp, events_by_time|
-              events_by_time.group_by {|e| e.transaction_id }.each_pair do |tranasction_id, events_by_transaction_id|
-                num = events_by_transaction_id.size
-                val = events_by_transaction_id.map(&:exclusive_duration).sum
-                avg = num > 0 ? val.to_f / num.to_f : 0
-                event_data << {
-                  :name => name,
-                  :num => num,
-                  :tranaction_id => tranasction_id,
-                  :timestamp => timestamp,
-                  :value => val,
-                  :avg => avg
-                }
-              end
-            end
-          end
-        end
-
+        transaction_sample_data.push AppPerf::NestedEvent.arrange(events.dup, :presort => false)
         events.select {|e| e.category.eql?("error") }.each do |error|
           error_data << error
+        end
+        all_events += events.dup
+      end
+
+      all_events.group_by {|e| [event_name(e), e.payload[:end_point], round_time(e.started_at, 15)] }.each_pair do |group, grouped_events|
+        if group[0].present?
+
+          calls = grouped_events
+          db_calls = grouped_events.select {|e| event_name(e) == "Database" }
+          gc_calls = grouped_events.select {|e| event_name(e) == "GC Execution" }
+
+          transaction_data << {
+            :end_point => group[1],
+            :name => group[0],
+            :timestamp => group[2],
+            :call_count => calls.size,
+            :duration => calls.map(&:duration).sum,
+            :db_call_count => db_calls.size,
+            :db_duration => db_calls.map(&:duration).sum,
+            :gc_call_count => gc_calls.size,
+            :gc_duration => gc_calls.map(&:duration).sum
+          }
         end
       end
     end
@@ -107,9 +116,9 @@ module AppPerf
       difference_up = up - t
 
       if (difference_down < difference_up)
-        return down
+        return down.to_s
       else
-        return up
+        return up.to_s
       end
     end
 

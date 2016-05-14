@@ -1,9 +1,10 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
     <h4>
-      <%= link_to 'All', application_overview_path(@application) %> >
-      <%= link_to @transaction.end_point, application_transactions_path(@application, :filter => @transaction.end_point) %>
-      > <%= @transaction.id %>
+      <%= link_to 'Overview', application_overview_path(@application) %> >
+      <%= link_to 'All Transactions', application_transactions_path(@application) %> >
+      <%= link_to @transaction_sample.end_point, application_transactions_path(@application, :filter => @transaction_sample.end_point) %>
+      > <%= @transaction_sample.id %>
     </h4>
   </div>
 </div>
@@ -11,7 +12,7 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
     <h6>Average Request Time</h6>
-    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :transaction_id => @transaction.id) %>" data-duration="15000">
+    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :transaction_id => @transaction_sample.id) %>" data-duration="15000">
       <i class="fa fa-spinner fa-spin fa-5x"></i>
     </div>
   </div>
@@ -23,9 +24,10 @@
     <table>
     <% @transaction_samples.sort_by(&:duration).reverse.each do |transaction_sample| %>
       <tr>
-        <td class="small-4 medium-4 large-4">
+        <td class="small-6 medium-6 large-6">
           <% if transaction_sample.action.eql?("sql") %>
-            <%= transaction_sample.payload["name"] %>
+            <%= transaction_sample.payload["name"] %><br />
+            <%= transaction_sample.payload["sql"] %>
           <% elsif transaction_sample.category.eql?("action_view") %>
             <%= transaction_sample.payload["identifier"] %>
           <% else %>

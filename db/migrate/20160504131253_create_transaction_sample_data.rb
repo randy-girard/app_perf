@@ -1,6 +1,6 @@
-class CreateTransactionData < ActiveRecord::Migration
+class CreateTransactionSampleData < ActiveRecord::Migration
   def change
-    create_table :transaction_data, :force => true do |t|
+    create_table :transaction_sample_data, :force => true do |t|
       t.references :application
       t.references :host
       t.string :end_point

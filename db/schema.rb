@@ -40,22 +40,6 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   add_index "error_data", ["application_id"], name: "index_error_data_on_application_id", using: :btree
   add_index "error_data", ["host_id"], name: "index_error_data_on_host_id", using: :btree
 
-  create_table "event_data", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.integer  "transaction_id"
-    t.string   "name"
-    t.datetime "timestamp"
-    t.integer  "num"
-    t.float    "value"
-    t.float    "avg"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
-
-  add_index "event_data", ["application_id"], name: "index_event_data_on_application_id", using: :btree
-  add_index "event_data", ["host_id"], name: "index_event_data_on_host_id", using: :btree
-
   create_table "hosts", force: :cascade do |t|
     t.integer  "application_id"
     t.string   "name"
@@ -75,6 +59,25 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   end
 
   create_table "transaction_data", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.string   "end_point"
+    t.string   "name"
+    t.datetime "timestamp"
+    t.integer  "call_count"
+    t.float    "duration"
+    t.integer  "db_call_count"
+    t.float    "db_duration"
+    t.integer  "gc_call_count"
+    t.float    "gc_duration"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "transaction_data", ["application_id"], name: "index_transaction_data_on_application_id", using: :btree
+  add_index "transaction_data", ["host_id"], name: "index_transaction_data_on_host_id", using: :btree
+
+  create_table "transaction_sample_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
     t.string   "end_point"
@@ -105,7 +108,7 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   add_foreign_key "applications", "users"
   add_foreign_key "error_data", "applications"
   add_foreign_key "error_data", "hosts"
-  add_foreign_key "event_data", "applications"
-  add_foreign_key "event_data", "hosts"
   add_foreign_key "hosts", "applications"
+  add_foreign_key "transaction_data", "applications"
+  add_foreign_key "transaction_data", "hosts"
 end
