@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160512004740) do
+ActiveRecord::Schema.define(version: 20160515182836) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,8 +61,7 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   create_table "transaction_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
-    t.string   "end_point"
-    t.string   "name"
+    t.integer  "transaction_endpoint_id"
     t.datetime "timestamp"
     t.integer  "call_count"
     t.float    "duration"
@@ -70,17 +69,27 @@ ActiveRecord::Schema.define(version: 20160512004740) do
     t.float    "db_duration"
     t.integer  "gc_call_count"
     t.float    "gc_duration"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   add_index "transaction_data", ["application_id"], name: "index_transaction_data_on_application_id", using: :btree
   add_index "transaction_data", ["host_id"], name: "index_transaction_data_on_host_id", using: :btree
+  add_index "transaction_data", ["transaction_endpoint_id"], name: "index_transaction_data_on_transaction_endpoint_id", using: :btree
+
+  create_table "transaction_endpoints", force: :cascade do |t|
+    t.integer  "application_id"
+    t.string   "name"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "transaction_endpoints", ["application_id"], name: "index_transaction_endpoints_on_application_id", using: :btree
 
   create_table "transaction_sample_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
-    t.string   "end_point"
+    t.integer  "transaction_endpoint_id"
     t.string   "name"
     t.datetime "started_at"
     t.string   "transaction_id"
@@ -94,9 +103,13 @@ ActiveRecord::Schema.define(version: 20160512004740) do
     t.integer  "parent_id"
     t.string   "action"
     t.string   "category"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
+
+  add_index "transaction_sample_data", ["application_id"], name: "index_transaction_sample_data_on_application_id", using: :btree
+  add_index "transaction_sample_data", ["host_id"], name: "index_transaction_sample_data_on_host_id", using: :btree
+  add_index "transaction_sample_data", ["transaction_endpoint_id"], name: "index_transaction_sample_data_on_transaction_endpoint_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
@@ -111,4 +124,9 @@ ActiveRecord::Schema.define(version: 20160512004740) do
   add_foreign_key "hosts", "applications"
   add_foreign_key "transaction_data", "applications"
   add_foreign_key "transaction_data", "hosts"
+  add_foreign_key "transaction_data", "transaction_endpoints"
+  add_foreign_key "transaction_endpoints", "applications"
+  add_foreign_key "transaction_sample_data", "applications"
+  add_foreign_key "transaction_sample_data", "hosts"
+  add_foreign_key "transaction_sample_data", "transaction_endpoints"
 end

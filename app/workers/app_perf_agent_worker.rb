@@ -51,10 +51,13 @@ class AppPerfAgentWorker < ActiveJob::Base
       children = datum.delete(:children)
       # Hack right now to get the request_id. Ideally this would be
       # part of the bulk load as well.
+      endpoint = datum.delete(:end_point)
+      transaction_endpoint = application.transaction_endpoints.where(:name => endpoint).first_or_create
+
       transaction_sample_datum = application.transaction_sample_data.new(datum)
       transaction_sample_datum.application = application
       transaction_sample_datum.host = host
-      transaction_sample_datum.end_point = datum[:payload][:end_point]
+      transaction_sample_datum.transaction_endpoint = transaction_endpoint
       transaction_sample_datum.save
       transaction_sample_datum.request_id = transaction_sample_datum.id
       transaction_sample_datum.save
@@ -68,8 +71,12 @@ class AppPerfAgentWorker < ActiveJob::Base
     if data.present?
       data.each do |child_datum|
         children = child_datum.delete(:children)
+
+        endpoint = child_datum.delete(:end_point)
+        transaction_endpoint = application.transaction_endpoints.where(:name => endpoint).first_or_create
+
         child = transaction_sample_datum.children.build(child_datum)
-        child.end_point = child_datum[:payload][:end_point]
+        child.transaction_endpoint = transaction_endpoint
         child.application = application
         child.host = host
         child.request_id = transaction_sample_datum.request_id || transaction_sample_datum.id
@@ -82,6 +89,10 @@ class AppPerfAgentWorker < ActiveJob::Base
   def process_transaction_data(data)
     event_data = []
     data.each do |datum|
+      endpoint = datum.delete(:end_point)
+      transaction_endpoint = application.transaction_endpoints.where(:name => endpoint).first_or_create
+      datum[:transaction_endpoint_id] = transaction_endpoint.id
+      datum[:host_id] = host.id
       event_data << application.transaction_data.new(datum)
     end
     TransactionDatum.import(event_data)

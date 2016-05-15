@@ -24,7 +24,7 @@ module AppPerf
         start_time = Time.now
         loop do
           begin
-            if Time.now > start_time + 15.seconds && !@queue.empty?
+            if Time.now > start_time + 60.seconds && !@queue.empty?
               process_data
               dispatch_events(:transaction_sample_data)
               dispatch_events(:transaction_data)
@@ -77,26 +77,26 @@ module AppPerf
         end
         events.each {|e| e.payload[:end_point] = end_point }
 
-        Rails.logger.info events.inspect
-        Rails.logger.flush
-        transaction_sample_data.push AppPerf::NestedEvent.arrange(events.dup, :presort => false)
+        root_event = AppPerf::NestedEvent.arrange(events.dup, :presort => false)
+        if root_event.duration.to_f > 0.2
+          transaction_sample_data.push root_event
+        end
+
         events.select {|e| e.category.eql?("error") }.each do |error|
           error_data << error
         end
         all_events += events.dup
       end
 
-      all_events.group_by {|e| [event_name(e), e.payload[:end_point], round_time(e.started_at, 15)] }.each_pair do |group, grouped_events|
+      all_events.group_by {|e| [e.payload[:end_point], round_time(e.started_at, 60)] }.each_pair do |group, grouped_events|
         if group[0].present?
-
           calls = grouped_events
           db_calls = grouped_events.select {|e| event_name(e) == "Database" }
           gc_calls = grouped_events.select {|e| event_name(e) == "GC Execution" }
 
           transaction_data << {
-            :end_point => group[1],
-            :name => group[0],
-            :timestamp => group[2],
+            :end_point => group[0],
+            :timestamp => group[1],
             :call_count => calls.size,
             :duration => calls.map(&:duration).sum,
             :db_call_count => db_calls.size,

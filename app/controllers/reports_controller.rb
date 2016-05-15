@@ -16,18 +16,13 @@ class ReportsController < ApplicationController
     case params[:id]
     when "average_duration"
       data = @application.transaction_data
-      data = data.where(:end_point => params[:filter]) if params[:filter]
-      database_data = data.where(:name => "Database")
-      ruby_data = data.where(:name => "Ruby")
-      gc_data = data.where(:name => "GC Execution")
-
       if params[:transaction_id]
-        @range = (data.first.timestamp - 5.minutes)..(data.first.timestamp + 5.minutes)
+        data = data.where(:transaction_endpoint_id => params[:transaction_id])
       end
 
-      @report_data.push({ :name => "Ruby", :data => ruby_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") }) if ruby_data.present?
-      @report_data.push({ :name => "Database", :data => database_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(db_duration) / SUM(db_call_count)") }) if database_data.present?
-      @report_data.push({ :name => "GC Execution", :data => gc_data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(gc_duration) / SUM(gc_call_count)") }) if gc_data.present?
+      @report_data.push({ :name => "Ruby", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") }) rescue nil
+      @report_data.push({ :name => "Database", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(db_duration) / SUM(db_call_count)") }) rescue nil
+      @report_data.push({ :name => "GC Execution", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(gc_duration) / SUM(gc_call_count)") }) rescue nil
       @report_colors = ["#A5FFFF", "#EECC45", "#4E4318"]
       @plot_options = {
         :area => {
@@ -35,11 +30,11 @@ class ReportsController < ApplicationController
         }
       }
     when "memory_physical"
-      data = @application.transaction_data.where(:name => "Memory Usage")
+      data = @application.transaction_data#.where(:name => "Memory Usage")
       @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") })
       @report_colors = ["#A5FFFF"]
     when "errors"
-      data = @application.transaction_data.where(:name => "Error")
+      data = @application.transaction_data#.where(:name => "Error")
       @report_data.push({ :name => "Errors", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(call_count)") })
       @report_colors = ["#D3DE00"]
     end

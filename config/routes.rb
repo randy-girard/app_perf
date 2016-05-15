@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   resources :applications do
     resource :overview, :controller => "overview", :only => [:show]
     resources :errors, :only => [:index, :show]
-    resources :transactions, :only => [:index, :show]
+    resources :transactions, :only => [:index, :show] do
+      resources :transaction_samples, :only => [:show], :as => "samples"
+    end
     resources :database, :controller => "database", :only => [:index]
     resources :raw_data, :only => [:index, :show]
     resources :reports, :only => [:index, :show, :new, :error] do

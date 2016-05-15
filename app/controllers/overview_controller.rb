@@ -4,6 +4,7 @@ class OverviewController < ApplicationController
 
   def show
     @hosts = @application.hosts
+    @transactions = @application.transaction_endpoints
 
     @transaction_samples = @application
       .transaction_sample_data

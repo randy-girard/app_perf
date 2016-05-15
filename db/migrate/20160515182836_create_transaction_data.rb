@@ -3,8 +3,7 @@ class CreateTransactionData < ActiveRecord::Migration
     create_table :transaction_data do |t|
       t.references :application, index: true, foreign_key: true
       t.references :host, index: true, foreign_key: true
-      t.string :end_point
-      t.string :name
+      t.references :transaction_endpoint, index: true, foreign_key: true
       t.datetime :timestamp
       t.integer :call_count
       t.float :duration

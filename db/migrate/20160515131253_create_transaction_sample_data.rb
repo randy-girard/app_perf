@@ -1,9 +1,9 @@
 class CreateTransactionSampleData < ActiveRecord::Migration
   def change
     create_table :transaction_sample_data, :force => true do |t|
-      t.references :application
-      t.references :host
-      t.string :end_point
+      t.references :application, index: true, foreign_key: true
+      t.references :host, index: true, foreign_key: true
+      t.references :transaction_endpoint, index: true, foreign_key: true
       t.string :name
       t.datetime :started_at
       t.string :transaction_id

@@ -14,7 +14,7 @@
     }
   }
 
-  options.merge!(:plotOptions => @plot_options) if @plot_options
+  options[:library].merge!(:plotOptions => @plot_options) if @plot_options
 
 
   area_chart(@report_data, options)
