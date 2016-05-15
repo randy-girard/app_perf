@@ -1,6 +1,6 @@
 <tr>
-  <td width="100"><%= transaction_sample_datum.id %></td>
-  <td width="500">
+  <td width="20"><%= transaction_sample_datum.id %></td>
+  <td style="padding-left: <%= depth * 40 %>px;">
     <% if transaction_sample_datum.action.eql?("sql") %>
       <%= transaction_sample_datum.payload[:name] %><br />
       <%= transaction_sample_datum.payload[:sql] %>
@@ -16,20 +16,11 @@
       <%= transaction_sample_datum.name %><br />
     <% end %>
   </td>
-  <td width="100">
+  <td width="200">
     <div class="progress">
       <div class="progress-meter" style="width: <%= transaction_sample_datum.duration / @transaction_sample.duration * 100.to_f %>%"></div>
     </div>
   </td>
   <td width="50"><%= transaction_sample_datum.duration %></td>
 </tr>
-<% if transaction_sample_datum.children.present? %>
-<tr>
-  <td colspan="4">
-    <table>
-      <%= render transaction_sample_datum.children %>
-    </table>
-  </td>
-</tr>
-<% end %>
-
+<%= render transaction_sample_datum.children, :depth => depth + 1 %>
