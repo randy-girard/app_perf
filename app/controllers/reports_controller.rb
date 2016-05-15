@@ -20,9 +20,9 @@ class ReportsController < ApplicationController
         data = data.where(:transaction_endpoint_id => params[:transaction_id])
       end
 
-      @report_data.push({ :name => "Ruby", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") }) rescue nil
-      @report_data.push({ :name => "Database", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(db_duration) / SUM(db_call_count)") }) rescue nil
-      @report_data.push({ :name => "GC Execution", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(gc_duration) / SUM(gc_call_count)") }) rescue nil
+      @report_data.push({ :name => "Ruby", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("CASE SUM(call_count) WHEN 0 THEN 0 ELSE SUM(duration) / SUM(call_count) END") }) rescue nil
+      @report_data.push({ :name => "Database", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("CASE SUM(db_call_count) WHEN 0 THEN 0 ELSE SUM(db_duration) / SUM(db_call_count) END") }) rescue nil
+      @report_data.push({ :name => "GC Execution", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("CASE SUM(gc_call_count) WHEN 0 THEN 0 ELSE SUM(gc_duration) / SUM(gc_call_count) END") }) rescue nil
       @report_colors = ["#A5FFFF", "#EECC45", "#4E4318"]
       @plot_options = {
         :area => {

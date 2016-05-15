@@ -112,11 +112,17 @@ module AppPerf
           db_calls = grouped_events.select {|e| event_name(e) == "Database" }
           gc_calls = grouped_events.select {|e| event_name(e) == "GC Execution" }
 
+          durations = calls.map(&:duration)
+
           transaction_data << {
             :end_point => group[0],
             :timestamp => group[1],
             :call_count => calls.size,
-            :duration => calls.map(&:duration).sum,
+            :duration => durations.sum,
+            :avg => durations.sum / durations.size.to_f,
+            :min => durations.min,
+            :max => durations.max,
+            :sum_sqr => durations.inject {|sum, item| sum + item*item },
             :db_call_count => db_calls.size,
             :db_duration => db_calls.map(&:duration).sum,
             :gc_call_count => gc_calls.size,

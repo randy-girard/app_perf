@@ -7,6 +7,10 @@ class CreateTransactionData < ActiveRecord::Migration
       t.datetime :timestamp
       t.integer :call_count
       t.float :duration
+      t.float :avg
+      t.float :min
+      t.float :max
+      t.float :sum_sqr
       t.integer :db_call_count
       t.float :db_duration
       t.integer :gc_call_count
