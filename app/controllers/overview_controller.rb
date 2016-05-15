@@ -4,7 +4,7 @@ class OverviewController < ApplicationController
 
   def show
     @hosts = @application.hosts
-    @transactions = @application.transaction_endpoints
+    @transactions = @application.transaction_endpoints.joins(:transaction_sample_data).group("transaction_endpoints.id").having("COUNT(transaction_sample_data.id) > 0")
 
     @transaction_samples = @application
       .transaction_sample_data
