@@ -1,6 +1,6 @@
 <ul >
   <li class="active"><%= link_to 'Dashboard', metrics_path %></li>
-<% for metric in Metric.select('DISTINCT(category)').order('category ASC') -%>
+<% for metric in TransactionSampleDatum.select('DISTINCT(category)').order('category ASC') -%>
   <li><%= link_to metric.category.titleize, system_metrics_category_path(metric.category) %></li>
 <% end -%>
   <li>|</li>

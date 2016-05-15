@@ -18,11 +18,32 @@ module AppPerf
       # Create an instrument that will match notification names on the given
       # pattern.
       def initialize(pattern)
+        reset
         @pattern = pattern
       end
 
       def active?
         false
+      end
+
+      def occurance_type
+        :seconds
+      end
+
+      def occurance_value
+        60.seconds
+      end
+
+      def ready?
+        if occurance_type.eql?(:seconds)
+          Time.now > @timer + occurance_value
+        else
+          false
+        end
+      end
+
+      def reset
+        @timer = Time.now
       end
 
       def before

@@ -1,6 +1,6 @@
 module AppPerf
   class Config
-    attr_accessor :store, :instruments, :notification_exclude_patterns, :path_exclude_patterns, :options
+    attr_accessor :store, :instruments, :monitors, :notification_exclude_patterns, :path_exclude_patterns, :options
 
     def initialize
       self.store = AppPerf::Store.new
@@ -12,8 +12,11 @@ module AppPerf
         AppPerf::Instrument::ActiveRecord.new,
         AppPerf::Instrument::Rack.new,
         AppPerf::Instrument::RubyVm.new,
-        AppPerf::Instrument::Memory.new,
         AppPerf::Instrument::Errors.new
+      ]
+
+      self.monitors = [
+        AppPerf::Monitor::Memory.new
       ]
     end
 

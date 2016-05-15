@@ -4,33 +4,33 @@ module SystemMetrics
 
     def index
       @category_metrics = {}
-      categories = Metric.select('DISTINCT(category)').order('category ASC').map(&:category)
+      categories = TransactionSampleDatum.select('DISTINCT(category)').order('category ASC').map(&:category)
       categories.each do |category|
-        @category_metrics[category] = Metric.where(:category => category, :started_at => date_range).order('duration DESC').limit(limit(10))
+        @category_metrics[category] = TransactionSampleDatum.where(:category => category, :started_at => date_range).order('duration DESC').limit(limit(10))
       end
     end
 
     def show
-      @metric = Metric.find(params[:id])
+      @metric = TransactionSampleDatum.find(params[:id])
     end
 
     def destroy
       category = params[:id]
       if category == 'all'
-        Metric.delete_all
+        TransactionSampleDatum.delete_all
       else
-        Metric.where(:category => category).delete_all
+        TransactionSampleDatum.where(:category => category).delete_all
       end
 
       redirect_to system_metrics_admin_path
     end
 
     def category
-      @metrics = Metric.where(:category => params[:category], :started_at => date_range).order('duration DESC').limit(limit)
+      @metrics = TransactionSampleDatum.where(:category => params[:category], :started_at => date_range).order('duration DESC').limit(limit)
     end
 
     def admin
-      @categories = Metric.select('category, count(category) as count').order('category ASC').group('category')
+      @categories = TransactionSampleDatum.select('category, count(category) as count').order('category ASC').group('category')
     end
 
     private

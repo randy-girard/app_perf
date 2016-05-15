@@ -18,12 +18,24 @@ module AppPerf
       @queue << events
     end
 
+    def monitors
+      Rails.application.config.app_perf.monitors.select(&:active?)
+    end
+
     def initialize_dispatcher
       thread = Thread.new do
         set_void_instrumenter
         start_time = Time.now
         loop do
           begin
+            monitors.each do |monitor|
+              if monitor.ready?
+                data = monitor.instrument
+                analytic_event_data << data if data
+                monitor.reset
+              end
+            end
+
             if Time.now > start_time + 60.seconds && !@queue.empty?
               process_data
               dispatch_events(:analytic_event_data)
@@ -38,7 +50,7 @@ module AppPerf
             Rails.logger.error "#{ex.backtrace.inspect}"
           end
           Rails.logger.flush
-          sleep 15
+          sleep 5
         end
       end
       thread.abort_on_exception = true
@@ -91,15 +103,6 @@ module AppPerf
           error_data << error
         end
         all_events += events.dup
-      end
-
-      memory_events = all_events.select {|e| e.category.eql?("memory") }
-      memory_events.group_by {|e| round_time(e.started_at, 60) }.each_pair do |timestamp, memory|
-        analytic_event_data << {
-          :name => "Memory",
-          :timestamp => timestamp,
-          :value => memory.map(&:duration).sum  / memory.size.to_f
-        }
       end
 
       all_events.group_by {|e| [e.payload[:end_point], round_time(e.started_at, 60)] }.each_pair do |group, grouped_events|

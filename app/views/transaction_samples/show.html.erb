@@ -11,6 +11,15 @@
 
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
+    <table>
+      <%= render @transaction_sample %>
+    </table>
+  </div>
+</div>
+
+<% if false %>
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
     <% total_duration = @transaction_samples.sum(:duration) %>
     <table>
     <% @transaction_samples.each do |transaction_sample| %>
@@ -38,3 +47,4 @@
     </table>
   </div>
 </div>
+<% end %>

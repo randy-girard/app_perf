@@ -40,4 +40,5 @@ module AppPerf
 end
 
 require 'app_perf/instrument'
+require 'app_perf/monitor'
 require 'app_perf/engine'
