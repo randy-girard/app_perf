@@ -11,10 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160515182836) do
+ActiveRecord::Schema.define(version: 20160515182837) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "analytic_event_data", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.datetime "timestamp"
+    t.string   "name"
+    t.float    "value"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "analytic_event_data", ["application_id"], name: "index_analytic_event_data_on_application_id", using: :btree
+  add_index "analytic_event_data", ["host_id"], name: "index_analytic_event_data_on_host_id", using: :btree
 
   create_table "applications", force: :cascade do |t|
     t.integer  "user_id"
@@ -118,6 +131,8 @@ ActiveRecord::Schema.define(version: 20160515182836) do
     t.datetime "updated_at",      null: false
   end
 
+  add_foreign_key "analytic_event_data", "applications"
+  add_foreign_key "analytic_event_data", "hosts"
   add_foreign_key "applications", "users"
   add_foreign_key "error_data", "applications"
   add_foreign_key "error_data", "hosts"

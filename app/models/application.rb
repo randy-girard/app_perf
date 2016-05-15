@@ -2,6 +2,7 @@ class Application < ActiveRecord::Base
   belongs_to :user
   has_many :raw_data
   has_many :hosts
+  has_many :analytic_event_data
   has_many :transaction_endpoints
   has_many :transaction_data
   has_many :transaction_sample_data

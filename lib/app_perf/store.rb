@@ -26,6 +26,7 @@ module AppPerf
           begin
             if Time.now > start_time + 60.seconds && !@queue.empty?
               process_data
+              dispatch_events(:analytic_event_data)
               dispatch_events(:transaction_sample_data)
               dispatch_events(:transaction_data)
               dispatch_events(:error_data)
@@ -47,6 +48,10 @@ module AppPerf
 
     def set_void_instrumenter
       Thread.current[:"instrumentation_#{notifier.object_id}"] = VoidInstrumenter.new(notifier)
+    end
+
+    def analytic_event_data
+      Thread.current[:app_perf_analytic_event_data] ||= []
     end
 
     def transaction_sample_data
@@ -78,7 +83,7 @@ module AppPerf
         events.each {|e| e.payload[:end_point] = end_point }
 
         root_event = AppPerf::NestedEvent.arrange(events.dup, :presort => false)
-        if root_event.duration.to_f > 0.2
+        if root_event.duration > 200
           transaction_sample_data.push root_event
         end
 
@@ -88,8 +93,18 @@ module AppPerf
         all_events += events.dup
       end
 
+      memory_events = all_events.select {|e| e.category.eql?("memory") }
+      memory_events.group_by {|e| round_time(e.started_at, 60) }.each_pair do |timestamp, memory|
+        analytic_event_data << {
+          :name => "Memory",
+          :timestamp => timestamp,
+          :value => memory.map(&:duration).sum  / memory.size.to_f
+        }
+      end
+
       all_events.group_by {|e| [e.payload[:end_point], round_time(e.started_at, 60)] }.each_pair do |group, grouped_events|
         if group[0].present?
+
           calls = grouped_events
           db_calls = grouped_events.select {|e| event_name(e) == "Database" }
           gc_calls = grouped_events.select {|e| event_name(e) == "GC Execution" }
@@ -105,6 +120,14 @@ module AppPerf
             :gc_duration => gc_calls.map(&:duration).sum
           }
         end
+      end
+
+      error_data.group_by {|e| round_time(e.started_at, 60) }.each_pair do |timestamp, errors|
+        analytic_event_data << {
+          :name => "Error",
+          :timestamp => timestamp,
+          :value => errors.size
+        }
       end
     end
 
@@ -154,10 +177,7 @@ module AppPerf
     end
 
     def dispatch_events(method)
-      Rails.logger.info method.inspect
       data = send(method)
-      Rails.logger.info data.inspect
-      Rails.logger.flush
       if data.present?
         uri = URI(url(method))
         req = Net::HTTP::Post.new(uri, { "Content-Type" => "application/json", "Accept-Encoding" => "gzip", "User-Agent" => "gzip" })

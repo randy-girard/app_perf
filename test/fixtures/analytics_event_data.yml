@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  application_id: 
+  host_id: 
+  timestamp: 2016-05-15 06:47:11
+  name: MyString
+  value: 1.5
+
+two:
+  application_id: 
+  host_id: 
+  timestamp: 2016-05-15 06:47:11
+  name: MyString
+  value: 1.5

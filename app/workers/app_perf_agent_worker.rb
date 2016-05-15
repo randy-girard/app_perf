@@ -16,6 +16,8 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       if protocol_version.to_i.eql?(1)
         case method
+        when "analytic_event_data"
+          process_analytic_event_data(data)
         when "transaction_data"
           process_transaction_data(data)
         when "transaction_sample_data"
@@ -30,6 +32,15 @@ class AppPerfAgentWorker < ActiveJob::Base
   end
 
   private
+
+  def process_analytic_event_data(data)
+    analytic_event_data = []
+    data.each do |datum|
+      datum[:host_id] = host.id
+      analytic_event_data << application.analytic_event_data.new(datum)
+    end
+    AnalyticEventDatum.import(analytic_event_data)
+  end
 
   def process_transaction_sample_data(data)
     raw_data = []

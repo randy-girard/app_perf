@@ -30,12 +30,12 @@ class ReportsController < ApplicationController
         }
       }
     when "memory_physical"
-      data = @application.transaction_data#.where(:name => "Memory Usage")
-      @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(duration) / SUM(call_count)") })
+      data = @application.analytic_event_data.where(:name => "Memory")
+      @report_data.push({ :name => "Memory Usage", :data => data.group_by_minute(:timestamp, range: @range).average(:value) })
       @report_colors = ["#A5FFFF"]
     when "errors"
-      data = @application.transaction_data#.where(:name => "Error")
-      @report_data.push({ :name => "Errors", :data => data.group_by_minute(:timestamp, range: @range).calculate_all("SUM(call_count)") })
+      data = @application.analytic_event_data.where(:name => "Error")
+      @report_data.push({ :name => "Errors", :data => data.group_by_minute(:timestamp, range: @range).sum(:value) })
       @report_colors = ["#D3DE00"]
     end
     render :layout => false

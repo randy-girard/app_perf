@@ -6,7 +6,6 @@ module AppPerf
   autoload :Middleware,     'app_perf/middleware'
   autoload :NestedEvent,    'app_perf/nested_event'
   autoload :Store,          'app_perf/store'
-  autoload :AsyncStore,     'app_perf/async_store'
   autoload :Version,        'app_perf/version'
 
   def self.config
