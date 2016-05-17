@@ -1,4 +1,0 @@
-<% set_title "#{params[:category].titleize} Category System Metrics" -%>
-<% set_page_title params[:category].titleize -%>
-<%= render :partial => "metric_table", 
-  :locals => { :metrics => @metrics, :include_children => false, :columns => [:identifier, :action, :when, :duration] } %>

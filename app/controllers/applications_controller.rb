@@ -10,6 +10,7 @@ class ApplicationsController < ApplicationController
   # GET /applications/1
   # GET /applications/1.json
   def show
+    @root_uri = URI.parse(root_url)
   end
 
   # GET /applications/new
