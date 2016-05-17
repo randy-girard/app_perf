@@ -1,0 +1,5 @@
+license_key: '19509de2-d07d-470f-a8f5-aab940569d84'
+app_name: AppPerf
+host: 127.0.0.1
+port: 9291
+ssl: false

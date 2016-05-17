@@ -43,21 +43,7 @@ class AppPerfAgentWorker < ActiveJob::Base
   end
 
   def process_transaction_sample_data(data)
-    raw_data = []
     transaction_sample_data = []
-
-    begin
-      data.each do |datum|
-        raw_data << application.raw_data.new do |raw_datum|
-          raw_datum.host = host
-          raw_datum.body = datum
-          raw_datum.method = datum[:name]
-        end
-        RawDatum.import(raw_data)
-      end
-    rescue
-    end
-
     data.each do |datum|
       children = datum.delete(:children)
       # Hack right now to get the request_id. Ideally this would be

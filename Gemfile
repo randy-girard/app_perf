@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5.2'
 # Use sqlite3 as the database for Active Record
@@ -31,6 +30,7 @@ gem 'bcrypt', '~> 3.1.7'
 # gem 'unicorn'
 gem 'foreman'
 gem 'puma'
+gem 'passenger'
 #gem 'newrelic_rpm'
 gem 'kaminari'
 gem "chartkick"
@@ -43,6 +43,7 @@ gem "highcharts-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
 gem "activerecord-import"
+gem "app_perf_ruby_agent", :github => "randy-girard/app_perf_ruby_agent"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

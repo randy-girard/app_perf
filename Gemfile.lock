@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/randy-girard/app_perf_ruby_agent.git
+  revision: 5eab352038389c99ab956a81ca5551f8fe2c16f5
+  specs:
+    app_perf_ruby_agent (0.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -104,6 +110,9 @@ GEM
     multi_json (1.11.2)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
+    passenger (5.0.28)
+      rack
+      rake (>= 0.8.1)
     pg (0.18.4)
     puma (2.15.3)
     rack (1.6.4)
@@ -190,6 +199,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-import
+  app_perf_ruby_agent!
   bcrypt (~> 3.1.7)
   byebug
   calculate-all
@@ -204,6 +214,7 @@ DEPENDENCIES
   jquery-rails
   jquery-turbolinks
   kaminari
+  passenger
   pg
   puma
   rails (= 4.2.5.2)
