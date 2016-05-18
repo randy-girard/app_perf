@@ -1,4 +1,5 @@
 class ApplicationsController < ApplicationController
+  skip_before_action :set_current_application
   before_action :set_application, only: [:show, :edit, :update, :destroy]
 
   # GET /applications

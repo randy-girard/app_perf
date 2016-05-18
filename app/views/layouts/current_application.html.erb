@@ -16,9 +16,15 @@
     <%= render "shared/header" %>
 
     <div class="row expanded">
-      <div class="small-12 medium-12 large-12 columns">
+      <div class="medium-10 large-11 medium-push-2 large-push-1 columns">
         <%= yield %>
       </div>
+
+      <% if @current_user && @current_application %>
+        <div class="medium-2 large-1 medium-pull-10 large-pull-11 columns">
+          <%= render "shared/menu" %>
+        </div>
+      <% end %>
     </div>
 
 

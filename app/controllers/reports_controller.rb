@@ -3,11 +3,11 @@ class ReportsController < ApplicationController
   def show
     @reporter = case params[:id]
       when "average_duration"
-        DurationReporter.new(@application, params, view_context)
+        DurationReporter.new(@current_application, params, view_context)
       when "memory_physical"
-        MemoryReporter.new(@application, params, view_context)
+        MemoryReporter.new(@current_application, params, view_context)
       when "errors"
-        ErrorReporter.new(@application, params, view_context)
+        ErrorReporter.new(@current_application, params, view_context)
       end
 
     render :layout => false

@@ -6,7 +6,9 @@ class ApplicationController < ActionController::Base
   around_filter :use_time_zone
   before_filter :authenticate_user!
 
-  before_action :set_application
+  before_action :set_current_application
+
+  layout :set_layout
 
   helper_method :current_user
   def current_user
@@ -17,9 +19,20 @@ class ApplicationController < ActionController::Base
     redirect_to new_user_session_url  unless current_user
   end
 
-  def set_application
-    if @current_user && params[:application_id]
-      @application ||= @current_user.applications.find(params[:application_id])
+  def set_current_application
+    if @current_user
+      @applications = @current_user.applications
+      if params[:application_id]
+        @current_application ||= @applications.find {|a| a.id.eql?(params[:application_id].to_i) }
+      end
+    end
+  end
+
+  def set_layout
+    if @current_application
+      "current_application"
+    else
+      "application"
     end
   end
 

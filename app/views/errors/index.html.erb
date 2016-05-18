@@ -9,7 +9,7 @@
       </tr>
       <% @errors.each do |error_datum| %>
         <tr>
-          <td><%= link_to 'View Error', application_error_path(@application, error_datum) %></td>
+          <td><%= link_to 'View Error', application_error_path(@current_application, error_datum) %></td>
           <td><%= error_datum.message %></td>
           <td><%= error_datum.timestamp %></td>
           <td><%= error_datum.count %></td>

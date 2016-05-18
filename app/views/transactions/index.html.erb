@@ -1,8 +1,8 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
     <h4>
-      <%= link_to 'Overview', application_overview_path(@application) %> >
-      <%= link_to_if @transaction, 'All Transactions', application_transactions_path(@application) %>
+      <%= link_to 'Overview', application_overview_path(@current_application) %> >
+      <%= link_to_if @transaction, 'All Transactions', application_transactions_path(@current_application) %>
       <% if @transaction %>
       > <%= @transaction.name %>
       <% end %>
@@ -13,7 +13,7 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
     <h6>Average Request Time</h6>
-    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@application, :id => "average_duration", :filter => @filter) %>" data-duration="15000">
+    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "average_duration", :filter => @filter) %>" data-duration="15000">
       <i class="fa fa-spinner fa-spin fa-5x"></i>
     </div>
   </div>
@@ -26,7 +26,7 @@
         <% @transactions.each do |transaction| %>
           <tr>
             <td>
-              <%= link_to transaction.name, application_transaction_path(@application, transaction) %><br />
+              <%= link_to transaction.name, application_transaction_path(@current_application, transaction) %><br />
             </td>
           </tr>
         <% end %>
