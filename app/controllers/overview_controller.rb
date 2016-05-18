@@ -13,6 +13,7 @@ class OverviewController < ApplicationController
     @time_consuming_transactions = @application
       .transaction_endpoints
       .select("transaction_endpoints.*, SUM(transaction_data.call_count * transaction_data.duration) AS total_time_spent")
+      .where(:transaction_data => { :timestamp => @range })
       .joins(:transaction_data)
       .group("transaction_endpoints.id")
       .order("SUM(transaction_data.call_count * transaction_data.duration) DESC")
