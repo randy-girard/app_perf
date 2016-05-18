@@ -66,3 +66,23 @@
     </div>
   </div>
 </div>
+
+<div class="row">
+  <div class="small-8 medium-8 large-8 columns">
+    <h4>Transactions (Most consuming)</h4>
+    <table>
+    <% @time_consuming_transactions.each do |transaction| %>
+      <tr>
+        <td><%= link_to transaction.name, application_transaction_path(@application, transaction) %></td>
+        <td width="65%">
+          <div class="progress">
+            <span class="progress-meter" style="width: <%= number_to_percentage(transaction.total_time_spent / @total_time_spent * 100) %>">
+              <p class="progress-meter-text"><%= number_to_percentage(transaction.total_time_spent / @total_time_spent * 100, :precision => 1) %></p>
+            </span>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+</div>
