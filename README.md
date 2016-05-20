@@ -2,6 +2,7 @@
 
 ![Overview](/doc/overview.png?raw=true "Overview")
 ![Sample](/doc/sample.png?raw=true "Sample")
+![Database](/doc/database.png?raw=true "Database")
 
 <b>NOTE: This application is in extremely beginning stages and I am still working out flows and learning the data model. I will be cleaning code up as I go.</b>
 
