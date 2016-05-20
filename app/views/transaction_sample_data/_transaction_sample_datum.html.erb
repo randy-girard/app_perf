@@ -1,5 +1,11 @@
 <tr>
-  <td width="20"><%= transaction_sample_datum.id %></td>
+  <td width="20">
+    <% if transaction_sample_datum.action.eql?("sql") %>
+    <%= link_to transaction_sample_datum.id, application_database_sample_path(@current_application, transaction_sample_datum.grouping, transaction_sample_datum) %>
+    <% else %>
+    <%= transaction_sample_datum.id %>
+    <% end %>
+  </td>
   <td style="padding-left: <%= depth * 40 %>px;">
     <% if transaction_sample_datum.action.eql?("sql") %>
       <%= transaction_sample_datum.payload[:name] %><br />
