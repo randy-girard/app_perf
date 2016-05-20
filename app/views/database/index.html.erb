@@ -1,14 +1,33 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
+    <h4>Database</h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-3 medium-3 large-3 columns">
     <table>
       <tbody>
-        <% @transaction_samples.each_pair do |name, transaction_samples| %>
+        <% @database_calls.each do |database_call| %>
           <tr>
-            <td><%= name %></td>
-            <td><%= transaction_samples.sum(&:duration) / transaction_samples.size %></td>
+            <td><%= link_to database_call.name, application_database_samples_path(@current_application, database_call) %></td>
+            <td width="40%">
+              <div class="progress">
+                <span class="progress-meter" style="width: <%= database_call.duration / @total_duration * 100.to_f %>%">
+                  <p class="progress-meter-text"><%= number_to_percentage(database_call.duration / @total_duration * 100.to_f, :precision => 2) %></p>
+                </span>
+              </div>
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
+  </div>
+
+  <div class="small-9 medium-9 large-9 columns">
+    <h6>Database calls</h6>
+    <div id="database_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "database") %>" data-duration="15000">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
   </div>
 </div>

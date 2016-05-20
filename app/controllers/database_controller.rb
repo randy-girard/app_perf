@@ -1,9 +1,14 @@
 class DatabaseController < ApplicationController
 
   def index
-    @transaction_samples = @current_application.transaction_sample_data
-      .where(:category => "active_record")
-      .group_by {|t| t.payload[:name] }
+    @database_calls = @current_application
+      .database_calls
+      .joins(:database_samples)
+      .where(:transaction_sample_data => { :started_at => @time_range })
+      .group("database_calls.id")
+      .select("database_calls.*, SUM(transaction_sample_data.exclusive_duration) AS duration")
+      .order("SUM(transaction_sample_data.exclusive_duration) DESC")
+    @total_duration = @database_calls.map(&:duration).sum
   end
 
 end

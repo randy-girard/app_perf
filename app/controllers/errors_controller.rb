@@ -1,10 +1,11 @@
 class ErrorsController < ApplicationController
   def index
     @errors = @current_application
-      .error_data
-      .group("REGEXP_REPLACE(error_data.message, ':0x[0-9a-z].*\>', '>')")
-      .select("MAX(error_data.id) AS id, REGEXP_REPLACE(error_data.message, ':0x[0-9a-z].*\>', '>') AS message, MAX(error_data.timestamp) AS timestamp, COUNT(*) AS count")
-      .order("MAX(error_data.timestamp) DESC")
+      .error_messages
+      .joins(:error_data)
+      .group("error_messages.id")
+      .select("error_messages.*, COUNT(error_data.id) AS instances_count")
+      .order("last_error_at DESC")
   end
 
   def show

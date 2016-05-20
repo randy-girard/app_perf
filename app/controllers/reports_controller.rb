@@ -8,9 +8,16 @@ class ReportsController < ApplicationController
         MemoryReporter.new(@current_application, params, view_context)
       when "errors"
         ErrorReporter.new(@current_application, params, view_context)
+      when "database"
+        DatabaseReporter.new(@current_application, params, view_context)
+      when "database_samples"
+        DatabaseSampleReporter.new(@current_application, params, view_context)
       end
 
-    render :layout => false
+    respond_to do |format|
+      format.html { render :layout => false }
+      format.json { render :json => @reporter.report_data }
+    end
   end
 
   def new

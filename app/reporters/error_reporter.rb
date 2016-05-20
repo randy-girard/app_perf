@@ -4,8 +4,6 @@ class ErrorReporter < Reporter
     view_context.area_chart(report_data, report_options)
   end
 
-  private
-
   def report_data
     data = application.analytic_event_data.where(:name => "Error")
 
@@ -14,6 +12,8 @@ class ErrorReporter < Reporter
       :data => data.group_by_minute(:timestamp, range: time_range).sum(:value)
     }]
   end
+
+  private
 
   def report_colors
     ["#D3DE00"]

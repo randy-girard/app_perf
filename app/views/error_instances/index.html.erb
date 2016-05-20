@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <h4>
+      <%= link_to "Errors", application_errors_path(@current_application) %> >
+      <%= @error_message.error_class %>
+    </h4>
+  </div>
+</div>
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <table>
+      <tr>
+        <th width="100"></th>
+        <th>Message</th>
+        <th width="200">Errored At</th>
+      </tr>
+      <% @error_instances.each do |error_instance| %>
+        <tr>
+          <td><%= link_to 'View Error', application_error_instance_path(@current_application, @error_message, error_instance) %></td>
+          <td><%= error_instance.message %></td>
+          <td><%= error_instance.created_at %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

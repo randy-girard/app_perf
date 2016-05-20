@@ -4,8 +4,6 @@ class DurationReporter < Reporter
     view_context.area_chart(report_data, report_options)
   end
 
-  private
-
   def report_data
     data = application.transaction_data
     if params[:transaction_id]
@@ -19,6 +17,8 @@ class DurationReporter < Reporter
     hash
   end
 
+  private
+
   def report_colors
     ["#A5FFFF", "#EECC45", "#4E4318"]
   end
@@ -28,8 +28,10 @@ class DurationReporter < Reporter
       :id => "duration_chart",
       :height => "100%",
       :library => {
-        :area => {
-          :stacking => "normal"
+        :plotOptions => {
+          :area => {
+            :stacking => "normal"
+          }
         },
         :colors => report_colors,
         :legend => {

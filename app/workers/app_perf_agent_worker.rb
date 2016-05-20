@@ -50,11 +50,12 @@ class AppPerfAgentWorker < ActiveJob::Base
       # part of the bulk load as well.
       endpoint = datum.delete(:end_point)
       transaction_endpoint = application.transaction_endpoints.where(:name => endpoint).first_or_create
-
+      database_group = process_database_data(datum)
       transaction_sample_datum = application.transaction_sample_data.new(datum)
       transaction_sample_datum.application = application
       transaction_sample_datum.host = host
       transaction_sample_datum.transaction_endpoint = transaction_endpoint
+      transaction_sample_datum.grouping = database_group
       transaction_sample_datum.save
       transaction_sample_datum.request_id = transaction_sample_datum.id
       transaction_sample_datum.save
@@ -71,10 +72,11 @@ class AppPerfAgentWorker < ActiveJob::Base
 
         endpoint = child_datum.delete(:end_point)
         transaction_endpoint = application.transaction_endpoints.where(:name => endpoint).first_or_create
-
+        database_group = process_database_data(child_datum)
         child = transaction_sample_datum.children.build(child_datum)
         child.transaction_endpoint = transaction_endpoint
         child.application = application
+        child.grouping = database_group
         child.host = host
         child.request_id = transaction_sample_datum.request_id || transaction_sample_datum.id
         process_transaction_sample_data_children(transaction_sample_data, child, children, depth + 1) if children.present?
@@ -98,14 +100,39 @@ class AppPerfAgentWorker < ActiveJob::Base
   def process_error_data(data)
     error_data = []
     data.each do |datum|
+      message, backtrace, fingerprint = generate_fingerprint(datum[:payload][:message], datum[:payload][:backtrace])
+
+      error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
+      error_message.error_class ||= datum[:payload][:error_class]
+      error_message.error_message ||= message
+      error_message.last_error_at = Time.now
+      error_message.save
+
       error_data << application.error_data.new do |error_datum|
         error_datum.host = host
+        error_datum.error_message = error_message
         error_datum.transaction_id = datum[:transaction_id]
-        error_datum.message = datum[:payload][:message]
-        error_datum.backtrace = datum[:payload][:backtrace]
+        error_datum.message = message
+        error_datum.backtrace = backtrace
         error_datum.timestamp = datum[:started_at]
       end
     end
     ErrorDatum.import(error_data)
+  end
+
+  def generate_fingerprint(message, backtrace)
+    message, fingerprint = ErrorMessage.generate_fingerprint(message)
+    return message, backtrace, fingerprint
+  end
+
+  def process_database_data(data)
+    if data[:category].eql?("active_record")
+      name = "PostgreSQL"
+      database_type = application.database_types.where(:name => name).first_or_create
+      application.database_calls.where(
+        :name => data[:payload][:name],
+        :database_type_id => database_type.id
+      ).first_or_create
+    end
   end
 end

@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <h4>
+      <%= link_to "Errors", application_errors_path(@current_application) %> >
+      <%= link_to @error_message.error_class, application_error_instances_path(@current_application, @error_message) %> >
+    </h4>
+    <h4>
+      <%= @error_instance.message %>
+    </h4>
+  </div>
+</div>
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns">
+    <pre>
+      <% @error_instance.backtrace.each do |line| %>
+      <%= line %>
+      <% end %>
+    </pre>
+  </div>
+</div>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160515182837) do
+ActiveRecord::Schema.define(version: 20160519134740) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,19 +39,53 @@ ActiveRecord::Schema.define(version: 20160515182837) do
 
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
 
-  create_table "error_data", force: :cascade do |t|
+  create_table "database_calls", force: :cascade do |t|
     t.integer  "application_id"
-    t.integer  "host_id"
-    t.integer  "transaction_id"
-    t.string   "message"
-    t.text     "backtrace"
-    t.datetime "timestamp"
+    t.integer  "database_type_id"
+    t.string   "name"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "database_calls", ["application_id"], name: "index_database_calls_on_application_id", using: :btree
+  add_index "database_calls", ["database_type_id"], name: "index_database_calls_on_database_type_id", using: :btree
+
+  create_table "database_types", force: :cascade do |t|
+    t.integer  "application_id"
+    t.string   "name"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
   end
 
+  add_index "database_types", ["application_id"], name: "index_database_types_on_application_id", using: :btree
+
+  create_table "error_data", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.integer  "error_message_id"
+    t.string   "transaction_id"
+    t.string   "message"
+    t.text     "backtrace"
+    t.datetime "timestamp"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
   add_index "error_data", ["application_id"], name: "index_error_data_on_application_id", using: :btree
+  add_index "error_data", ["error_message_id"], name: "index_error_data_on_error_message_id", using: :btree
   add_index "error_data", ["host_id"], name: "index_error_data_on_host_id", using: :btree
+
+  create_table "error_messages", force: :cascade do |t|
+    t.integer  "application_id"
+    t.string   "fingerprint"
+    t.string   "error_class"
+    t.string   "error_message"
+    t.datetime "last_error_at"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "error_messages", ["application_id"], name: "index_error_messages_on_application_id", using: :btree
 
   create_table "hosts", force: :cascade do |t|
     t.integer  "application_id"
@@ -61,15 +95,6 @@ ActiveRecord::Schema.define(version: 20160515182837) do
   end
 
   add_index "hosts", ["application_id"], name: "index_hosts_on_application_id", using: :btree
-
-  create_table "raw_data", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.string   "method"
-    t.text     "body"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
 
   create_table "transaction_data", force: :cascade do |t|
     t.integer  "application_id"
@@ -106,6 +131,8 @@ ActiveRecord::Schema.define(version: 20160515182837) do
   create_table "transaction_sample_data", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
+    t.integer  "grouping_id"
+    t.string   "grouping_type"
     t.integer  "transaction_endpoint_id"
     t.string   "name"
     t.datetime "started_at"
@@ -125,6 +152,7 @@ ActiveRecord::Schema.define(version: 20160515182837) do
   end
 
   add_index "transaction_sample_data", ["application_id"], name: "index_transaction_sample_data_on_application_id", using: :btree
+  add_index "transaction_sample_data", ["grouping_type", "grouping_id"], name: "index_transaction_sample_data_on_grouping_type_and_grouping_id", using: :btree
   add_index "transaction_sample_data", ["host_id"], name: "index_transaction_sample_data_on_host_id", using: :btree
   add_index "transaction_sample_data", ["transaction_endpoint_id"], name: "index_transaction_sample_data_on_transaction_endpoint_id", using: :btree
 
@@ -138,8 +166,13 @@ ActiveRecord::Schema.define(version: 20160515182837) do
   add_foreign_key "analytic_event_data", "applications"
   add_foreign_key "analytic_event_data", "hosts"
   add_foreign_key "applications", "users"
+  add_foreign_key "database_calls", "applications"
+  add_foreign_key "database_calls", "database_types"
+  add_foreign_key "database_types", "applications"
   add_foreign_key "error_data", "applications"
+  add_foreign_key "error_data", "error_messages"
   add_foreign_key "error_data", "hosts"
+  add_foreign_key "error_messages", "applications"
   add_foreign_key "hosts", "applications"
   add_foreign_key "transaction_data", "applications"
   add_foreign_key "transaction_data", "hosts"

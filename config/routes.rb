@@ -10,11 +10,15 @@ Rails.application.routes.draw do
 
   resources :applications do
     resource :overview, :controller => "overview", :only => [:show]
-    resources :errors, :only => [:index, :show]
+    resources :errors, :only => [:index, :show] do
+      resources :instances, :controller => "error_instances", :only => [:index, :show]
+    end
     resources :transactions, :only => [:index, :show] do
       resources :transaction_samples, :only => [:show], :as => "samples"
     end
-    resources :database, :controller => "database", :only => [:index]
+    resources :database, :controller => "database", :only => [:index] do
+      resources :samples, :only => [:index, :show], :controller => "database_samples", :as => "samples"
+    end
     resources :reports, :only => [:index, :show, :new, :error] do
       collection do
         get :error

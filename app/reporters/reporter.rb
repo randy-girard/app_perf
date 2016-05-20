@@ -9,11 +9,11 @@ class Reporter
   def render
   end
 
-  private
-
   def report_data
     []
   end
+
+  private
 
   def report_colors
     []

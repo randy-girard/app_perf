@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user!
 
   before_action :set_current_application
+  before_action :set_time_range
 
   layout :set_layout
 
@@ -38,5 +39,9 @@ class ApplicationController < ActionController::Base
 
   def use_time_zone(&block)
     Time.use_zone('Eastern Time (US & Canada)', &block)
+  end
+
+  def set_time_range
+    @time_range = (Time.now - 10.minutes)..Time.now
   end
 end

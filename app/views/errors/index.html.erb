@@ -3,16 +3,18 @@
     <table>
       <tr>
         <th width="100"></th>
-        <th>Method</th>
+        <th width="200">Error Class</th>
+        <th>Error Message</th>
         <th width="200">Latest</th>
         <th width="100">Count</th>
       </tr>
-      <% @errors.each do |error_datum| %>
+      <% @errors.each do |error| %>
         <tr>
-          <td><%= link_to 'View Error', application_error_path(@current_application, error_datum) %></td>
-          <td><%= error_datum.message %></td>
-          <td><%= error_datum.timestamp %></td>
-          <td><%= error_datum.count %></td>
+          <td><%= link_to 'View Error', application_error_instances_path(@current_application, error) %></td>
+          <td><%= error.error_class %></td>
+          <td><%= error.error_message[0..100] %></td>
+          <td><%= error.last_error_at %></td>
+          <td><%= error.instances_count %></td>
         </tr>
       <% end %>
     </table>

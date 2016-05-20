@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/randy-girard/app_perf_ruby_agent.git
-  revision: 5eab352038389c99ab956a81ca5551f8fe2c16f5
+  revision: db615295d8753689b0178418a4460c3bf1060355
   specs:
     app_perf_ruby_agent (0.0.1)
 

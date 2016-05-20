@@ -3,6 +3,7 @@ class TransactionSampleDatum < ActiveRecord::Base
   belongs_to :host
   belongs_to :parent, :class_name => self.name
   belongs_to :transaction_endpoint
+  belongs_to :grouping, :polymorphic => true
 
   has_many :children, :inverse_of => :parent, :class_name => self.name, :foreign_key => :parent_id
 

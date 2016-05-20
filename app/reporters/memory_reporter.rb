@@ -4,8 +4,6 @@ class MemoryReporter < Reporter
     view_context.area_chart(report_data, report_options)
   end
 
-  private
-
   def report_data
     data = application.analytic_event_data.where(:name => "Memory")
 
@@ -14,6 +12,8 @@ class MemoryReporter < Reporter
       :data => data.group_by_minute(:timestamp, range: time_range).average(:value)
     }]
   end
+
+  private
 
   def report_colors
     ["#A5FFFF"]

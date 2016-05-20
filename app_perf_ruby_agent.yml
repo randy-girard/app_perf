@@ -3,3 +3,4 @@ app_name: AppPerf
 host: 127.0.0.1
 port: 9291
 ssl: false
+sample_threshold: 100
