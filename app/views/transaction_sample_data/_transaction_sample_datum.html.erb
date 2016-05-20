@@ -15,6 +15,9 @@
     <% else %>
       <%= transaction_sample_datum.name %><br />
     <% end %>
+    <% if transaction_sample_datum.payload[:backtrace].present? %>
+    <pre><%= transaction_sample_datum.payload[:backtrace].join("\n") %></pre>
+    <% end %>
   </td>
   <td width="200">
     <div class="progress">
