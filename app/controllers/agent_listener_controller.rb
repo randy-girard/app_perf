@@ -15,9 +15,9 @@ class AgentListenerController < ApplicationController
   end
 
   def invoke_raw_method
-    response = NewRelicAgentWorker.new(params).execute
+    #NewRelicAgentWorker.perform_later(params)
 
-    render :json => response, :status => :ok
+    render :json => "", :status => :ok
   end
 
   private
