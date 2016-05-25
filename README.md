@@ -1,5 +1,7 @@
 ## AppPerf (Application Performance Monitoring)
 
+[![Build Status](https://travis-ci.org/randy-girard/app_perf.svg?branch=master)](https://travis-ci.org/randy-girard/app_perf)
+
 ![Overview](/doc/overview.png?raw=true "Overview")
 ![Sample](/doc/sample.png?raw=true "Sample")
 ![Database](/doc/database.png?raw=true "Database")
