@@ -8,7 +8,7 @@ describe Reporter do
   describe '#new' do
     it 'works' do
       application = double('application')
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       result = Reporter.new(application, params, view_context)
       expect(result).not_to be_nil
@@ -19,7 +19,7 @@ describe Reporter do
   describe '#render' do
     it 'returns nil' do
       application = double('application')
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       reporter = Reporter.new(application, params, view_context)
       result = reporter.render
@@ -31,7 +31,7 @@ describe Reporter do
   describe '#report_data' do
     it 'works' do
       application = double('application')
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       reporter = Reporter.new(application, params, view_context)
       result = reporter.report_data

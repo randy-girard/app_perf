@@ -9,7 +9,7 @@ describe ErrorReporter do
     it 'works' do
       application = create(:application)
       analytic_event_data = create(:analytic_event_datum, :application => application, :name => "Error", :timestamp => Time.now - 5.minutes)
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       expect(view_context).to receive(:area_chart)
       error_reporter = ErrorReporter.new(application, params, view_context)
@@ -22,7 +22,7 @@ describe ErrorReporter do
     it 'works' do
       application = create(:application)
       analytic_event_data = create(:analytic_event_datum, :application => application, :name => "Error")
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       error_reporter = ErrorReporter.new(application, params, view_context)
       result = error_reporter.report_data

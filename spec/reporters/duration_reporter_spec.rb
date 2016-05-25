@@ -9,8 +9,7 @@ describe DurationReporter do
     it 'works' do
       application = double('application')
       expect(application).to receive(:transaction_data)
-      params = double('params')
-      expect(params).to receive(:[])
+      params = {}
       view_context = double('view_context')
       expect(view_context).to receive(:area_chart)
       duration_reporter = DurationReporter.new(application, params, view_context)
@@ -23,8 +22,7 @@ describe DurationReporter do
     it 'works' do
       application = double('application')
       expect(application).to receive(:transaction_data)
-      params = double('params')
-      expect(params).to receive(:[])
+      params = {}
       view_context = double('view_context')
       duration_reporter = DurationReporter.new(application, params, view_context)
       result = duration_reporter.report_data

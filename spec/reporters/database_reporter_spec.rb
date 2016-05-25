@@ -9,7 +9,7 @@ describe DatabaseReporter do
     it 'works' do
       application = create(:application)
       database_call = create(:database_call, :application => application)
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       expect(view_context).to receive(:area_chart)
       database_reporter = DatabaseReporter.new(application, params, view_context)
@@ -22,7 +22,7 @@ describe DatabaseReporter do
     it 'works' do
       application = create(:application)
       database_call = create(:database_call, :application => application)
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       database_reporter = DatabaseReporter.new(application, params, view_context)
       result = database_reporter.report_data

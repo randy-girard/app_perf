@@ -9,7 +9,7 @@ describe MemoryReporter do
     it 'works' do
       application = create(:application)
       analytic_event_data = create(:analytic_event_datum, :application => application)
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       expect(view_context).to receive(:area_chart)
       memory_reporter = MemoryReporter.new(application, params, view_context)
@@ -22,7 +22,7 @@ describe MemoryReporter do
     it 'works' do
       application = create(:application)
       analytic_event_data = create(:analytic_event_datum, :application => application)
-      params = double('params')
+      params = {}
       view_context = double('view_context')
       memory_reporter = MemoryReporter.new(application, params, view_context)
       result = memory_reporter.report_data
