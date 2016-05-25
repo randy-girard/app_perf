@@ -11,9 +11,9 @@ class DurationReporter < Reporter
     end
 
     hash = []
-    hash.push({ :name => "Ruby", :data => data.group_by_minute(:timestamp, range: time_range).calculate_all("CASE SUM(call_count) WHEN 0 THEN 0 ELSE SUM(duration) / SUM(call_count) END") }) rescue nil
-    hash.push({ :name => "Database", :data => data.group_by_minute(:timestamp, range: time_range).calculate_all("CASE SUM(db_call_count) WHEN 0 THEN 0 ELSE SUM(db_duration) / SUM(db_call_count) END") }) rescue nil
-    hash.push({ :name => "GC Execution", :data => data.group_by_minute(:timestamp, range: time_range).calculate_all("CASE SUM(gc_call_count) WHEN 0 THEN 0 ELSE SUM(gc_duration) / SUM(gc_call_count) END") }) rescue nil
+    hash.push({ :name => "Ruby", :data => data.group_by_period(params[:period], :timestamp, permit: %w[minute hour day] , range: time_range).calculate_all("CASE SUM(call_count) WHEN 0 THEN 0 ELSE SUM(duration) / SUM(call_count) END") }) rescue nil
+    hash.push({ :name => "Database", :data => data.group_by_period(params[:period], :timestamp, permit: %w[minute hour day] , range: time_range).calculate_all("CASE SUM(db_call_count) WHEN 0 THEN 0 ELSE SUM(db_duration) / SUM(db_call_count) END") }) rescue nil
+    hash.push({ :name => "GC Execution", :data => data.group_by_period(params[:period], :timestamp, permit: %w[minute hour day] , range: time_range).calculate_all("CASE SUM(gc_call_count) WHEN 0 THEN 0 ELSE SUM(gc_duration) / SUM(gc_call_count) END") }) rescue nil
     hash
   end
 

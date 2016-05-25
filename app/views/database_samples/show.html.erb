@@ -16,7 +16,9 @@
         <td>
             <%= @database_sample.payload[:name] %><br />
             <%= @database_sample.payload[:sql] %><br />
+            <% if @database_sample.payload[:backtrace].present? %>
             <pre><%= @database_sample.payload[:backtrace].join("\n") %></pre>
+            <% end %>
         </td>
         <td width="50"><%= @database_sample.duration %></td>
       </tr>

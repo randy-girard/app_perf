@@ -1,6 +1,8 @@
 class Reporter
 
   def initialize(application, params, view_context)
+    params[:period] ||= "minute"
+
     self.application = application
     self.params = params
     self.view_context = view_context
@@ -20,7 +22,9 @@ class Reporter
   end
 
   def time_range
-    (Time.now - 10.minutes)..Time.now
+    start_time = params[:st] ? Time.at(params[:st].to_i) : Time.now - 10.minutes
+    end_time = params[:se] ? Time.at(params[:se].to_i) : Time.now
+    start_time..end_time
   end
 
   attr_accessor :application, :params, :view_context

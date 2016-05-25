@@ -8,70 +8,39 @@
     <div class="row">
       <div class="small-12 medium-12 large-12 columns">
         <h6>Average Request Time</h6>
-        <div class="dynamic-chart" data-height="300px" data-chart-id="#duration_chart" data-url="<%= application_report_path(@current_application, :id => "average_duration", :filter => @filter, :transaction_id => @transaction_id) %>" data-duration="15000">
+        <div class="dynamic-chart" data-height="300px" data-chart-id="#duration_chart" data-url="<%= application_report_path(@current_application, :id => "average_duration", :filter => @filter, :transaction_id => @transaction_id, :st => params[:st], :se => params[:se]) %>" data-duration="15000">
           <%= area_chart([], { :id => "duration_chart" }) %>
         </div>
       </div>
       <div class="small-8 medium-8 large-8 columns">
         <h6>Memory Usage</h6>
-        <div class="dynamic-chart" data-height="300px" data-chart-id="#memory_chart" data-url="<%= application_report_path(@current_application, :id => "memory_physical", :filter => @filter, :transaction_id => @transaction_id) %>" data-duration="15000">
+        <div class="dynamic-chart" data-height="300px" data-chart-id="#memory_chart" data-url="<%= application_report_path(@current_application, :id => "memory_physical", :filter => @filter, :transaction_id => @transaction_id, :st => params[:st], :se => params[:se]) %>" data-duration="15000">
           <%= area_chart([], { :id => "memory_chart" }) %>
         </div>
       </div>
 
       <div class="small-4 medium-4 large-4 columns">
         <h6>Errors</h6>
-        <div class="dynamic-chart" data-height="300px" data-chart-id="#errors_chart" data-url="<%= application_report_path(@current_application, :id => "errors", :filter => @filter, :transaction_id => @transaction_id) %>" data-duration="15000">
+        <div class="dynamic-chart" data-height="300px" data-chart-id="#errors_chart" data-url="<%= application_report_path(@current_application, :id => "errors", :filter => @filter, :transaction_id => @transaction_id, :st => params[:st], :se => params[:se]) %>" data-duration="15000">
           <%= area_chart([], { :id => "errors_chart" }) %>
         </div>
       </div>
     </div>
   </div>
   <div class="small-4 medium-4 large-4 columns">
-    <% if false %>
-    <div class="row">
-      <div class="small-12 medium-12 large-12 columns">
-        <table>
-          <tbody>
-            <% @hosts.each do |host| %>
-              <tr>
-                <td><%= host.name %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <% end %>
-    <div class="row">
-      <div class="small-12 medium-12 large-12 columns">
-        <table>
-          <tbody>
-            <% @transactions.each do |transaction| %>
-              <tr>
-                <td>
-                  <%= transaction.name %><br />
-                  <% transaction.root_transaction_sample_data.order(:duration).reverse_order.limit(3).each do |sample| %>
-                    <%= link_to "#{sample.duration}s", application_transaction_sample_path(@current_application, transaction, sample) %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="small-8 medium-8 large-8 columns">
     <h4>Transactions (Most consuming)</h4>
     <table>
     <% @time_consuming_transactions.each do |transaction| %>
       <tr>
-        <td><%= link_to transaction.name, application_transaction_path(@current_application, transaction) %></td>
-        <td width="65%">
+        <td>
+          <div><%= link_to transaction.name, application_transaction_path(@current_application, transaction) %></div>
+          <div>
+            <% transaction.root_transaction_sample_data.order(:duration).reverse_order.limit(3).each do |sample| %>
+              <%= link_to "#{sample.duration}s", application_transaction_sample_path(@current_application, transaction, sample) %>
+            <% end %>
+          </div>
+        </td>
+        <td width="50%">
           <div class="progress">
             <span class="progress-meter" style="width: <%= number_to_percentage(transaction.total_time_spent / @total_time_spent * 100) %>">
               <p class="progress-meter-text"><%= number_to_percentage(transaction.total_time_spent / @total_time_spent * 100, :precision => 1) %></p>

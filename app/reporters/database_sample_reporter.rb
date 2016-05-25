@@ -10,7 +10,7 @@ class DatabaseSampleReporter < Reporter
       .includes(:database_samples => :transaction_endpoint)
       .where(:database_calls => { :id => params[:database_id] })
       .group("transaction_endpoints.name")
-      .group_by_minute(:started_at, range: time_range)
+      .group_by_period(params[:period],:started_at, permit: %w[minute hour day], range: time_range)
       .sum("transaction_sample_data.exclusive_duration")
   end
 
