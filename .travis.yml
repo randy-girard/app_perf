@@ -1,0 +1,15 @@
+language: ruby
+rvm:
+  - 2.1.5
+
+services:
+  - postgresql
+
+script:
+  - RAILS_ENV=test bundle exec rake db:migrate
+  - bundle exec rake db:test:prepare
+  - bundle exec rake
+
+before_script:
+  - psql -c 'create database test;' -U postgres
+  - cp config/database.yml.travis config/database.yml
