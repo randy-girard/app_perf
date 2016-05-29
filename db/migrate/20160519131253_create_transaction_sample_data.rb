@@ -6,7 +6,7 @@ class CreateTransactionSampleData < ActiveRecord::Migration
       t.references :grouping, index: true, polymorphic: true
       t.references :transaction_endpoint, index: true, foreign_key: true
       t.string :name
-      t.datetime :started_at
+      t.datetime :timestamp
       t.string :transaction_id
       t.text :payload
       t.float :duration

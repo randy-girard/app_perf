@@ -9,7 +9,7 @@ class MemoryReporter < Reporter
 
     [{
       :name => "Memory Usage",
-      :data => data.group_by_period(params[:period], :timestamp, permit: %w[minute hour day], range: time_range).average(:value)
+      :data => data.group_by_period(*report_params).average(:value)
     }]
   end
 

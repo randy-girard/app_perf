@@ -9,7 +9,7 @@ class DatabaseReporter < Reporter
       .database_calls
       .includes(:database_samples)
       .group("database_calls.name")
-      .group_by_period(params[:period], :started_at, permit: %w[minute hour day], range: time_range)
+      .group_by_period(*report_params)
       .sum("transaction_sample_data.exclusive_duration")
   end
 

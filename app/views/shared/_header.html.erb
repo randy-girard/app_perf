@@ -27,9 +27,9 @@
       <li>
         <%= link_to params[:range] || "Last 10 minutes", '#' %>
         <ul class="menu vertical">
-          <li><%= link_to 'Last 10 minutes', :range => "Last 10 minutes", :period => "minute", :st => (Time.now - 10.minutes).to_i, :se => Time.now.to_i %></li>
-          <li><%= link_to 'Last hour', :range => "Last hour", :period => "minute", :st => (Time.now - 1.hour).to_i, :se => Time.now.to_i %></li>
-          <li><%= link_to 'Last day', :range => "Last day", :period => "hour", :st => (Time.now - 1.day).to_i, :se => Time.now.to_i %></li>
+          <li><%= link_to 'Last 10 minutes', :range => "Last 10 minutes", :period => "minute", :last => 10 %></li>
+          <li><%= link_to 'Last hour', :range => "Last hour", :period => "minute", :last => 60 %></li>
+          <li><%= link_to 'Last day', :range => "Last day", :period => "hour", :last => 24 %></li>
         </ul>
       </li>
     </ul>

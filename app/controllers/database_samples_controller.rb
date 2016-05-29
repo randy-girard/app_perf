@@ -4,7 +4,7 @@ class DatabaseSamplesController < ApplicationController
   def index
     @database_samples = @database_call
       .database_samples
-      .where(:started_at => @time_range)
+      .where(:timestamp => @time_range)
       .order("exclusive_duration DESC")
     @total_duration = @database_samples.map(&:exclusive_duration).sum
   end

@@ -9,7 +9,7 @@ class ErrorReporter < Reporter
 
     [{
       :name => "Errors",
-      :data => data.group_by_period(params[:period], :timestamp, permit: %w[minute hour day], range: time_range).sum(:value)
+      :data => data.group_by_period(*report_params).sum(:value)
     }]
   end
 

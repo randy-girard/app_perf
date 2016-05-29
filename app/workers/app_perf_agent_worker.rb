@@ -114,7 +114,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         error_datum.transaction_id = datum[:transaction_id]
         error_datum.message = message
         error_datum.backtrace = backtrace
-        error_datum.timestamp = datum[:started_at]
+        error_datum.timestamp = datum[:timestamp]
       end
     end
     ErrorDatum.import(error_data)

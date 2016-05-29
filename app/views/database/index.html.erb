@@ -26,7 +26,7 @@
 
   <div class="small-9 medium-9 large-9 columns">
     <h6>Database calls</h6>
-    <div id="database_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "database") %>" data-duration="15000">
+    <div id="database_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "database", :period => params[:period], :st => params[:st], :se => params[:se], :last => params[:last]) %>" data-duration="15000">
       <i class="fa fa-spinner fa-spin fa-5x"></i>
     </div>
   </div>

@@ -13,7 +13,7 @@
 <div class="row">
   <div class="small-12 medium-12 large-12 columns">
     <h6>Average Request Time</h6>
-    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "average_duration", :filter => @filter) %>" data-duration="15000">
+    <div id="average-duration_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "average_duration", :filter => @filter, :period => params[:period], :st => params[:st], :se => params[:se], :last => params[:last]) %>" data-duration="15000">
       <i class="fa fa-spinner fa-spin fa-5x"></i>
     </div>
   </div>
