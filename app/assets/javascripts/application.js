@@ -20,6 +20,12 @@
 //= require turbolinks
 //= require_tree .
 
+Highcharts.setOptions({
+  global: {
+    useUTC: false
+  }
+});
+
 $(function(){
   function turbolinksSetInterval(intervalFunction, duration) {
     var interval = setInterval(intervalFunction, duration);

@@ -12,8 +12,8 @@ class DurationReporter < Reporter
 
     hash = []
     hash.push({ :name => "View", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(view_duration) / COUNT(*) END") }) rescue nil
-    hash.push({ :name => "Database", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(db_duration) / COUNT(*) END") }) rescue nil
     hash.push({ :name => "App", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(app_duration) / COUNT(*) END") }) rescue nil
+    hash.push({ :name => "Database", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(db_duration) / COUNT(*) END") }) rescue nil
     hash.push({ :name => "Middleware", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(middleware_duration) / COUNT(*) END") }) rescue nil
     hash.push({ :name => "GC Execution", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(gc_duration) / COUNT(*) END") }) rescue nil
     hash
@@ -22,7 +22,7 @@ class DurationReporter < Reporter
   private
 
   def report_colors
-    ["#b51fa4", "#5374b0", "#A5FFFF", "#EECC45", "#4E4318"]
+    ["#b51fa4", "#A5FFFF", "#5374b0", "#EECC45", "#4E4318"]
   end
 
   def report_options
