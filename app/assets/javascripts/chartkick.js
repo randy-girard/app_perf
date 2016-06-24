@@ -255,7 +255,13 @@
         this.name = "highcharts";
 
         var defaultOptions = {
-          chart: {},
+          chart: {
+            events: {
+              selection: function(event) {
+                $(this.container.parentElement).trigger("selection", [event.xAxis[0].min / 1000, event.xAxis[0].max / 1000]);
+              }
+            }
+          },
           xAxis: {
             title: {
               text: null

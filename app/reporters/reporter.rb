@@ -11,6 +11,12 @@ class Reporter
   def render
   end
 
+  def pre_render
+  end
+
+  def post_render
+  end
+
   def report_data
     []
   end
@@ -38,8 +44,8 @@ class Reporter
   end
 
   def time_range
-    start_time = params[:st] ? Time.at(params[:st].to_i) : nil
-    end_time = params[:se] ? Time.at(params[:se].to_i) : nil
+    start_time = params[:st] ? Time.at(params[:st].to_i).beginning_of_minute : nil
+    end_time = params[:se] ? Time.at(params[:se].to_i).beginning_of_minute + 1.minute : nil
 
     if start_time && end_time
       start_time..end_time

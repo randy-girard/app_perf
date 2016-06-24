@@ -42,8 +42,9 @@ class ApplicationController < ActionController::Base
   end
 
   def set_time_range
-    @start_time = params[:st] ? Time.at(params[:st].to_i) : Time.now - 10.minutes
-    @end_time = params[:se] ? Time.at(params[:se].to_i) : Time.now
+    @start_time = (params[:st] ? Time.at(params[:st].to_i) : Time.now - 10.minutes).beginning_of_minute
+    @end_time = (params[:se] ? Time.at(params[:se].to_i) : Time.now).end_of_minute
+
     @time_range = @start_time..@end_time
   end
 end

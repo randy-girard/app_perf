@@ -4,6 +4,17 @@ class DurationReporter < Reporter
     view_context.area_chart(report_data, report_options)
   end
 
+  def post_render
+
+    js = <<-EOF
+      $("#duration_chart").on('selection', function(event, min, max) {
+        event.preventDefault();
+        window.location = "/applications/1/transactions?custom=1&st=" + min + "&se=" + max
+      });
+    EOF
+    view_context.javascript_tag { view_context.raw(js) }
+  end
+
   def report_data
     data = application.transaction_data
     if params[:transaction_id]
@@ -30,6 +41,9 @@ class DurationReporter < Reporter
       :id => "duration_chart",
       :height => "100%",
       :library => {
+        :chart => {
+          :zoomType => "x"
+        },
         :plotOptions => {
           :area => {
             :stacking => "normal"
@@ -41,7 +55,12 @@ class DurationReporter < Reporter
         },
         :animation => false,
         :xAxis => {
-          :plotLines => []
+          :plotLines => [],
+          :type => 'datetime',
+          :dateTimeLabelFormats => {
+            :hour => '%I %p',
+            :minute => '%I:%M %p'
+          }
         }
       }
     }

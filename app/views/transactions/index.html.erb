@@ -26,7 +26,7 @@
         <% @transactions.each do |transaction| %>
           <tr>
             <td>
-              <%= link_to transaction.name, application_transaction_path(@current_application, transaction) %><br />
+              <%= link_to transaction.name, application_transaction_path(@current_application, transaction, :custom => params[:custom], :st => params[:st], :se => params[:se]) %><br />
             </td>
           </tr>
         <% end %>

@@ -1,7 +1,8 @@
 class TransactionsController < ApplicationController
 
   def index
-    @transactions = @current_application.transaction_endpoints
+    @transactions = @current_application.transaction_endpoints.includes(:transaction_sample_data)
+    @transactions = @transactions.where(:transaction_sample_data => { :timestamp => @time_range }) if @time_range
   end
 
   def show

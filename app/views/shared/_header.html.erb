@@ -25,7 +25,11 @@
   <div class="top-bar-right">
     <ul class="dropdown menu" data-dropdown-menu>
       <li>
+        <% if params[:custom] %>
+        <%= link_to "#{@start_time.strftime("%I:%M:%S %p")} - #{@end_time.strftime("%I:%M:%S %p")}" %>
+        <% else %>
         <%= link_to params[:range] || "Last 10 minutes", '#' %>
+        <% end %>
         <ul class="menu vertical">
           <li><%= link_to 'Last 10 minutes', :range => "Last 10 minutes", :period => "minute", :last => 10 %></li>
           <li><%= link_to 'Last hour', :range => "Last hour", :period => "minute", :last => 60 %></li>

@@ -30,7 +30,12 @@ class MemoryReporter < Reporter
         },
         :animation => false,
         :xAxis => {
-          :plotLines => []
+          :plotLines => [],
+          :type => 'datetime',
+          :dateTimeLabelFormats => {
+            :hour => '%I %p',
+            :minute => '%I:%M %p'
+          }
         }
       }
     }

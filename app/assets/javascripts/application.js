@@ -17,6 +17,7 @@
 //= require highcharts
 //= require highcharts/highcharts-more
 //= require chartkick
+//= require progressive_render
 //= require turbolinks
 //= require_tree .
 
