@@ -5,6 +5,6 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-user = User.create(:email => "test@example.com", :password => "password")
+user = User.create(:email => "user@example.com", :password => "password")
 application = user.applications.create(:name => "App Perf")
 application.update_column(:license_key, "19509de2-d07d-470f-a8f5-aab940569d84")

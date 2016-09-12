@@ -300,7 +300,6 @@ DEPENDENCIES
   passenger
   pg
   progressive_render
-  puma
   rails (= 4.2.5.2)
   rspec-rails
   sass-rails (~> 5.0)
@@ -315,4 +314,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.11.2
+   1.12.5

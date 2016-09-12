@@ -12,4 +12,5 @@ script:
 
 before_script:
   - psql -c 'create database test;' -U postgres
+  - cp app_perf_ruby_agent.yml.sample app_perf_ruby_agent.yml
   - cp config/database.yml.travis config/database.yml

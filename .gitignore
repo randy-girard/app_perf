@@ -9,6 +9,8 @@
 /.project
 /.bundle
 /.DS_Store
+/*.lock
+/app_perf_ruby_agent.yml
 /config/database.yml
 
 # Ignore the default SQLite database.

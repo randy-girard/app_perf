@@ -12,23 +12,27 @@ Dir.chdir APP_ROOT do
   system "gem install bundler --conservative"
   system "bundle check || bundle install"
 
-  # puts "\n== Copying sample files =="
+  puts "== Copying configuration files =="
   unless File.exist?("config/database.yml")
     system "cp config/database.yml.sample config/database.yml"
   end
+  
+  unless File.exist?("app_perf_ruby_agent.yml")
+    system "cp app_perf_ruby_agent.yml.sample app_perf_ruby_agent.yml"
+  end
 
-  puts "\n== Preparing database =="
+  puts "== Removing old logs and tempfiles =="
   system "rm -rf public/system"
   system "rm -rf public/uploads"
+  system "rm -rf db/development.sqlite3"
   system "rm -rf db/development"
-  
-  system "bin/setup_database"
-
-  puts "\n== Removing old logs and tempfiles =="
+  system "rm -rf db/test"
+  system "rm -rf db/test.sqlite3"
   system "rm -f log/*"
   system "rm -rf tmp/cache"
   
-  if RUBY_PLATFORM =~ /darwin/
-    system("which nginx || brew install homebrew/nginx/nginx-full --with-mp4-h264-module")
-  end
+  puts "== Setting up Database=="
+  system "bundle exec rake db:create"
+  system "bundle exec rake db:migrate"
+  system "bundle exec rake db:seed"
 end
