@@ -1,8 +1,0 @@
-if [ ! -d db/development ]; then
-  initdb -D db/development
-  pg_ctl -D db/development -o "-p 5443" start
-  bundle exec rake db:create
-  bundle exec rake db:migrate
-  bundle exec rake db:seed
-  pg_ctl -D db/development -o "-p 5443" stop
-fi

@@ -30,7 +30,6 @@ gem 'bcrypt', '~> 3.1.7'
 # Use Unicorn as the app server
 # gem 'unicorn'
 gem 'foreman'
-gem 'puma'
 gem 'passenger'
 #gem 'newrelic_rpm'
 gem 'kaminari'

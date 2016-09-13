@@ -62,7 +62,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       process_transaction_sample_data_children(transaction_sample_data, transaction_sample_datum, children)
     end
 
-    TransactionSampleDatum.import(transaction_sample_data, recursive: true)
+    #TransactionSampleDatum.import(transaction_sample_data, recursive: true)
   end
 
   def process_transaction_sample_data_children(transaction_sample_data, transaction_sample_datum, data, depth = 1)
@@ -79,8 +79,9 @@ class AppPerfAgentWorker < ActiveJob::Base
         child.grouping = database_group
         child.host = host
         child.request_id = transaction_sample_datum.request_id || transaction_sample_datum.id
+        child.save
         process_transaction_sample_data_children(transaction_sample_data, child, children, depth + 1) if children.present?
-        transaction_sample_data << child if depth.eql?(1)
+        #transaction_sample_data << child if depth.eql?(1)
       end
     end
   end

@@ -7,7 +7,7 @@ Rails.application.load_tasks
 
 @@server_already_running = false
 
-if Rails.env.development?
+if ENV["START_DB"]
   task :start_database_if_not_running do
     running = `pg_ctl status -D #{Rails.root}/db/development -o '-p 5443'`
     if running.to_s =~ /server is running/

@@ -1,0 +1,4 @@
+if [ ! -d db/development ]; then
+  initdb -D db/development
+  pg_ctl -D db/development -o "-p 5443" start
+fi
