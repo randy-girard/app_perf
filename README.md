@@ -30,4 +30,4 @@ This should create and setup the database and any other needed services/apps. Th
 bundle exec foreman start
 ```
 
-Navigate to http://localhost:9291. This application is setup to report to itself so you can begin seeing information immediatetly!
+Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediatetly!
