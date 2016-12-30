@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: 0d2e11c97ce4920c6be94c383806806866e30b4f
+  revision: 263cf077b9d8cf4adb84cb4d5369a1be6581aaf8
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -151,7 +151,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0221)
     mini_portile2 (2.1.0)
-    minitest (5.9.0)
+    minitest (5.10.1)
     multi_json (1.11.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -207,7 +207,7 @@ GEM
       activesupport (= 4.2.5.2)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (11.2.2)
+    rake (12.0.0)
     rdoc (4.2.2)
       json (~> 1.4)
     redis (3.3.0)
