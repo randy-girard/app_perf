@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: 263cf077b9d8cf4adb84cb4d5369a1be6581aaf8
+  revision: cf7a618ba3daf1145d729e1cb4a9b4d7ed5582b9
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -48,6 +48,9 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
+    activeuuid (0.6.1)
+      activerecord (>= 3.1)
+      uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
     arel (6.0.3)
@@ -277,6 +280,7 @@ GEM
       thread_safe (~> 0.1)
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
+    uuidtools (2.1.5)
     web-console (2.3.0)
       activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
@@ -288,6 +292,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-import
+  activeuuid
   app_perf_rpm!
   bcrypt (~> 3.1.7)
   byebug

@@ -131,8 +131,8 @@ class AppPerfAgentWorker < ActiveJob::Base
       end
     }
     ids = Trace.import(traces).ids
-    new_traces = application.traces.where(:id => ids)
-    (new_traces + existing_traces).uniq {|t| t.trace_key }
+
+    application.traces.where(:trace_key => trace_keys).all
   end
 
   def process_version_2(data)

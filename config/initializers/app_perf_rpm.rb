@@ -5,4 +5,5 @@ AppPerfRpm.configure do |rpm|
   rpm.license_key = ENV["APP_PERF_LICENSE_KEY"]
   rpm.application_name = "App Perf"
   rpm.sample_rate = 100
+  rpm.dispatch_interval = 10
 end
