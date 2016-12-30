@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160519134740) do
+ActiveRecord::Schema.define(version: 20161230191409) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,16 @@ ActiveRecord::Schema.define(version: 20160519134740) do
 
   add_index "applications", ["name", "user_id"], name: "index_applications_on_name_and_user_id", unique: true, using: :btree
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
+
+  create_table "backtraces", force: :cascade do |t|
+    t.integer  "backtraceable_id"
+    t.string   "backtraceable_type"
+    t.text     "backtrace"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "backtraces", ["backtraceable_type", "backtraceable_id"], name: "index_backtraces_on_backtraceable_type_and_backtraceable_id", using: :btree
 
   create_table "database_calls", force: :cascade do |t|
     t.integer  "application_id"

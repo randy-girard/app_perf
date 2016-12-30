@@ -43,7 +43,7 @@ gem 'sinatra', :require => nil
 gem "sidekiq"
 gem "activerecord-import"
 gem "progressive_render"
-gem "app_perf_rpm", :git => "git@github.com:randy-girard/app_perf_rpm", :branch => "master"
+gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm"
 gem 'faker'
 
 # Use Capistrano for deployment
