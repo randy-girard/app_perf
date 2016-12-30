@@ -1,33 +1,39 @@
-<div class="row">
-  <div class="small-12 medium-12 large-12 columns">
-    <h4>Database</h4>
-  </div>
-</div>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Database
+  </h1>
+  <ol class="breadcrumb">
+    <li class="active">Database</li>
+  </ol>
+</section>
 
-<div class="row">
-  <div class="small-3 medium-3 large-3 columns">
-    <table>
-      <tbody>
-        <% @database_calls.each do |database_call| %>
-          <tr>
-            <td><%= link_to database_call.name, application_database_samples_path(@current_application, database_call) %></td>
-            <td width="40%">
-              <div class="progress">
-                <span class="progress-meter" style="width: <%= database_call.duration / @total_duration * 100.to_f %>%">
-                  <p class="progress-meter-text"><%= number_to_percentage(database_call.duration / @total_duration * 100.to_f, :precision => 2) %></p>
-                </span>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+<section class="content">
+  <div class="row">
+    <div class="col-lg-12">
+      <%= paginate @database_calls %>
+    </div>
 
-  <div class="small-9 medium-9 large-9 columns">
-    <h6>Database calls</h6>
-    <div id="database_chart" class="dynamic-chart" data-height="300px" data-url="<%= application_report_path(@current_application, :id => "database", :period => params[:period], :st => params[:st], :se => params[:se], :last => params[:last]) %>" data-duration="15000">
-      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    <div class="col-lg-12 connectedSortable">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Name</h3>
+        </div>
+        <div class="box-body">
+          <table class="table">
+            <tr>
+              <th>Statement</th>
+              <th class="text-center" width="200">Duration (ms)</th>
+            </tr>
+            <% @database_calls.each do |database_call| %>
+              <tr>
+                <td class="ellipsis"><%= database_call.statement %></td>
+                <td class="text-center"><%= number_with_precision(database_call.duration, :precision => 2) %>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>

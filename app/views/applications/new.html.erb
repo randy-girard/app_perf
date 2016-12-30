@@ -1,5 +1,51 @@
-<h1>New Application</h1>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Applications
+  </h1>
+  <ol class="breadcrumb">
+    <li><%= link_to "Applications", applications_path %></li>
+    <li class="active">New Application</li>
+  </ol>
+</section>
 
-<%= render 'form' %>
+<section class="content">
+  <div class="row">
+    <div class="col-lg-12 connectedSortable">
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Adding App Perf to your application</h3>
+        </div>
+        <div class="box-body">
+          <p>
+            Add the following gem to your project:
+          <p>
+          <div>
+<pre class="text-wrap">
+# Gemfile
+gem "app_perf_ruby_agent", :github => "randy-girard/app_perf_ruby_agent"
+</pre>
+          </div>
 
-<%= link_to 'Back', applications_path %>
+          <p>
+            Copy and paste the contents below into your application setup or initializer:
+          </p>
+
+          <div>
+<pre class="text-wrap">
+require 'app_perf_rpm'
+
+AppPerfRpm.configure do |rpm|
+  rpm.license_key = "<%= @current_user.license_key %>"
+  rpm.application_name = "Application Name"
+end
+</pre>
+        </div>
+
+        <p>
+          Metrics will automatically be gathered and your application will show up on the <%= link_to "Applications", applications_path %> page.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

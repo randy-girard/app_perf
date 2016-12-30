@@ -8,17 +8,16 @@ Rails.application.routes.draw do
 
   resource :dashboard, :controller => "dashboard"
 
-  resources :applications do
+  resources :applications, :only => [:index, :new, :edit, :update, :destroy] do
     resource :overview, :controller => "overview", :only => [:show]
+
     resources :errors, :only => [:index, :show] do
       resources :instances, :controller => "error_instances", :only => [:index, :show]
     end
-    resources :transactions, :only => [:index, :show] do
-      resources :transaction_samples, :only => [:show], :as => "samples"
-    end
-    resources :database, :controller => "database", :only => [:index] do
-      resources :samples, :only => [:index, :show], :controller => "database_samples", :as => "samples"
-    end
+
+    resources :traces, :only => [:index, :show]
+    resources :database, :controller => "database", :only => [:index]
+
     resources :reports, :only => [:index, :show, :new, :error] do
       collection do
         get :error
@@ -26,17 +25,17 @@ Rails.application.routes.draw do
     end
   end
 
-  post "/api/listener/:protocol_version/:license_key/:method" => "agent_listener#create"
+  post "/api/listener/:protocol_version/:license_key" => "agent_listener#create"
 
   # NewRelic RPM support
-  get "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
-  post "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
-  resources :agent_listener, :only => [:create, :invoke_raw_method] do
-    collection do
-      get :invoke_raw_method
-      post :invoke_raw_method
-    end
-  end
+  # get "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
+  # post "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
+  # resources :agent_listener, :only => [:create, :invoke_raw_method] do
+  #   collection do
+  #     get :invoke_raw_method
+  #     post :invoke_raw_method
+  #   end
+  # end
 
   root :to => "dashboard#show"
 

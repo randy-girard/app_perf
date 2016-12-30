@@ -1,0 +1,42 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Traces
+  </h1>
+  <ol class="breadcrumb">
+    <li><%= link_to 'Overview', application_overview_path(@current_application) %></li>
+    <li class="active">Traces</li>
+  </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-lg-12">
+      <%= paginate @traces %>
+    </div>
+    
+    <div class="col-lg-12 connectedSortable">
+      <div class="box">
+        <div class="box-header">
+          <i class="fa fa-clock"></i>
+          <h3 class="box-title">Urls</h3>
+        </div>
+        <div class="box-body">
+          <table class="table">
+            <tr>
+              <th>URL</th>
+              <th class="text-center" width="200">Duration (ms)</th>
+            </tr>
+            <% @traces.each do |trace| %>
+              <tr>
+                <td class="ellipsis"><%= link_to trace.root_sample.payload[:url], application_trace_path(@current_application, :id => trace.trace_key) %><br /></td>
+                <td class="text-center"><%= number_with_precision(trace.duration, :precision => 2) %>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

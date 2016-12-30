@@ -16,10 +16,6 @@ Dir.chdir APP_ROOT do
   unless File.exist?("config/database.yml")
     system "cp config/database.yml.sample config/database.yml"
   end
-  
-  unless File.exist?("app_perf_ruby_agent.yml")
-    system "cp app_perf_ruby_agent.yml.sample app_perf_ruby_agent.yml"
-  end
 
   puts "== Removing old logs and tempfiles =="
   system "rm -rf public/system"
@@ -30,8 +26,9 @@ Dir.chdir APP_ROOT do
   system "rm -rf db/test.sqlite3"
   system "rm -f log/*"
   system "rm -rf tmp/cache"
-  
+
   puts "== Setting up Database=="
+  system "bundle exec rake db:drop"
   system "bundle exec rake db:create"
   system "bundle exec rake db:migrate"
   system "bundle exec rake db:seed"

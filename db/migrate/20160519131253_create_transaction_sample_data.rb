@@ -3,21 +3,24 @@ class CreateTransactionSampleData < ActiveRecord::Migration
     create_table :transaction_sample_data, :force => true do |t|
       t.references :application, index: true, foreign_key: true
       t.references :host, index: true, foreign_key: true
-      t.references :grouping, index: true, polymorphic: true
+      t.references :grouping, index: true, type: :uuid, polymorphic: true
+      t.references :layer, index: true, foreign_key: true
       t.references :transaction_endpoint, index: true, foreign_key: true
+      t.references :trace, index: true, foreign_key: true
+      t.string :sample_type, :default => "web"
       t.string :name
       t.datetime :timestamp
-      t.string :transaction_id
       t.text :payload
       t.float :duration
       t.float :exclusive_duration
-      t.float :db_duration
-      t.float :view_duration
-      t.float :gc_duration
-      t.integer :request_id
-      t.integer :parent_id
-      t.string :action
+      t.string :trace_key
+      t.string :request_id
+      t.string :parent_id
       t.string :category
+      t.string :url
+      t.string :domain
+      t.string :controller
+      t.string :action
       t.timestamps null: false
     end
   end

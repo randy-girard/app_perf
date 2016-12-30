@@ -1,6 +1,7 @@
 GIT
-  remote: git://github.com/randy-girard/app_perf_ruby_agent.git
+  remote: git@github.com:randy-girard/app_perf_ruby_agent
   revision: 7da093082c27f1caa2f2fd778c0e78b90da2083b
+  branch: master
   specs:
     app_perf_ruby_agent (0.0.1)
       activesupport
@@ -86,6 +87,7 @@ GEM
       capistrano (~> 3.0)
       puma (>= 2.6)
     chartkick (1.4.2)
+    coderay (1.1.1)
     coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.1.x)
@@ -98,6 +100,10 @@ GEM
     debug_inspector (0.0.2)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    dotenv (2.1.1)
+    dotenv-rails (2.1.1)
+      dotenv (= 2.1.1)
+      railties (>= 4.0, < 5.1)
     erubis (2.7.0)
     execjs (2.6.0)
     factory_girl (4.7.0)
@@ -138,6 +144,7 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
+    method_source (0.8.2)
     mime-types (3.0)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0221)
@@ -164,6 +171,10 @@ GEM
       sass
       sass-rails
       uglifier
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     puma (2.15.3)
     rack (1.6.4)
     rack-protection (1.5.3)
@@ -238,6 +249,7 @@ GEM
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
+    slop (3.6.0)
     spring (1.7.1)
     sprockets (3.6.0)
       concurrent-ruby (~> 1.0)
@@ -287,6 +299,7 @@ DEPENDENCIES
   capistrano3-puma
   chartkick
   coffee-rails (~> 4.1.0)
+  dotenv-rails
   factory_girl_rails
   font-awesome-rails
   foreman
@@ -300,6 +313,7 @@ DEPENDENCIES
   passenger
   pg
   progressive_render
+  pry
   rails (= 4.2.5.2)
   rspec-rails
   sass-rails (~> 5.0)

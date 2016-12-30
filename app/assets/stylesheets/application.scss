@@ -1,12 +1,49 @@
 // Place all the styles related to the Applications controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+/*
+ *= require bootstrap
+ *= require AdminLTE
+ *= require skins/_all-skins
+ *= require bootstrap-wysihtml5/bootstrap3-wysihtml5
+ *= require jvectormap/jquery-jvectormap-1.2.2
+ *= require daterangepicker/daterangepicker
+ *= require morris/morris
+ *= require datepicker/datepicker3
+ *= require_self
+ */
 
-@import "foundation_and_overrides";
-@import "font-awesome";
+.text-wrap {
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.ellipsis {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .dynamic-chart {
-  border: 1px solid #ccc;
-  text-align: center;
-  margin: 0 auto;
+  margin: 0px 10px;
+}
+.chart-legend {
+  margin: 5px;
+
+  table {
+    tbody {
+      tr {
+        td.legendColorBox {
+          padding-left: 5px;
+        }
+        td.legendLabel {
+          padding-left: 2px;
+        }
+      }
+    }
+  }
 }

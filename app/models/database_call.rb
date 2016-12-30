@@ -4,5 +4,5 @@ class DatabaseCall < ActiveRecord::Base
   belongs_to :database_type
   belongs_to :transaction_endpoint
 
-  has_many :database_samples, :as => :grouping, :class_name => "TransactionSampleDatum"
+  has_one :database_sample, :as => :grouping, :primary_key => :uuid, :class_name => "TransactionSampleDatum"
 end

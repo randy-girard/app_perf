@@ -1,35 +1,38 @@
 <tr>
-  <td width="20">
-    <% if transaction_sample_datum.action.eql?("sql") %>
-    <%= link_to transaction_sample_datum.id, application_database_sample_path(@current_application, transaction_sample_datum.grouping, transaction_sample_datum) %>
+  <td width="20"><%= transaction_sample_datum.id %></td>
+  <td width="150"><%= transaction_sample_datum.layer.name %></td>
+  <td class="ellipsis" style="padding-left: <%= depth * 40 %>px;">
+    <% if transaction_sample_datum.payload.present? %>
+      <% if transaction_sample_datum.layer.name.eql?("rack") %>
+      <%= transaction_sample_datum.payload["url"] %>
+      <% elsif transaction_sample_datum.layer.name.eql?("actioncontroller") %>
+      <%= transaction_sample_datum.payload["controller"] %>
+      <%= transaction_sample_datum.payload["action"] %>
+      <% elsif transaction_sample_datum.layer.database? %>
+      <%= transaction_sample_datum.payload["name"] %><br />
+      <%= transaction_sample_datum.payload["sql"] %>
+      <% elsif transaction_sample_datum.layer.name.eql?("actionview") %>
+      <%= transaction_sample_datum.payload["name"].to_s.gsub(Rails.root.to_s, "") %>:<%= transaction_sample_datum.payload["line_number"] %><br />
+      <%= transaction_sample_datum.payload["type"] %><br />
+      <% elsif transaction_sample_datum.layer.http? %>
+      <%= transaction_sample_datum.payload["remote_host"] %>
+      <% else %>
+      <% end %>
+      <% if transaction_sample_datum.app_backtrace.present? %>
+      <br />
+      <pre class="text-wrap"><%= transaction_sample_datum.app_backtrace.join("\n") %></pre>
+      <% end %>
     <% else %>
-    <%= transaction_sample_datum.id %>
-    <% end %>
-  </td>
-  <td style="padding-left: <%= depth * 40 %>px;">
-    <% if transaction_sample_datum.action.eql?("sql") %>
-      <%= transaction_sample_datum.payload[:name] %><br />
-      <%= transaction_sample_datum.payload[:sql] %>
-
-    <% elsif transaction_sample_datum.action.eql?("render_template") %>
-      <%= transaction_sample_datum.name %><br />
-      <%= transaction_sample_datum.payload[:identifier] %>
-
-    <% elsif transaction_sample_datum.action.eql?("render_partial") %>
-      <%= transaction_sample_datum.name %><br />
-      <%= transaction_sample_datum.payload[:identifier] %>
-    <% else %>
-      <%= transaction_sample_datum.name %><br />
-    <% end %>
-    <% if transaction_sample_datum.payload[:backtrace].present? %>
-    <pre><%= transaction_sample_datum.payload[:backtrace].join("\n") %></pre>
+      <%= transaction_sample_datum.layer.name %>
     <% end %>
   </td>
   <td width="200">
-    <div class="progress">
-      <div class="progress-meter" style="width: <%= transaction_sample_datum.duration / @transaction_sample.duration * 100.to_f %>%"></div>
+    <div class="progress progress-xs">
+      <div class="progress-bar progress-bar-danger" style="width: <%= number_to_percentage(transaction_sample_datum.exclusive_duration / @trace.duration.to_f * 100.to_f, :precision => 2) %>"></div>
     </div>
   </td>
-  <td width="50"><%= transaction_sample_datum.duration %></td>
+  <td><span class="badge"><%= number_to_percentage(transaction_sample_datum.exclusive_duration / @trace.duration.to_f * 100.to_f, :precision => 1) %></span></td>
+  <td width="50"><%= number_with_precision(transaction_sample_datum.duration, :precision => 2) %></td>
+  <td width="50"><%= number_with_precision(transaction_sample_datum.exclusive_duration, :precision => 2) %></td>
 </tr>
 <%= render transaction_sample_datum.children, :depth => depth + 1 %>

@@ -1,6 +1,6 @@
 class ApplicationsController < ApplicationController
   skip_before_action :set_current_application
-  before_action :set_application, only: [:show, :edit, :update, :destroy]
+  before_action :set_application, only: [:edit, :update, :destroy]
 
   # GET /applications
   # GET /applications.json
@@ -8,35 +8,13 @@ class ApplicationsController < ApplicationController
     @applications = @current_user.applications
   end
 
-  # GET /applications/1
-  # GET /applications/1.json
-  def show
-    @root_uri = URI.parse(root_url)
-  end
-
   # GET /applications/new
   def new
-    @application = @current_user.applications.new
+    @root_uri = URI.parse(root_url)
   end
 
   # GET /applications/1/edit
   def edit
-  end
-
-  # POST /applications
-  # POST /applications.json
-  def create
-    @application = @current_user.applications.new(application_params)
-
-    respond_to do |format|
-      if @application.save
-        format.html { redirect_to @application, notice: 'Application was successfully created.' }
-        format.json { render :show, status: :created, location: @application }
-      else
-        format.html { render :new }
-        format.json { render json: @application.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # PATCH/PUT /applications/1

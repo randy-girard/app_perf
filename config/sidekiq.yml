@@ -1,3 +1,4 @@
 ---
+:concurrency: 5
 :queues:
   - app_perf

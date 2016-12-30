@@ -6,5 +6,7 @@ class CreateHosts < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+
+    add_index :hosts, [:name, :application_id], :unique => true
   end
 end

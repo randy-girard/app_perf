@@ -29,4 +29,3 @@ class AgentListenerController < ApplicationController
     JSON.parse body
   end
 end
-

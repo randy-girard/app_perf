@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-
+gem 'dotenv-rails'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5.2'
 # Use sqlite3 as the database for Active Record
@@ -43,7 +43,7 @@ gem 'sinatra', :require => nil
 gem "sidekiq"
 gem "activerecord-import"
 gem "progressive_render"
-gem "app_perf_ruby_agent", :github => "randy-girard/app_perf_ruby_agent"
+gem "app_perf_ruby_agent", :git => "git@github.com:randy-girard/app_perf_ruby_agent", :branch => "master"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -54,6 +54,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'sqlite3'
+  gem 'pry'
 end
 
 group :development do

@@ -16,17 +16,35 @@ class DurationReporter < Reporter
   end
 
   def report_data
-    data = application.transaction_data
-    if params[:transaction_id]
-      data = data.where(:transaction_endpoint_id => params[:transaction_id])
-    end
+
+    relation = application
+      .traces
+      .joins(:root_sample, :transaction_sample_data => [:layer, :host])
+      .joins("LEFT JOIN database_calls ON database_calls.uuid = transaction_sample_data.grouping_id AND transaction_sample_data.grouping_type = 'DatabaseCall'")
+      .where("transaction_sample_data_traces.sample_type = ?", "web")
+      .group("layers.name")
+
+    relation = relation.where("transaction_sample_data.domain = ?", params[:_domain]) if params[:_domain]
+    relation = relation.where("transaction_sample_data.url = ?", params[:_url]) if params[:_url]
+    relation = relation.where("transaction_sample_data.controller = ?", params[:_controller]) if params[:_controller]
+    relation = relation.where("transaction_sample_data.action = ?", params[:_action]) if params[:_action]
+    relation = relation.where("transaction_sample_data.layer_id = ?", params[:_layer]) if params[:_layer]
+    relation = relation.where("transaction_sample_data.host_id = ?", params[:_host]) if params[:_host]
+    relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]
+
+    data = relation.group_by_period(*report_params).calculate_all("CASE COUNT(DISTINCT transaction_sample_data_traces.trace_id) WHEN 0 THEN 0 ELSE SUM(transaction_sample_data_traces.exclusive_duration) / COUNT(DISTINCT transaction_sample_data_traces.trace_id) END")
 
     hash = []
-    hash.push({ :name => "View", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(view_duration) / COUNT(*) END") }) rescue nil
-    hash.push({ :name => "App", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(app_duration) / COUNT(*) END") }) rescue nil
-    hash.push({ :name => "Database", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(db_duration) / COUNT(*) END") }) rescue nil
-    hash.push({ :name => "Middleware", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(middleware_duration) / COUNT(*) END") }) rescue nil
-    hash.push({ :name => "GC Execution", :data => data.group_by_period(*report_params).calculate_all("CASE COUNT(*) WHEN 0 THEN 0 ELSE SUM(gc_duration) / COUNT(*) END") }) rescue nil
+    layers = {}
+    data.each_pair do |layer, event|
+      layers[layer.first] ||= []
+      layers[layer.first] << [layer.second.to_i * 1000, event]
+    end
+
+    layers.each_pair do |layer, data|
+      hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
+    end
+
     hash
   end
 

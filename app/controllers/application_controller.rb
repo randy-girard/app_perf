@@ -30,10 +30,10 @@ class ApplicationController < ActionController::Base
   end
 
   def set_layout
-    if @current_application
-      "current_application"
-    else
+    if @current_user
       "application"
+    else
+      "public"
     end
   end
 
@@ -42,9 +42,6 @@ class ApplicationController < ActionController::Base
   end
 
   def set_time_range
-    @start_time = (params[:st] ? Time.at(params[:st].to_i) : Time.now - 10.minutes).beginning_of_minute
-    @end_time = (params[:se] ? Time.at(params[:se].to_i) : Time.now).end_of_minute
-
-    @time_range = @start_time..@end_time
+    @time_range = Reporter.time_range(params)
   end
 end

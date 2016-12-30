@@ -23,6 +23,16 @@ class Reporter
 
   private
 
+  def parse(items)
+    items.map do |item|
+      raise item.inspect
+      [
+        item.first.to_i * 1000,
+        item.last
+      ]
+    end
+  end
+
   def report_colors
     []
   end
@@ -30,25 +40,33 @@ class Reporter
   def report_params
     options = {}
     options[:permit] = %w[minute hour day]
-    if time_range
+    if (time_range = Reporter.time_range(params))
       options[:range] = time_range
     else
-      options[:last] = (params[:last] || 10)
+      options[:last] = (params[:_last] || 60)
     end
 
     [
       params[:period],
-      :timestamp,
+      "transaction_sample_data.timestamp",
       options
     ]
   end
 
-  def time_range
-    start_time = params[:st] ? Time.at(params[:st].to_i).beginning_of_minute : nil
-    end_time = params[:se] ? Time.at(params[:se].to_i).beginning_of_minute + 1.minute : nil
+  def self.time_range(params)
+    params.delete(:_past) if params[:_st] && params[:_se]
+    params.delete(:_interval) if params[:_st] && params[:_se]
 
-    if start_time && end_time
-      start_time..end_time
+    if params[:_past] && params[:_interval]
+      @start_time = (Time.now - params[:_interval].to_i.send(params[:_past])).beginning_of_minute
+      @end_time = Time.now.end_of_minute
+    else
+      @start_time = (params[:_st] ? Time.at(params[:_st].to_i) : Time.now - 60.minutes).beginning_of_minute
+      @end_time = (params[:_se] ? Time.at(params[:_se].to_i) : Time.now).end_of_minute
+    end
+
+    if @start_time && @end_time
+      @start_time..@end_time
     else
       nil
     end

@@ -1,42 +1,23 @@
-<div class="top-bar">
-  <div class="top-bar-left">
-    <ul class="dropdown menu" data-dropdown-menu>
-      <li class="menu-text">AppPerf</li>
-      <% if @current_user %>
-        <li><%= link_to "Dashboard", dashboard_path %></li>
-        <% if @applications %>
-        <li>
-          <%= link_to "Applications", applications_path %>
-          <ul class="menu vertical">
-          <% @applications.each do |application| %>
-            <li><%= link_to application.name, application_overview_path(application) %></li>
-          <% end %>
-          </ul>
-        </li>
-        <% else %>
-        <li><%= link_to "Applications", applications_path %></li>
-        <% end %>
-        <li><%= link_to 'Logout', user_session_path, :method => :delete %></li>
-      <% end %>
-    </ul>
-  </div>
+<header class="main-header">
+  <!-- Logo -->
+  <a href="index2.html" class="logo">
+    <!-- mini logo for sidebar mini 50x50 pixels -->
+    <span class="logo-mini"><b>A</b>P</span>
+    <!-- logo for regular state and mobile devices -->
+    <span class="logo-lg"><b>App</b>Perf</span>
+  </a>
+  <!-- Header Navbar: style can be found in header.less -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
 
-  <% if @current_user && @current_application %>
-  <div class="top-bar-right">
-    <ul class="dropdown menu" data-dropdown-menu>
-      <li>
-        <% if params[:custom] %>
-        <%= link_to "#{@start_time.strftime("%I:%M:%S %p")} - #{@end_time.strftime("%I:%M:%S %p")}" %>
-        <% else %>
-        <%= link_to params[:range] || "Last 10 minutes", '#' %>
-        <% end %>
-        <ul class="menu vertical">
-          <li><%= link_to 'Last 10 minutes', :range => "Last 10 minutes", :period => "minute", :last => 10 %></li>
-          <li><%= link_to 'Last hour', :range => "Last hour", :period => "minute", :last => 60 %></li>
-          <li><%= link_to 'Last day', :range => "Last day", :period => "hour", :last => 24 %></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-  <% end %>
-</div>
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li><%= link_to "Applications", applications_path %></li>
+        <li><%= link_to 'Sign Out', user_session_path, :method => :delete %></li>
+      </ul>
+    </div>
+  </nav>
+</header>

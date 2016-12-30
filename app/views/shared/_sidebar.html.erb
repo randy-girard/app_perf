@@ -1,0 +1,57 @@
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+  <!-- sidebar: style can be found in sidebar.less -->
+  <section class="sidebar">
+    <% if false %>
+    <!-- search form -->
+    <form action="#" method="get" class="sidebar-form">
+      <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+              <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+              </button>
+            </span>
+      </div>
+    </form>
+    <% end %>
+    <!-- /.search form -->
+    <!-- sidebar menu: : style can be found in sidebar.less -->
+    <ul class="sidebar-menu">
+      <% if @current_application %>
+        <li class="header">Monitoring</li>
+        <li class="active">
+          <%= link_to application_overview_path(@current_application) do  %>
+            <i class="fa fa-dashboard"></i> <span>Overview</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to application_traces_path(@current_application) do  %>
+            <i class="fa fa-arrows-h"></i> <span>Traces</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to application_database_index_path(@current_application) do  %>
+            <i class="fa fa-database"></i> <span>Database</span>
+          <% end %>
+        </li>
+
+        <li class="header">Events</li>
+        <li>
+          <%= link_to application_errors_path(@current_application) do  %>
+            <i class="fa fa-exclamation-triangle"></i> <span>Errors</span>
+          <% end %>
+        </li>
+      <% else %>
+        <li class="header">Applications</li>
+        <% @current_user.applications.each do |application| %>
+          <li class="active">
+            <%= link_to application_overview_path(application) do  %>
+              <i class="fa fa-sign-in"></i> <span><%= application.name %></span>
+            <% end %>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </section>
+  <!-- /.sidebar -->
+</aside>
