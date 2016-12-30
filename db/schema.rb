@@ -41,7 +41,7 @@ ActiveRecord::Schema.define(version: 20161230191409) do
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
 
   create_table "backtraces", force: :cascade do |t|
-    t.integer  "backtraceable_id"
+    t.string   "backtraceable_id"
     t.string   "backtraceable_type"
     t.text     "backtrace"
     t.datetime "created_at",         null: false

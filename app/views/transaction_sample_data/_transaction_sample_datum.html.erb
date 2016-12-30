@@ -1,3 +1,4 @@
+<% if version == 1 %>
 <tr>
   <td width="20"><%= transaction_sample_datum.id %></td>
   <td width="150"><%= transaction_sample_datum.layer.name %></td>
@@ -18,9 +19,9 @@
       <%= transaction_sample_datum.payload["remote_host"] %>
       <% else %>
       <% end %>
-      <% if transaction_sample_datum.app_backtrace.present? %>
+      <% if (backtrace = transaction_sample_datum.backtrace).present? %>
       <br />
-      <pre class="text-wrap"><%= transaction_sample_datum.app_backtrace.join("\n") %></pre>
+      <pre class="text-wrap"><%= transaction_sample_datum.backtrace.backtrace.join("\n") %></pre>
       <% end %>
     <% else %>
       <%= transaction_sample_datum.layer.name %>
@@ -35,4 +36,17 @@
   <td width="50"><%= number_with_precision(transaction_sample_datum.duration, :precision => 2) %></td>
   <td width="50"><%= number_with_precision(transaction_sample_datum.exclusive_duration, :precision => 2) %></td>
 </tr>
-<%= render transaction_sample_datum.children, :depth => depth + 1 %>
+<%= render transaction_sample_datum.children, :depth => depth + 1, :version => 1 %>
+<% end %>
+<% if version == 2 %>
+
+
+<% percentage = (((transaction_sample_datum.timestamp + transaction_sample_datum.duration).to_f - start_time.to_f) / (end_time.to_f - start_time.to_f) * 100) %>
+<% margin = previous_margin + ((transaction_sample_datum.timestamp.to_f - start_time.to_f) / (end_time.to_f - start_time.to_f)) * 10000 %>
+<div><%= transaction_sample_datum.layer.name %> <%= transaction_sample_datum.timestamp.to_f %> <%= transaction_sample_datum.duration %></div>
+<div style="margin-left: <%= margin %>%; width: <%= percentage %>%; height: 30px; background-color: red; text-align: center"><% transaction_sample_datum.layer.name %> <% end_time %></div>
+
+<% transaction_sample_datum.inspect %>
+<%= render transaction_sample_datum.children, :depth => depth + 1, :version => 2, :start_time => start_time, :end_time => end_time, :previous_margin => margin %>
+<br />
+<% end %>

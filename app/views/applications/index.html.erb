@@ -29,7 +29,7 @@
             </tr>
             <% @applications.each do |application| %>
               <tr>
-                <td><%= link_to application.name, application %></td>
+                <td><%= link_to application.name, application_overview_path(application) %></td>
                 <td><%= link_to 'Destroy', application, method: :delete, data: { confirm: 'Deleting this Application will remove all existing metrics and they will not be able to be recovered. Are you sure?' }, :class => "btn btn-danger" %></td>
               </tr>
             <% end %>

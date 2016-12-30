@@ -8,6 +8,8 @@ class TransactionSampleDatum < ActiveRecord::Base
   belongs_to :layer
   belongs_to :trace
 
+  has_one :backtrace, :as => :backtraceable, :primary_key => :trace_key
+
   delegate :name, :to => :layer, :prefix => true
 
   has_many :children,
@@ -40,14 +42,6 @@ class TransactionSampleDatum < ActiveRecord::Base
     else
       [self.send(attribute)]
     end
-  end
-
-  def app_backtrace(lines = 10)
-    @app_backtrace ||=
-      Array(payload["backtrace"])
-        .select {|bt| bt.starts_with?("*") }
-        .delete_if {|bt| bt.include?("vendor/bundle") }
-        .map {|bt| bt[1..-1] }
   end
 
   # Returns if the current node is the parent of the given node.

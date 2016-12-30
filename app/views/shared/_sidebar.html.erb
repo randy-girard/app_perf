@@ -19,37 +19,28 @@
     <ul class="sidebar-menu">
       <% if @current_application %>
         <li class="header">Monitoring</li>
-        <li class="active">
+        <li class="<%= 'active' if @current_page["OverviewController#show"] %>">
           <%= link_to application_overview_path(@current_application) do  %>
             <i class="fa fa-dashboard"></i> <span>Overview</span>
           <% end %>
         </li>
-        <li>
+        <li class="<%= 'active' if @current_page["TracesController"] %>">
           <%= link_to application_traces_path(@current_application) do  %>
             <i class="fa fa-arrows-h"></i> <span>Traces</span>
           <% end %>
         </li>
-        <li>
+        <li class="<%= 'active' if @current_page["DatabaseController"] %>">
           <%= link_to application_database_index_path(@current_application) do  %>
             <i class="fa fa-database"></i> <span>Database</span>
           <% end %>
         </li>
 
         <li class="header">Events</li>
-        <li>
+        <li class="<%= 'active' if @current_page["ErrorsController"] || @current_page["ErrorInstancesController"] %>">>
           <%= link_to application_errors_path(@current_application) do  %>
             <i class="fa fa-exclamation-triangle"></i> <span>Errors</span>
           <% end %>
         </li>
-      <% else %>
-        <li class="header">Applications</li>
-        <% @current_user.applications.each do |application| %>
-          <li class="active">
-            <%= link_to application_overview_path(application) do  %>
-              <i class="fa fa-sign-in"></i> <span><%= application.name %></span>
-            <% end %>
-          </li>
-        <% end %>
       <% end %>
     </ul>
   </section>

@@ -15,7 +15,7 @@
 
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav">
-        <li><%= link_to "Applications", applications_path %></li>
+        <li class="<%= 'active' if @current_page["ApplicationsController"] %>"><%= link_to "Applications", applications_path %></li>
         <li><%= link_to 'Sign Out', user_session_path, :method => :delete %></li>
       </ul>
     </div>

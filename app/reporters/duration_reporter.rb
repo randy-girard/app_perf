@@ -16,7 +16,6 @@ class DurationReporter < Reporter
   end
 
   def report_data
-
     relation = application
       .traces
       .joins(:root_sample, :transaction_sample_data => [:layer, :host])

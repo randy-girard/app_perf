@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user!
 
   before_action :set_current_application
+  before_action :set_current_page
   before_action :set_time_range
 
   layout :set_layout
@@ -22,11 +23,17 @@ class ApplicationController < ActionController::Base
 
   def set_current_application
     if @current_user
-      @applications = @current_user.applications
       if params[:application_id]
-        @current_application ||= @applications.find {|a| a.id.eql?(params[:application_id].to_i) }
+        @current_application ||= @current_user.applications.find(params[:application_id])
       end
     end
+  end
+
+  def set_current_page
+    @current_page = {
+      "#{self.class}" => "active",
+      "#{self.class}##{action_name}" => "active"
+    }
   end
 
   def set_layout

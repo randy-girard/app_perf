@@ -139,6 +139,7 @@ class AppPerfAgentWorker < ActiveJob::Base
     events = []
     samples = []
     database_calls = []
+    backtraces = []
 
     data = load_data(data)
     layers = load_layers(data)
@@ -159,6 +160,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       sql = _opts.fetch("sql") { nil }
       adapter = _opts.fetch("adapter") { nil }
       sample_type = _opts.fetch("type") { "web" }
+      _backtrace = _opts.delete("backtrace")
 
       timestamp = Time.at(_start)
       duration = _duration
@@ -205,6 +207,15 @@ class AppPerfAgentWorker < ActiveJob::Base
       sample[:domain] = domain
       sample[:controller] = controller
       sample[:action] = action
+
+      if _backtrace
+        backtrace = Backtrace.new
+        backtrace.backtrace = _backtrace
+        backtrace.backtraceable_id = _trace_key
+        backtrace.backtraceable_type = "TransactionSampleDatum"
+        backtraces << backtrace
+      end
+
       samples << sample
     end
 
@@ -232,6 +243,7 @@ class AppPerfAgentWorker < ActiveJob::Base
 
     samples = all_events.map {|s| application.transaction_sample_data.new(s) }
 
+    Backtrace.import(backtraces)
     TransactionSampleDatum.import(samples)
     DatabaseCall.import(database_calls)
   end
