@@ -7,17 +7,13 @@ describe AgentListenerController do
   # TODO: auto-generated
   describe 'POST create' do
     it 'works' do
-      post :create, {}, {}
+      application = create(:application)
+
+      post :create, {
+          :protocol_version => 2,
+          :license_key => application.license_key
+        }, {}
       expect(response.status).to eq(200)
     end
   end
-
-  # TODO: auto-generated
-  describe 'GET invoke_raw_method' do
-    it 'works' do
-      get :invoke_raw_method, {}, {}
-      expect(response.status).to eq(200)
-    end
-  end
-
 end

@@ -16,15 +16,6 @@ describe ApplicationsController, :type => :controller do
   end
 
   # TODO: auto-generated
-  describe 'GET show' do
-    it 'works' do
-      application = create(:application, :user => subject.current_user)
-      get :show, :id => application
-      expect(response.status).to eq(200)
-    end
-  end
-
-  # TODO: auto-generated
   describe 'GET new' do
     it 'works' do
       get :new, {}, {}
@@ -38,15 +29,6 @@ describe ApplicationsController, :type => :controller do
       application = create(:application, :user => subject.current_user)
       get :edit, :id => application
       expect(response.status).to eq(200)
-    end
-  end
-
-  # TODO: auto-generated
-  describe 'POST create' do
-    it 'works' do
-      post :create, :application => { :name => "Test" }
-      expect(response.status).to eq(302)
-      expect(response).to redirect_to(application_path(assigns(:application)))
     end
   end
 

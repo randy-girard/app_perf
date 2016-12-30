@@ -7,8 +7,8 @@ describe DurationReporter do
   # TODO: auto-generated
   describe '#render' do
     it 'works' do
-      application = double('application')
-      expect(application).to receive(:transaction_data)
+      application = create(:application)
+      
       params = {}
       view_context = double('view_context')
       expect(view_context).to receive(:area_chart)
@@ -20,8 +20,8 @@ describe DurationReporter do
   # TODO: auto-generated
   describe '#report_data' do
     it 'works' do
-      application = double('application')
-      expect(application).to receive(:transaction_data)
+      application = create(:application)
+
       params = {}
       view_context = double('view_context')
       duration_reporter = DurationReporter.new(application, params, view_context)

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe TransactionsController, :type => :controller do
+describe TracesController, :type => :controller do
   login_user
 
   # TODO: auto-generated

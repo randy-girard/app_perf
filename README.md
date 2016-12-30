@@ -41,7 +41,7 @@ App Perf will automatically detect new applications that are posting data and di
 In order to monitor an application, you have to add the Ruby Agent gem to the Gemfile:
 
 ```
-gem "app_perf_ruby_agent", :git => "git@github.com:randy-girard/app_perf_ruby_agent"
+gem "app_perf_rpm", :git => "git@github.com:randy-girard/app_perf_rpm"
 ```
 
 Once you have add the gem, Add the following lines to your project (or in an initializer):
@@ -69,13 +69,13 @@ Currently the only protocol version supported is 2. License key is generated whe
 
 ## Contributing to the App Perf Ruby Agent
 
-Clone the github project at https://github.com/randy-girard/app_perf_ruby_agent somewhere locally, then run the following command to force bundler to look at that specific path:
+Clone the github project at https://github.com/randy-girard/app_perf_rpm somewhere locally, then run the following command to force bundler to look at that specific path:
 
 ```
-bundle config local.app_perf_ruby_agent /path/to/local/app_perf_ruby_agent
+bundle config local.app_perf_rpm /path/to/local/app_perf_rpm
 ```
 
 To remove this configuration, run the following command:
 ```
-bundle config --delete local.app_perf_ruby_agent
+bundle config --delete local.app_perf_rpm
 ```
