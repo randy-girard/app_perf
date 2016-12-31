@@ -38,7 +38,7 @@ describe ApplicationsController, :type => :controller do
       application = create(:application, :user => subject.current_user)
       put :update, :id => application, :application => { :name => "Test" }
       expect(response.status).to eq(302)
-      expect(response).to redirect_to(application_path(assigns(:application)))
+      expect(response).to redirect_to(applications_path)
     end
   end
 

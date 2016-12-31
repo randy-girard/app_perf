@@ -29,6 +29,7 @@ describe AppPerfAgentWorker do
       }
 
       app_perf_agent_worker = AppPerfAgentWorker.new
+      expect(app_perf_agent_worker).to receive(:perform_data_retention_cleanup).once
       expect { app_perf_agent_worker.perform(params) }
         .to change {Application.count}.by(1)
         .and change{DatabaseType.count}.by(1)
@@ -49,7 +50,7 @@ describe AppPerfAgentWorker do
 
     it 'works with existing application' do
       user = User.create(:email => "user@example.com", :password => "password")
-      application = user.applications.create(:name => "App Name")
+      application = create(:application, :user => user, :name => "App Name", :data_retention_hours => nil)
       application.traces.create(:trace_key => "b0b1d8d48f4565e10484b452aee413400980768e")
 
       params = {
@@ -73,6 +74,7 @@ describe AppPerfAgentWorker do
       }
 
       app_perf_agent_worker = AppPerfAgentWorker.new
+      expect(app_perf_agent_worker).to receive(:perform_data_retention_cleanup).once
       expect { app_perf_agent_worker.perform(params) }
         .to change {Application.count}.by(0)
         .and change{DatabaseType.count}.by(1)

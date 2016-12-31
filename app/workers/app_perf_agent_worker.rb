@@ -45,12 +45,16 @@ class AppPerfAgentWorker < ActiveJob::Base
 
         # TODO: Move this to a job/cron to run for all
         # apps on a regular basis.
-        DataRetentionJanitor.new.perform(application.id)
+        perform_data_retention_cleanup
       end
     #end
   end
 
   private
+
+  def perform_data_retention_cleanup
+    DataRetentionJanitor.new.perform(application.id)
+  end
 
   def load_data(data)
     data
@@ -239,6 +243,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       }
 
       trace = traces.find {|t| t.trace_key == trace_key }
+
       root = arrange(events, trace)
       flattened_sample = flatten_sample(root)
 
