@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   post '/users/sign_in' => 'sessions#create', :as => :user_sessions
   delete '/users/sign_out' => 'sessions#destroy', :as => :user_session
 
-  resource :dashboard, :controller => "dashboard"
+  resource :dashboard, :controller => "dashboard", :only => [:show]
 
   resources :applications, :only => [:index, :new, :edit, :update, :destroy] do
     resource :overview, :controller => "overview", :only => [:show]

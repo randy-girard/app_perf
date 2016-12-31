@@ -42,6 +42,10 @@ class AppPerfAgentWorker < ActiveJob::Base
             process_version_2(samples)
           end
         end
+
+        # TODO: Move this to a job/cron to run for all
+        # apps on a regular basis.
+        DataRetentionJanitor.new.perform(application.id)
       end
     #end
   end

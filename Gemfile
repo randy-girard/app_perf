@@ -41,6 +41,7 @@ gem "font-awesome-rails"
 gem "highcharts-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
+gem "sucker_punch"
 gem "activerecord-import"
 gem "progressive_render"
 gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"

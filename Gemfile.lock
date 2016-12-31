@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: cf7a618ba3daf1145d729e1cb4a9b4d7ed5582b9
+  revision: e6f32baccfe24198733f3156c718b4bcef80c0c1
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -271,6 +271,8 @@ GEM
     sshkit (1.11.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    sucker_punch (2.0.2)
+      concurrent-ruby (~> 1.0.0)
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (2.0.2)
@@ -331,6 +333,7 @@ DEPENDENCIES
   sinatra
   spring
   sqlite3
+  sucker_punch
   turbolinks
   uglifier (>= 1.3.0)
   web-console (~> 2.0)

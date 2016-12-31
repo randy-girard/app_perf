@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161230191409) do
+ActiveRecord::Schema.define(version: 20161231022752) do
 
   create_table "analytic_event_data", force: :cascade do |t|
     t.integer  "application_id"
@@ -30,8 +30,10 @@ ActiveRecord::Schema.define(version: 20161230191409) do
     t.integer  "user_id"
     t.string   "name"
     t.string   "license_key"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "data_retention_days"
+    t.decimal  "data_retention_hours", precision: 6, scale: 1
   end
 
   add_index "applications", ["name", "user_id"], name: "index_applications_on_name_and_user_id", unique: true

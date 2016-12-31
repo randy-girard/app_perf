@@ -13,8 +13,10 @@ class Application < ActiveRecord::Base
   has_many :hosts, :dependent => :delete_all
 
   validates :name, :uniqueness => { :scope => :user_id }
+  validates :data_retention_hours, :numericality => { :greater_than => 0 }
 
   before_validation do |record|
     record.license_key ||= record.user.license_key
+    record.data_retention_hours ||= DEFAULT_DATA_RETENTION_HOURS
   end
 end

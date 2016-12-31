@@ -21,7 +21,7 @@
       <% end %>
       <% if (backtrace = transaction_sample_datum.backtrace).present? %>
       <br />
-      <pre class="text-wrap"><%= transaction_sample_datum.backtrace.backtrace.join("\n") %></pre>
+      <pre class="text-wrap"><%= transaction_sample_datum.backtrace.app_backtrace.join("\n") %></pre>
       <% end %>
     <% else %>
       <%= transaction_sample_datum.layer.name %>
