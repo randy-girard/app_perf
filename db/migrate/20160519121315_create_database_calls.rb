@@ -5,7 +5,7 @@ class CreateDatabaseCalls < ActiveRecord::Migration
       t.references :host, index: true, foreign_key: true
       t.references :database_type, index: true, foreign_key: true
       t.references :layer, index: true, foreign_key: true
-      t.uuid :uuid, index: true
+      t.string :uuid, index: true
       t.string :statement
       t.datetime :timestamp
       t.float :duration

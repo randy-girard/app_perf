@@ -185,7 +185,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       if sql
         database_type = database_types.find {|dt| dt.name == adapter }
         database_call = application.database_calls.new(
-          :uuid => SecureRandom.uuid,
+          :uuid => SecureRandom.uuid.to_s,
           :database_type_id => database_type.id,
           :host_id => host.id,
           :layer_id => layer.id,
@@ -201,7 +201,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         sample[:transaction_endpoint_id] = endpoint.id
       end
       if database_call
-        sample[:grouping_id] = database_call.uuid
+        sample[:grouping_id] = database_call.uuid.to_s
         sample[:grouping_type] = "DatabaseCall"
       end
       sample[:sample_type] = sample_type
