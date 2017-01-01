@@ -2,7 +2,15 @@
 
 [![Build Status](https://travis-ci.org/randy-girard/app_perf.svg?branch=master)](https://travis-ci.org/randy-girard/app_perf)
 
+### Demo
+
+There is an instance of this running at https://app-perf.herokuapp.com. Please note that there is a low data retention setting so that it doesn't go over the allowed total row count with Heroku.
+
+To log in use the email address of "user@example.com" and a password of "password".
+
 ![Overview](/doc/overview.png?raw=true "Overview")
+
+
 
 <b>NOTE: This application is in extremely beginning stages and I am still working out flows and learning the data model. I will be cleaning code up as I go.</b>
 
