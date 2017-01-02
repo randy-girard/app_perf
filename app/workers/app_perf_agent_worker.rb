@@ -10,7 +10,7 @@ class AppPerfAgentWorker < ActiveJob::Base
                 :protocol_version
 
   def perform(params)
-    #AppPerfRpm.without_tracing do
+    AppPerfRpm.without_tracing do
       self.license_key      = params.fetch(:license_key) { nil }
       self.protocol_version = params.fetch(:protocol_version) { nil }
       self.host             = params.fetch(:host)
@@ -47,7 +47,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         # apps on a regular basis.
         perform_data_retention_cleanup
       end
-    #end
+    end
   end
 
   private

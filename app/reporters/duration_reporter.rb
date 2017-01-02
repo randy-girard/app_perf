@@ -17,10 +17,10 @@ class DurationReporter < Reporter
 
   def report_data
     relation = application
-      .traces
-      .joins(:root_sample, :transaction_sample_data => [:layer, :host])
+      .transaction_sample_data
+      .joins(:layer)
       .joins("LEFT JOIN database_calls ON database_calls.uuid = transaction_sample_data.grouping_id AND transaction_sample_data.grouping_type = 'DatabaseCall'")
-      .where("transaction_sample_data_traces.sample_type = ?", "web")
+      .where(:sample_type => "web")
       .group("layers.name")
 
     relation = relation.where("transaction_sample_data.domain = ?", params[:_domain]) if params[:_domain]
@@ -31,7 +31,9 @@ class DurationReporter < Reporter
     relation = relation.where("transaction_sample_data.host_id = ?", params[:_host]) if params[:_host]
     relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]
 
-    data = relation.group_by_period(*report_params).calculate_all("CASE COUNT(DISTINCT transaction_sample_data_traces.trace_id) WHEN 0 THEN 0 ELSE SUM(transaction_sample_data_traces.exclusive_duration) / COUNT(DISTINCT transaction_sample_data_traces.trace_id) END")
+    data = relation
+      .group_by_period(*report_params)
+      .calculate_all("CASE COUNT(DISTINCT trace_id) WHEN 0 THEN 0 ELSE SUM(exclusive_duration) / COUNT(DISTINCT trace_id) END")
 
     hash = []
     layers = {}

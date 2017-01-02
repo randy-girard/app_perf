@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: a7e4cdbf34764df1e9652b2792ddc28835db5d18
+  revision: ed2a56a271d9d989a04e92d6f0a99b84e3b243e2
   branch: master
   specs:
     app_perf_rpm (0.0.1)
