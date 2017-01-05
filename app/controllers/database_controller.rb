@@ -4,7 +4,7 @@ class DatabaseController < ApplicationController
     @database_calls = @current_application
       .database_calls
       .where(:timestamp => @time_range)
-      .order("duration DESC")
+      .order("timestamp DESC")
       .page(params[:page])
   end
 

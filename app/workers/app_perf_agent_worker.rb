@@ -25,6 +25,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       self.data             = Array(params.fetch(:data))
       self.user             = User.find_by_license_key(license_key)
       self.application      = user.applications.where(:name => name).first_or_initialize
+      self.application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
       self.application.license_key = license_key
       self.application.save
 
@@ -67,7 +68,10 @@ class AppPerfAgentWorker < ActiveJob::Base
           Rails.logger.error _serialized_opts.inspect
           _opts = {}
         end
-        [_layer, _trace_key, _start, _duration, _opts]
+
+        trace_key = generate_trace_id(_trace_key)
+
+        [_layer, trace_key, _start.to_f, _duration.to_f, _opts]
       }
   end
 
@@ -229,6 +233,7 @@ class AppPerfAgentWorker < ActiveJob::Base
 
     all_events = []
     samples.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
+      trace = traces.find {|t| t.trace_key == trace_key }
       timestamp = events.map {|e| e[:timestamp] }.min
       duration = events.map {|e| e[:duration] }.max
       url = (events.find {|e| e[:url] } || {}).fetch(:url) { nil }
@@ -240,43 +245,40 @@ class AppPerfAgentWorker < ActiveJob::Base
         e[:domain] ||= domain
         e[:controller] ||= controller
         e[:action] ||= action
+        e[:trace_id] = trace.id
       }
 
-      trace = traces.find {|t| t.trace_key == trace_key }
+      #root = arrange(events, trace)
+      #flattened_sample = flatten_sample(root)
+      existing_samples = trace.transaction_sample_data.all
+      new_samples = events.map {|s| application.transaction_sample_data.new(s) }
+      all_samples = existing_samples + new_samples
+      root_event = trace.arrange_samples(all_samples)
+      set_exclusive_durations(root_event)
 
-      root = arrange(events, trace)
-      flattened_sample = flatten_sample(root)
+      all_samples.select {|s| s.id.present? }.each(&:save)
 
-      all_events += flattened_sample
+      all_events += new_samples
     end
 
-    samples = all_events.map {|s| application.transaction_sample_data.new(s) }
 
     Backtrace.import(backtraces)
-    TransactionSampleDatum.import(samples)
+    TransactionSampleDatum.import(all_events)
     DatabaseCall.import(database_calls)
   end
 
-  def flatten_sample(root, depth = 0)
-    children_sample = root.delete(:children) || []
-    children = if children_sample.present?
-      root[:request_id] = generate_trace_id
-      children_sample.map do |child|
-        child[:parent_id] = root[:request_id]
-        flatten_sample(child)
-      end
+  def set_exclusive_durations(root)
+    children = if root.children
+      root.children.map {|c| set_exclusive_durations(c) }
     else
       []
     end
-
-    root[:exclusive_duration] ||= root[:duration] - children_sample.inject(0.0) { |sum, child| sum + child[:duration] }
-
-    [root] + children.flatten
+    root.exclusive_duration ||= root.duration - children.inject(0.0) { |sum, child| sum + child.duration }
+    root
   end
 
   def arrange(events, trace)
     while event = events.shift
-      event[:trace_id] = trace.id
       if parent = events.find { |n|
           start = (n[:timestamp] - event[:timestamp])
           start <= 0 && (start + n[:duration] >= event[:duration])
@@ -290,8 +292,12 @@ class AppPerfAgentWorker < ActiveJob::Base
     root
   end
 
-  def generate_trace_id
-    Digest::SHA1.hexdigest([Time.now, rand].join)
+  def generate_trace_id(seed = nil)
+    if seed.nil?
+      Digest::SHA1.hexdigest([Time.now, rand].join)
+    else
+      Digest::SHA1.hexdigest(seed)
+    end
   end
 
   def process_analytic_event_data(data)

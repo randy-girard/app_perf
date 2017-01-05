@@ -15,7 +15,7 @@
     <div class="col-lg-12">
       <%= paginate @traces %>
     </div>
-    
+
     <div class="col-lg-12 connectedSortable">
       <div class="box">
         <div class="box-header">
@@ -30,7 +30,10 @@
             </tr>
             <% @traces.each do |trace| %>
               <tr>
-                <td class="ellipsis"><%= link_to trace.root_sample.payload[:url], application_trace_path(@current_application, :id => trace.trace_key) %><br /></td>
+                <td class="ellipsis">
+                  <%= link_to trace.root_sample.payload["url"], application_trace_path(@current_application, :id => trace.trace_key) %>
+                  (<%= trace.transaction_sample_data.count.to_i %>)
+                </td>
                 <td class="text-center"><%= number_with_precision(trace.duration, :precision => 2) %>
               </tr>
             <% end %>

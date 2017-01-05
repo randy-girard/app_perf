@@ -24,7 +24,7 @@
     </div>
   </div>
 </section>
-<% else %>
+<% elsif true %>
 <section class="content">
   <div class="row">
     <div class="col-lg-12 connectedSortable">
@@ -34,7 +34,7 @@
         </div>
         <div class="box-body">
           <table class="table">
-            <%= render @trace.root_sample, :depth => 0, :version => 1 %>
+            <%= render @root_with_children, :depth => 0, :version => 1 %>
           </table>
         </div>
       </div>

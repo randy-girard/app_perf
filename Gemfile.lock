@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: ed2a56a271d9d989a04e92d6f0a99b84e3b243e2
+  revision: 5a31b53780d3b21aa9e1aade6fb0d455c978b018
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -126,7 +126,7 @@ GEM
       sprockets-es6 (>= 0.9.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
-    groupdate (2.5.3)
+    groupdate (3.1.1)
       activesupport (>= 3)
     highcharts-rails (4.2.5)
       railties (>= 3.1)

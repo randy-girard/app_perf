@@ -17,6 +17,5 @@ class Application < ActiveRecord::Base
 
   before_validation do |record|
     record.license_key ||= record.user.license_key
-    record.data_retention_hours ||= DEFAULT_DATA_RETENTION_HOURS
   end
 end

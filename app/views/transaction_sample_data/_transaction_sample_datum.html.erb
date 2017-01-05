@@ -1,10 +1,11 @@
-<% if version == 1 %>
-<tr>
+<tr class="<%= "info" if transaction_sample_datum.is_sql(params[:sql]) %>">
   <td width="20"><%= transaction_sample_datum.id %></td>
   <td width="150"><%= transaction_sample_datum.layer.name %></td>
   <td class="ellipsis" style="padding-left: <%= depth * 40 %>px;">
     <% if transaction_sample_datum.payload.present? %>
-      <% if transaction_sample_datum.layer.name.eql?("rack") %>
+      <% if transaction_sample_datum.layer.name.eql?("nginx") %>
+      <%= transaction_sample_datum.payload["url"] %>
+      <% elsif transaction_sample_datum.layer.name.eql?("rack") %>
       <%= transaction_sample_datum.payload["url"] %>
       <% elsif transaction_sample_datum.layer.name.eql?("actioncontroller") %>
       <%= transaction_sample_datum.payload["controller"] %>
@@ -19,34 +20,17 @@
       <%= transaction_sample_datum.payload["remote_host"] %>
       <% else %>
       <% end %>
-      <% if (backtrace = transaction_sample_datum.backtrace).present? %>
-      <br />
-      <pre class="text-wrap"><%= transaction_sample_datum.backtrace.app_backtrace.join("\n") %></pre>
-      <% end %>
     <% else %>
       <%= transaction_sample_datum.layer.name %>
     <% end %>
   </td>
   <td width="200">
     <div class="progress progress-xs">
-      <div class="progress-bar progress-bar-danger" style="width: <%= number_to_percentage(transaction_sample_datum.exclusive_duration / @trace.duration.to_f * 100.to_f, :precision => 2) %>"></div>
+      <div class="progress-bar progress-bar-danger" style="width: <%= number_to_percentage(transaction_sample_datum.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 2) %>"></div>
     </div>
   </td>
-  <td><span class="badge"><%= number_to_percentage(transaction_sample_datum.exclusive_duration / @trace.duration.to_f * 100.to_f, :precision => 1) %></span></td>
+  <td><span class="badge"><%= number_to_percentage(transaction_sample_datum.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 1) %></span></td>
   <td width="50"><%= number_with_precision(transaction_sample_datum.duration, :precision => 2) %></td>
   <td width="50"><%= number_with_precision(transaction_sample_datum.exclusive_duration, :precision => 2) %></td>
 </tr>
-<%= render transaction_sample_datum.children, :depth => depth + 1, :version => 1 %>
-<% end %>
-<% if version == 2 %>
-
-
-<% percentage = (((transaction_sample_datum.timestamp + transaction_sample_datum.duration).to_f - start_time.to_f) / (end_time.to_f - start_time.to_f) * 100) %>
-<% margin = previous_margin + ((transaction_sample_datum.timestamp.to_f - start_time.to_f) / (end_time.to_f - start_time.to_f)) * 10000 %>
-<div><%= transaction_sample_datum.layer.name %> <%= transaction_sample_datum.timestamp.to_f %> <%= transaction_sample_datum.duration %></div>
-<div style="margin-left: <%= margin %>%; width: <%= percentage %>%; height: 30px; background-color: red; text-align: center"><% transaction_sample_datum.layer.name %> <% end_time %></div>
-
-<% transaction_sample_datum.inspect %>
-<%= render transaction_sample_datum.children, :depth => depth + 1, :version => 2, :start_time => start_time, :end_time => end_time, :previous_margin => margin %>
-<br />
-<% end %>
+<%= render transaction_sample_datum.children, :depth => depth + 1, :version => 1 if transaction_sample_datum.children %>

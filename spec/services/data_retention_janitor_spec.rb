@@ -23,7 +23,7 @@ describe DataRetentionJanitor do
       create(:application, :user => user, :data_retention_hours => nil)
     }
 
-    it "should remove data older than data retention date" do
+    it "should not remove data" do
       application.traces.create(:trace_key => "1", :timestamp => 2.hours.ago)
 
       expect {

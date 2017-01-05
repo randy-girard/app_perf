@@ -5,12 +5,27 @@ class DatabaseReporter < Reporter
   end
 
   def report_data
-    application
+
+
+    data = application
       .database_calls
-      .includes(:database_samples)
-      .group("database_calls.name")
-      .group_by_period(*report_params)
-      .sum("transaction_sample_data.exclusive_duration")
+      .joins(:database_type)
+      .group("database_types.name")
+      .group_by_period(*report_params("database_calls.timestamp"))
+      .sum("database_calls.duration")
+
+    hash = []
+    layers = {}
+    data.each_pair do |layer, event|
+      layers[layer.first] ||= []
+      layers[layer.first] << [layer.second.to_i * 1000, event]
+    end
+
+    layers.each_pair do |layer, data|
+      hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
+    end
+
+    hash
   end
 
   private

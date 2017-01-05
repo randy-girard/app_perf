@@ -5,6 +5,9 @@ describe AppPerfAgentWorker do
 
   # TODO: auto-generated
   describe '#perform' do
+    context "trace header is set" do
+
+    end
     it 'works' do
       user = User.create(:email => "user@example.com", :password => "password")
 
@@ -36,7 +39,7 @@ describe AppPerfAgentWorker do
         .and change{Trace.count}.by(2)
         .and change{TransactionSampleDatum.count}.by(10)
 
-      samples = Trace.first.root_sample.dump_attribute_tree(:layer_name)
+      samples = Trace.first.arrange_samples.dump_attribute_tree(:layer_name)
       expect(samples).to eq([
         "rack", {
           :children=>[
@@ -51,7 +54,7 @@ describe AppPerfAgentWorker do
     it 'works with existing application' do
       user = User.create(:email => "user@example.com", :password => "password")
       application = create(:application, :user => user, :name => "App Name", :data_retention_hours => nil)
-      application.traces.create(:trace_key => "b0b1d8d48f4565e10484b452aee413400980768e")
+      application.traces.create(:trace_key => "b07994fb2ece323877895abf7634479f6dfbac42")
 
       params = {
         :license_key => user.license_key,
@@ -81,12 +84,22 @@ describe AppPerfAgentWorker do
         .and change{Trace.count}.by(1)
         .and change{TransactionSampleDatum.count}.by(10)
 
-      samples = Trace.first.root_sample.dump_attribute_tree(:layer_name)
+      samples = Trace.first.arrange_samples.dump_attribute_tree(:layer_name)
       expect(samples).to eq([
         "rack", {
           :children=>[
             "actioncontroller", {
               :children=>["activerecord", "activerecord", "activerecord"]
+            }
+          ]
+        }
+      ])
+      samples = Trace.first.arrange_samples.dump_attribute_tree([:exclusive_duration, [:round, 5]])
+      expect(samples).to eq([
+        26.87812, {
+          :children=>[
+            112.78582, {
+              :children=>[0.54908, 0.80514, 2.68197]
             }
           ]
         }

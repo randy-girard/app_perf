@@ -37,8 +37,8 @@ class Reporter
     []
   end
 
-  def report_params
-    options = {}
+  def report_params(timestamp = "transaction_sample_data.timestamp")
+    options = { }
     options[:permit] = %w[minute hour day]
     if (time_range = Reporter.time_range(params))
       options[:range] = time_range
@@ -48,7 +48,7 @@ class Reporter
 
     [
       params[:period],
-      "transaction_sample_data.timestamp",
+      timestamp,
       options
     ]
   end

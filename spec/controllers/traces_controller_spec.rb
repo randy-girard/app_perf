@@ -19,9 +19,9 @@ describe TracesController, :type => :controller do
   describe 'GET show' do
     it 'works' do
       application = create(:application, :user => subject.current_user)
-      transaction_endpoint = create(:transaction_endpoint, :application => application)
+      trace = create(:trace, :application => application)
 
-      get :show, :application_id => application, :id => transaction_endpoint
+      get :show, :application_id => application, :id => trace.trace_key
 
       expect(response.status).to eq(200)
     end

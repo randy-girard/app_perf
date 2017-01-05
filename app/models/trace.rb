@@ -6,7 +6,22 @@ class Trace < ActiveRecord::Base
 
   validates :trace_key, :uniqueness => { :scope => :application_id }
 
-  has_one :root_sample,
-    -> { where(:parent_id => nil) },
-    :class_name => "TransactionSampleDatum"
+  def root_sample
+    transaction_sample_data.order(:timestamp).first
+  end
+
+  def arrange_samples(samples = nil)
+    root = nil
+    samples ||= transaction_sample_data.dup.to_a
+    samples.sort! { |a, b| a.end <=> b.end }
+
+    while sample = samples.shift
+      if parent = samples.find { |n| n.parent_of?(sample) }
+        parent.add_child(sample)
+      elsif samples.empty?
+        root = sample
+      end
+    end
+    root
+  end
 end

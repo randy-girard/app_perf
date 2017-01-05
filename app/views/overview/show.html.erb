@@ -46,35 +46,6 @@
         </div>
       </div>
     </section>
-    <% if false %>
-    <section class="col-lg-8 connectedSortable">
-      <div class="box box-info">
-        <div class="box-header">
-          <i class="fa fa-clock"></i>
-          <h3 class="box-title">Memory Usage</h3>
-        </div>
-        <div class="box-body">
-          <div class="dynamic-chart" data-height="300px" data-chart-id="#memory_chart" data-url="<%= application_report_path(@current_application, :id => "memory_physical", :filter => @filter, :transaction_id => @transaction_id, :period => params[:period], :st => params[:st], :se => params[:se], :last => params[:last]) %>" data-duration="15000">
-            <%= area_chart([], { :id => "memory_chart" }) %>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="col-lg-4 connectedSortable">
-      <div class="box box-info">
-        <div class="box-header">
-          <i class="fa fa-clock"></i>
-          <h3 class="box-title">Errors</h3>
-        </div>
-        <div class="box-body">
-          <div class="dynamic-chart" data-height="300px" data-chart-id="#errors_chart" data-url="<%= application_report_path(@current_application, :id => "errors", :filter => @filter, :transaction_id => @transaction_id, :period => params[:period], :st => params[:st], :se => params[:se], :last => params[:last]) %>" data-duration="15000">
-            <%= area_chart([], { :id => "errors_chart" }) %>
-          </div>
-        </div>
-      </div>
-    </section>
-    <% end %>
   </div>
 
   <div class="row">
@@ -206,7 +177,7 @@
           <table class="table">
           <% @traces.each do |trace| %>
             <tr>
-              <td class="ellipsis"><%= link_to trace.root_sample.payload["url"], application_trace_path(@current_application, :id => trace.trace_key) %></td>
+              <td class="ellipsis"><%= link_to trace.arrange_samples.payload["url"], application_trace_path(@current_application, :id => trace.trace_key) %></td>
               <td width="100"><%= link_to "#{number_with_precision(trace.duration, :precision => 2)}s", application_trace_path(@current_application, :id => trace.trace_key) %></td>
               <td width="100" class="small"><%= time_ago_in_words(trace.timestamp) %> ago.</td>
             </tr>

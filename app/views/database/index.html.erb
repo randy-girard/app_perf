@@ -8,11 +8,41 @@
   </ol>
 </section>
 
+<% if selected_filters.present? %>
+<section class="content-header">
+  <% selected_filters.each_pair do |key, value| %>
+    <%= link_to dynamic_report_url(:without => key), :class => "btn btn-info btn-sm", :title => value do %>
+      <%= key %>: <%= truncate(value, :length => 40) %>
+      <i class="fa fa-remove"></i>
+    <% end %>
+  <% end %>
+</section>
+<% end %>
+
 <section class="content">
   <div class="row">
     <div class="col-lg-12">
       <%= paginate @database_calls %>
     </div>
+
+    <div class="col-lg- connectedSortable">
+      <div class="box">
+        <div class="box-header">
+          <i class="fa fa-clock"></i>
+          <h3 class="box-title">Database Query Time</h3>
+        </div>
+        <div class="box-body">
+          <div id="database-time"
+               style="height: 300px;"
+               class="dynamic-chart"
+               data-legend="#database-time-legend"
+               data-url="<%= dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "database" }) %>"
+               data-duration="15000"></div>
+          <div id="database-time-legend" class="chart-legend"></div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="col-lg-12 connectedSortable">
       <div class="box">
@@ -24,11 +54,13 @@
             <tr>
               <th>Statement</th>
               <th class="text-center" width="200">Duration (ms)</th>
+              <th width="150"></th>
             </tr>
             <% @database_calls.each do |database_call| %>
               <tr>
-                <td class="ellipsis"><%= database_call.statement %></td>
+                <td class="ellipsis"><%= link_to database_call.statement, application_trace_path(database_call.application, database_call.database_sample.trace_key, :sql => database_call.uuid) %></td>
                 <td class="text-center"><%= number_with_precision(database_call.duration, :precision => 2) %>
+                <td class="text-center"><%= time_ago_in_words(database_call.timestamp) %> ago</td>
               </tr>
             <% end %>
           </table>

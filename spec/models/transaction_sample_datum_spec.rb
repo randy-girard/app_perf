@@ -16,8 +16,8 @@ describe TransactionSampleDatum do
   # TODO: auto-generated
   describe '#parent_of?' do
     it 'works' do
-      transaction_sample_datum1= create(:transaction_sample_datum)
-      transaction_sample_datum2 = create(:transaction_sample_datum)
+      transaction_sample_datum1 = create(:transaction_sample_datum, :timestamp => Time.now - 5.minutes, :duration => 10.minutes)
+      transaction_sample_datum2 = create(:transaction_sample_datum, :timestamp => Time.now - 3.minutes, :duration => 5.minutes)
       result = transaction_sample_datum1.parent_of?(transaction_sample_datum2)
       expect(result).not_to be_nil
     end
@@ -26,8 +26,8 @@ describe TransactionSampleDatum do
   # TODO: auto-generated
   describe '#child_of?' do
     it 'works' do
-      transaction_sample_datum1 = create(:transaction_sample_datum)
-      transaction_sample_datum2 = create(:transaction_sample_datum)
+      transaction_sample_datum1 = create(:transaction_sample_datum, :timestamp => Time.now - 3.minutes, :duration => 5.minutes)
+      transaction_sample_datum2 = create(:transaction_sample_datum, :timestamp => Time.now - 5.minutes, :duration => 10.minutes)
       result = transaction_sample_datum1.child_of?(transaction_sample_datum2)
       expect(result).not_to be_nil
     end

@@ -23,4 +23,7 @@
 !/log/.keep
 /tmp
 
+# Ignore node modules
+node_modules
+
 /coverage
