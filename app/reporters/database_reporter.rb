@@ -25,7 +25,9 @@ class DatabaseReporter < Reporter
       hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
     end
 
-    hash
+    {
+      :data => hash
+    }
   end
 
   private

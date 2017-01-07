@@ -16,6 +16,8 @@ class DurationReporter < Reporter
   end
 
   def report_data
+    time_range, period = Reporter.time_range(params)
+
     relation = application
       .layers
       .joins("LEFT JOIN transaction_sample_data ON transaction_sample_data.layer_id = layers.id")
@@ -46,7 +48,23 @@ class DurationReporter < Reporter
       hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
     end
 
-    hash
+    events = application
+      .events
+      .where(:type => "Event::Deployment")
+      .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
+
+    {
+      :data => hash,
+      :events => events.map {|event|
+        {
+          :min => event.start_time.to_i * 1000,
+          :max => event.end_time.to_i * 1000,
+          :eventType => "Deployment",
+          :title => event.title,
+          :description => event.description
+        }
+      }
+    }
   end
 
   private

@@ -14,7 +14,6 @@ module ApplicationHelper
     _st         = options[:st]             || params[:_st]
     _se         = options[:se]             || params[:_se]
     _past       = options[:_past]          || params[:_past]
-    _interval   = options[:_interval]      || params[:_interval]
 
 
     base_params.merge!(:_host       => _host)       if _host
@@ -24,9 +23,8 @@ module ApplicationHelper
     base_params.merge!(:_action     => _action)     if _action
     base_params.merge!(:_layer      => _layer)      if _layer
     base_params.merge!(:_sql        => _sql)        if _sql
-    if _past && _interval
+    if _past
       base_params.merge!(:_past       => _past)
-      base_params.merge!(:_interval   => _interval)
     elsif _st && _se
       base_params.merge!(:_st         => _st)
       base_params.merge!(:_se         => _se)
@@ -57,7 +55,6 @@ module ApplicationHelper
     _st         = params[:_st]
     _se         = params[:_se]
     _past       = params[:_past]
-    _interval   = params[:_interval]
 
     base_params = {}
     base_params.merge!("Domain"     => _domain)     if _domain

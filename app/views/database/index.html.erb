@@ -58,7 +58,7 @@
             </tr>
             <% @database_calls.each do |database_call| %>
               <tr>
-                <td class="ellipsis"><%= link_to database_call.statement, application_trace_path(database_call.application, database_call.database_sample.trace_key, :sql => database_call.uuid) %></td>
+                <td class="ellipsis"><%= link_to database_call.statement, application_trace_path(database_call.application, database_call.database_sample.trace_key, :query => database_call.uuid) %></td>
                 <td class="text-center"><%= number_with_precision(database_call.duration, :precision => 2) %>
                 <td class="text-center"><%= time_ago_in_words(database_call.timestamp) %> ago</td>
               </tr>

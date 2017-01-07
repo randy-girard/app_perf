@@ -9,6 +9,7 @@ class DataRetentionJanitor
       application.database_calls.where("timestamp < ?", delete_time).delete_all
       application.traces.where("timestamp < ?", delete_time).delete_all
       application.analytic_event_data.where("timestamp < ?", delete_time).delete_all
+      application.events.delete_all
 
       application.error_data.where("created_at < ?", delete_time).delete_all
       application.error_messages.where("created_at < ?", delete_time).delete_all

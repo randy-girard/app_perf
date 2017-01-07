@@ -12,7 +12,7 @@ class TransactionSampleDatum < ActiveRecord::Base
 
   delegate :name, :to => :layer, :prefix => true
 
-  def is_sql(uuid)
+  def is_query?(uuid)
     grouping_type.eql?("DatabaseCall") &&
     grouping_id.to_s.eql?(uuid)
   end
@@ -32,7 +32,7 @@ class TransactionSampleDatum < ActiveRecord::Base
     @children ||= []
   end
 
-  serialize :payload
+  serialize :payload, JSON
 
   def ancestors
     ancestors = []

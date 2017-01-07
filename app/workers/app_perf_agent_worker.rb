@@ -25,8 +25,10 @@ class AppPerfAgentWorker < ActiveJob::Base
       self.data             = Array(params.fetch(:data))
       self.user             = User.find_by_license_key(license_key)
       self.application      = user.applications.where(:name => name).first_or_initialize
-      self.application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
       self.application.license_key = license_key
+      if self.application.new_record?
+        self.application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
+      end
       self.application.save
 
       if application
@@ -34,6 +36,11 @@ class AppPerfAgentWorker < ActiveJob::Base
 
         if protocol_version.to_i.eql?(2)
           errors, samples = data.partition {|d| d[0] == "error" }
+          metrics, samples = data.partition {|d| d[0] == "metric" }
+
+          if metrics.present?
+            process_metric_data(metrics)
+          end
 
           if errors.present?
             process_error_data(errors)
@@ -60,11 +67,12 @@ class AppPerfAgentWorker < ActiveJob::Base
   def load_data(data)
     data
       .map {|datum|
-        _layer, _trace_key, _start, _duration, _serialized_opts = datum
         begin
-          _opts = YAML.load(_serialized_opts).with_indifferent_access
+          _layer, _trace_key, _start, _duration, _serialized_opts = datum
+          _opts = _serialized_opts
         rescue => ex
           Rails.logger.error "SERIALIZATION ERROR"
+          Rails.logger.error ex.message.to_s
           Rails.logger.error _serialized_opts.inspect
           _opts = {}
         end
@@ -169,7 +177,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       domain = _opts.fetch("domain") { nil }
       controller = _opts.fetch("controller") { nil }
       action = _opts.fetch("action") { nil }
-      sql = _opts.fetch("sql") { nil }
+      query = _opts.fetch("query") { nil }
       adapter = _opts.fetch("adapter") { nil }
       sample_type = _opts.fetch("type") { "web" }
       _backtrace = _opts.delete("backtrace")
@@ -186,14 +194,14 @@ class AppPerfAgentWorker < ActiveJob::Base
         hash[:transaction_endpoint_id] = endpoint.id
       end
 
-      if sql
+      if query
         database_type = database_types.find {|dt| dt.name == adapter }
         database_call = application.database_calls.new(
           :uuid => SecureRandom.uuid.to_s,
           :database_type_id => database_type.id,
           :host_id => host.id,
           :layer_id => layer.id,
-          :statement => sql,
+          :statement => query,
           :timestamp => timestamp,
           :duration => _duration
         )
@@ -331,6 +339,21 @@ class AppPerfAgentWorker < ActiveJob::Base
       end
     end
     ErrorDatum.import(error_data)
+  end
+
+  def process_metric_data(data)
+    metric_data = []
+    data.select {|d| d.first.eql?("metric") }.each do |datum|
+      _, timestamp, data = datum
+
+      metric_data << application.analytic_event_data.new do |datum|
+        datum.host = host
+        datum.name = data["name"]
+        datum.value = data["value"]
+        datum.timestamp = Time.at(timestamp)
+      end
+    end
+    AnalyticEventDatum.import(metric_data)
   end
 
   def generate_fingerprint(message, backtrace)

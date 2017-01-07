@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161231022752) do
+ActiveRecord::Schema.define(version: 20170106142559) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -106,6 +106,19 @@ ActiveRecord::Schema.define(version: 20161231022752) do
   end
 
   add_index "error_messages", ["application_id"], name: "index_error_messages_on_application_id", using: :btree
+
+  create_table "events", force: :cascade do |t|
+    t.string   "type"
+    t.integer  "application_id"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.string   "title"
+    t.string   "description"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "events", ["application_id"], name: "index_events_on_application_id", using: :btree
 
   create_table "hosts", force: :cascade do |t|
     t.integer  "application_id"
@@ -226,6 +239,7 @@ ActiveRecord::Schema.define(version: 20161231022752) do
   add_foreign_key "error_data", "error_messages"
   add_foreign_key "error_data", "hosts"
   add_foreign_key "error_messages", "applications"
+  add_foreign_key "events", "applications"
   add_foreign_key "hosts", "applications"
   add_foreign_key "layers", "applications"
   add_foreign_key "traces", "applications"

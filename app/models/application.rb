@@ -11,6 +11,7 @@ class Application < ActiveRecord::Base
   has_many :traces, :dependent => :delete_all
   has_many :layers, :dependent => :delete_all
   has_many :hosts, :dependent => :delete_all
+  has_many :events, :dependent => :delete_all
 
   validates :name, :uniqueness => { :scope => :user_id }
   validates :data_retention_hours, :numericality => { :greater_than => 0, :allow_nil => true }

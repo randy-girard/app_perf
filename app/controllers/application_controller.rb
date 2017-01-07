@@ -49,6 +49,6 @@ class ApplicationController < ActionController::Base
   end
 
   def set_time_range
-    @time_range = Reporter.time_range(params)
+    @time_range, @period = Reporter.time_range(params)
   end
 end

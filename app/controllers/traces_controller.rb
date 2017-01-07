@@ -7,7 +7,7 @@ class TracesController < ApplicationController
   end
 
   def show
-    @database_call = params[:sql]
+    @database_call = params[:query]
     @trace = @current_application
       .traces
       .where(:trace_key => params[:id])

@@ -1,4 +1,4 @@
-<tr class="<%= "info" if transaction_sample_datum.is_sql(params[:sql]) %>">
+<tr class="<%= "info" if transaction_sample_datum.is_query?(params[:query]) %>">
   <td width="20"><%= transaction_sample_datum.id %></td>
   <td width="150"><%= transaction_sample_datum.layer.name %></td>
   <td class="ellipsis" style="padding-left: <%= depth * 40 %>px;">
@@ -12,7 +12,7 @@
       <%= transaction_sample_datum.payload["action"] %>
       <% elsif transaction_sample_datum.layer.database? %>
       <%= transaction_sample_datum.payload["name"] %><br />
-      <%= transaction_sample_datum.payload["sql"] %>
+      <%= transaction_sample_datum.payload["query"] %>
       <% elsif transaction_sample_datum.layer.name.eql?("actionview") %>
       <%= transaction_sample_datum.payload["name"].to_s.gsub(Rails.root.to_s, "") %>:<%= transaction_sample_datum.payload["line_number"] %><br />
       <%= transaction_sample_datum.payload["type"] %><br />

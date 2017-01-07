@@ -6,6 +6,10 @@ class Trace < ActiveRecord::Base
 
   validates :trace_key, :uniqueness => { :scope => :application_id }
 
+  def url
+    transaction_sample_data.where("url IS NOT NULL").pluck(:url).first
+  end
+
   def root_sample
     transaction_sample_data.order(:timestamp).first
   end

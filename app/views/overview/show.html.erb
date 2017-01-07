@@ -5,12 +5,9 @@
   </h1>
   <ol class="breadcrumb breadcrumb-as-navigation">
     <li class="active">View Past:</li>
-    <li><%= link_to '1h', dynamic_report_url(:_past => "hour", :_interval => "1") %></li>
-    <li><%= link_to '4h', dynamic_report_url(:_past => "hour", :_interval => "4") %></li>
-    <li><%= link_to '8h', dynamic_report_url(:_past => "hour", :_interval => "8") %></li>
-    <li><%= link_to '1d', dynamic_report_url(:_past => "day", :_interval => "1") %></li>
-    <li><%= link_to '3d', dynamic_report_url(:_past => "day", :_interval => "3") %></li>
-    <li><%= link_to '7d', dynamic_report_url(:_past => "day", :_interval => "7") %></li>
+    <% Reporter::PAST_OPTIONS.each do |option| %>
+    <li><%= link_to option[:label], dynamic_report_url(:_past => option[:past]) %></li>
+    <% end %>
   </ol>
 
 </section>
