@@ -27,14 +27,16 @@
             <tr>
               <th>URL</th>
               <th class="text-center" width="200">Duration (ms)</th>
+              <th class="text-center" width="200"></th>
             </tr>
             <% @traces.each do |trace| %>
               <tr>
                 <td class="ellipsis">
                   <%= link_to trace.url, application_trace_path(@current_application, :id => trace.trace_key) %>
-                  (<%= trace.transaction_sample_data.count.to_i %>)
+                  (<%= trace.transaction_sample_data_count.to_i %>)
                 </td>
-                <td class="text-center"><%= number_with_precision(trace.duration, :precision => 2) %>
+                <td class="text-center"><%= number_with_precision(trace.duration, :precision => 2) %></td>
+                <td class="text-center"><%= time_ago_in_words(trace.timestamp) %> ago</td>
               </tr>
             <% end %>
           </table>

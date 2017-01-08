@@ -1,5 +1,5 @@
 <tr class="<%= "info" if transaction_sample_datum.is_query?(params[:query]) %>">
-  <td width="20"><%= transaction_sample_datum.id %></td>
+  <td width="20"><%= link_to transaction_sample_datum.id, application_trace_path(@current_application, @trace.trace_key, :sample_id => transaction_sample_datum.id) %></td>
   <td width="150"><%= transaction_sample_datum.layer.name %></td>
   <td class="ellipsis" style="padding-left: <%= depth * 40 %>px;">
     <% if transaction_sample_datum.payload.present? %>
@@ -14,7 +14,7 @@
       <%= transaction_sample_datum.payload["name"] %><br />
       <%= transaction_sample_datum.payload["query"] %>
       <% elsif transaction_sample_datum.layer.name.eql?("actionview") %>
-      <%= transaction_sample_datum.payload["name"].to_s.gsub(Rails.root.to_s, "") %>:<%= transaction_sample_datum.payload["line_number"] %><br />
+      <%= transaction_sample_datum.payload["name"].to_s.gsub(Rails.root.to_s, "") %>
       <%= transaction_sample_datum.payload["type"] %><br />
       <% elsif transaction_sample_datum.layer.http? %>
       <%= transaction_sample_datum.payload["remote_host"] %>
@@ -22,6 +22,9 @@
       <% end %>
     <% else %>
       <%= transaction_sample_datum.layer.name %>
+    <% end %>
+    <% if transaction_sample_datum.payload["source"] %>
+      <%= render "shared/render_source", :source => transaction_sample_datum.payload["source"] %>
     <% end %>
   </td>
   <td width="200">

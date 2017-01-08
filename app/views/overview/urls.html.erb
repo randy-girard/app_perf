@@ -1,0 +1,16 @@
+<table class="table">
+  <tr>
+    <th width="30%">Domain</th>
+    <th>Url</th>
+    <th width="100">Freq</th>
+    <th width="100">Avg (ms)</th>
+  </tr>
+  <% @urls.each do |url| %>
+    <tr>
+      <td><%= link_to url.domain, dynamic_report_url({ :domain => url.domain }, { :controller => "overview", :action => "show" }) %></td>
+      <td class="ellipsis"><%= link_to url.url, dynamic_report_url({ :url => url.url }, { :controller => "overview", :action => "show" }) %></td>
+      <td><%= url.freq %></td>
+      <td><%= number_with_precision(url.average, :precision => 2) %></td>
+    </tr>
+  <% end %>
+</table>

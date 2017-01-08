@@ -1,13 +1,11 @@
 class TransactionSampleDatum < ActiveRecord::Base
   belongs_to :application
   belongs_to :host
-  #belongs_to :parent, :class_name => self.name, :foreign_key => :request_id
-  belongs_to :transaction_endpoint
   belongs_to :grouping, :primary_key => :uuid, :polymorphic => true
-  has_one :database_call, :foreign_key => :uuid, :primary_key => :grouping_id
   belongs_to :layer
   belongs_to :trace
 
+  has_one :database_call, :foreign_key => :uuid, :primary_key => :grouping_id
   has_one :backtrace, :as => :backtraceable, :primary_key => :trace_key
 
   delegate :name, :to => :layer, :prefix => true

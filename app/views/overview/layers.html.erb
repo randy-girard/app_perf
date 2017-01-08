@@ -1,0 +1,14 @@
+<table class="table">
+  <tr>
+    <th>Layer</th>
+    <th width="100">Freq</th>
+    <th width="100">Avg (ms)</th>
+  </tr>
+  <% @layers.each do |layer| %>
+    <tr>
+      <td><%= link_to layer.name, dynamic_report_url({ :layer => layer.id }, { :controller => "overview", :action => "show" }) %></td>
+      <td><%= layer.freq %></td>
+      <td><%= number_with_precision(layer.average, :precision => 2) %></td>
+    </tr>
+  <% end %>
+</table>

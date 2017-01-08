@@ -51,92 +51,28 @@
         <div class="box-header">
           <h3 class="box-title">Urls</h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <tr>
-              <th width="30%">Domain</th>
-              <th>Url</th>
-              <th width="100">Freq</th>
-              <th width="100">Avg (ms)</th>
-            </tr>
-            <% @urls.each do |url| %>
-              <tr>
-                <td><%= link_to url.domain, dynamic_report_url(:domain => url.domain) %></td>
-                <td class="ellipsis"><%= link_to url.url, dynamic_report_url(:url => url.url) %></td>
-                <td><%= url.freq %></td>
-                <td><%= number_with_precision(url.average, :precision => 2) %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "urls" }) %>" data-remote="true"></div>
       </div>
 
       <div class="box">
         <div class="box-header">
           <h3 class="box-title">Controllers</h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <tr>
-              <th width="30%">Controller</th>
-              <th>Action</th>
-              <th width="100">Freq</th>
-              <th width="100">Avg (ms)</th>
-            </tr>
-            <% @controllers.each do |controller| %>
-              <tr>
-                <td class="ellipsis"><%= link_to controller.controller, dynamic_report_url(:controller => controller.controller) %></td>
-                <td class="ellipsis"><%= link_to controller.action, dynamic_report_url(:action => controller.action) %></td>
-                <td><%= controller.freq %></td>
-                <td><%= number_with_precision(controller.average, :precision => 2) %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "controllers" }) %>" data-remote="true"></div>
       </div>
 
       <div class="box">
         <div class="box-header">
           <h3 class="box-title">Hosts</h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <tr>
-              <th>Host</th>
-              <th width="100">Freq</th>
-              <th width="100">Avg (ms)</th>
-            </tr>
-            <% @hosts.each do |host| %>
-              <tr>
-                <td><%= link_to host.name, dynamic_report_url(:host => host.id) %></td>
-                <td><%= host.freq %></td>
-                <td><%= number_with_precision(host.average, :precision => 2) %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "hosts" }) %>" data-remote="true"></div>
       </div>
 
       <div class="box">
         <div class="box-header">
           <h3 class="box-title">Database Queries</h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <tr>
-              <th>Statement</th>
-              <th width="100">Freq</th>
-              <th width="100">Avg (ms)</th>
-            </tr>
-            <% @database_calls.each do |database_call| %>
-              <tr>
-                <td class="ellipsis"><%= link_to database_call.statement, dynamic_report_url(:sql => database_call.id) %></td>
-                <td><%= database_call.freq %></td>
-                <td><%= number_with_precision(database_call.average, :precision => 2) %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "database_calls" }) %>" data-remote="true"></div>
       </div>
     </section>
 
@@ -146,42 +82,15 @@
           <i class="fa fa-clock"></i>
           <h3 class="box-title">Layers</h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <tr>
-              <th>Layer</th>
-              <th width="100">Freq</th>
-              <th width="100">Avg (ms)</th>
-            </tr>
-            <% @layers.each do |layer| %>
-              <tr>
-                <td><%= link_to layer.name, dynamic_report_url(:layer => layer.id) %></td>
-                <td><%= layer.freq %></td>
-                <td><%= number_with_precision(layer.average, :precision => 2) %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "layers" }) %>" data-remote="true"></div>
       </div>
 
       <div class="box">
         <div class="box-header">
           <i class="fa fa-clock"></i>
-          <h3 class="box-title">Transactions (Most Consuming) </h3>
+          <h3 class="box-title">Traces (Most Consuming) </h3>
         </div>
-        <!-- /.box-header -->
-        <div class="box-body">
-          <table class="table">
-          <% @traces.each do |trace| %>
-            <tr>
-              <td class="ellipsis"><%= link_to trace.arrange_samples.payload["url"], application_trace_path(@current_application, :id => trace.trace_key) %></td>
-              <td width="100"><%= link_to "#{number_with_precision(trace.duration, :precision => 2)}s", application_trace_path(@current_application, :id => trace.trace_key) %></td>
-              <td width="100" class="small"><%= time_ago_in_words(trace.timestamp) %> ago.</td>
-            </tr>
-          <% end %>
-          </table>
-        </div>
-        <!-- /.box-body -->
+        <div class="box-body" data-url="<%= dynamic_report_url({}, { :controller => "overview", :action => "traces" }) %>" data-remote="true"></div>
       </div>
       <!-- /.box -->
     </section>

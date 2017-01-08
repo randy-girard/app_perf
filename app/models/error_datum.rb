@@ -3,5 +3,6 @@ class ErrorDatum < ActiveRecord::Base
   belongs_to :host
   belongs_to :error_message
 
-  serialize :backtrace
+  serialize :backtrace, JSON
+  serialize :source, JSON
 end

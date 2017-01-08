@@ -9,7 +9,16 @@ Rails.application.routes.draw do
   resource :dashboard, :controller => "dashboard", :only => [:show]
 
   resources :applications, :only => [:index, :new, :edit, :update, :destroy] do
-    resource :overview, :controller => "overview", :only => [:show]
+    resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts] do
+      member do
+        get :urls
+        get :layers
+        get :database_calls
+        get :hosts
+        get :controllers
+        get :traces
+      end
+    end
 
     resources :errors, :only => [:index, :show] do
       resources :instances, :controller => "error_instances", :only => [:index, :show]

@@ -1,0 +1,11 @@
+<pre class="source small">
+<% source.tap do |source_extract| %>
+<% if source_extract["code"] %>
+Extracted source (around line #<%= source_extract["line_number"] %>):
+
+<% source_extract["code"].each do |line, source| -%>
+<div class="line <%= "active" if line.to_i == source_extract["line_number"].to_i -%>"><%= line %>: <%= source -%></div>
+<% end -%>
+<% end %>
+<% end %>
+</pre>

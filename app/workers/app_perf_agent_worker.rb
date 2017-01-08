@@ -35,8 +35,8 @@ class AppPerfAgentWorker < ActiveJob::Base
         self.host = application.hosts.where(:name => host).first_or_create
 
         if protocol_version.to_i.eql?(2)
-          errors, samples = data.partition {|d| d[0] == "error" }
-          metrics, samples = data.partition {|d| d[0] == "metric" }
+          errors, remaining_data = data.partition {|d| d[0] == "error" }
+          metrics, samples = Array(remaining_data).partition {|d| d[0] == "metric" }
 
           if metrics.present?
             process_metric_data(metrics)
@@ -79,7 +79,14 @@ class AppPerfAgentWorker < ActiveJob::Base
 
         trace_key = generate_trace_id(_trace_key)
 
-        [_layer, trace_key, _start.to_f, _duration.to_f, _opts]
+        begin
+          [_layer, trace_key, _start.to_f, _duration.to_f, _opts]
+        rescue => ex
+          Rails.logger.error "LOAD DATA ERROR"
+          Rails.logger.error "DATA: #{datum.inspect}"
+          Rails.logger.error "PARSED DATA: #{[_layer, _trace_key, _start, _duration, _serialized_opts].inspect}"
+          raise
+        end
       }
   end
 
@@ -335,6 +342,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         error_datum.transaction_id = trace_key
         error_datum.message = message
         error_datum.backtrace = backtrace
+        error_datum.source = data[:source]
         error_datum.timestamp = timestamp
       end
     end

@@ -7,7 +7,6 @@
   </ol>
 </section>
 
-<% if false %>
 <section class="content">
   <div class="row">
     <div class="col-lg-12 connectedSortable">
@@ -15,24 +14,7 @@
         <div class="box-header">
           <h3 class="box-title">Transaction Sample <%= @trace.duration.to_f %></h3>
         </div>
-        <div class="box-body">
-          <table class="table">
-            <%= render @trace.root_sample, :depth => 0, :version => 2, :previous_margin => 0, :start_time => @trace.root_sample.timestamp, :end_time => @trace.root_sample.timestamp + @trace.root_sample.duration %>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<% elsif true %>
-<section class="content">
-  <div class="row">
-    <div class="col-lg-12 connectedSortable">
-      <div class="box">
-        <div class="box-header">
-          <h3 class="box-title">Transaction Sample <%= @trace.duration.to_f %></h3>
-        </div>
-        <div class="box-body">
+        <div class="box-body" style="overflow-y: scroll; height: 300px;">
           <table class="table">
             <%= render @root_with_children, :depth => 0, :version => 1 %>
           </table>
@@ -40,5 +22,29 @@
       </div>
     </div>
   </div>
+
+  <% if @sample %>
+  <div class="row">
+    <div class="col-lg-12 connectedSortable">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Sample Details</h3>
+        </div>
+        <div class="box-body">
+          <% @sample.attributes.each_pair do |key, value| %>
+            <div>
+              <%= key %>:
+              <% if value.is_a?(Hash) %>
+                <% value.each_pair do |subkey, subvalue| %>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;<%= subkey %>: <%= subvalue %></div>
+                <% end %>
+              <% else %>
+               <%= value.inspect %>
+              <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
 </section>
-<% end %>

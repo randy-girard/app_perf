@@ -1,0 +1,16 @@
+<table class="table">
+  <tr>
+    <th width="30%">Controller</th>
+    <th>Action</th>
+    <th width="100">Freq</th>
+    <th width="100">Avg (ms)</th>
+  </tr>
+  <% @controllers.each do |controller| %>
+    <tr>
+      <td class="ellipsis"><%= link_to controller.controller, dynamic_report_url({ :controller => controller.controller }, { :controller => "overview", :action => "show" }) %></td>
+      <td class="ellipsis"><%= link_to controller.action, dynamic_report_url({ :action => controller.action }, { :controller => "overview", :action => "show" }) %></td>
+      <td><%= controller.freq %></td>
+      <td><%= number_with_precision(controller.average, :precision => 2) %></td>
+    </tr>
+  <% end %>
+</table>

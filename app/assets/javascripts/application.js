@@ -15,6 +15,7 @@
 //= require jQueryUI/jquery-ui
 //= require jquery.turbolinks
 //= require chartkick
+//= require pace/pace
 //= require progressive_render
 //= require turbolinks
 //= require knob/jquery.knob
@@ -55,3 +56,15 @@ function updateQueryStringParameter(uri, key, value) {
     return uri + separator + key + "=" + value;
   }
 }
+
+$(function() {
+  $('[data-remote="true"]').each(function() {
+    var self = $(this);
+    var url = self.data("url");
+
+    self.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
+    self.load(url, function() {
+      self.next(".overlay").remove();
+    });
+  });
+});

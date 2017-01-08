@@ -98,7 +98,6 @@ $(function() {
       chartData = data["data"];
       events = data["events"];
       options['events']['data'] = events;
-      console.log(options);
       $.plot(element, chartData, options);
     }
 
