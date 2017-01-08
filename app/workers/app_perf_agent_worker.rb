@@ -192,15 +192,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       timestamp = Time.at(_start)
       duration = _duration
 
-      if controller && action
-        endpoint = application.transaction_endpoints.where(
-          :name => "#{controller}##{action}",
-          :controller => controller,
-          :action => action
-        ).first_or_create
-        hash[:transaction_endpoint_id] = endpoint.id
-      end
-
       if query
         database_type = database_types.find {|dt| dt.name == adapter }
         database_call = application.database_calls.new(
@@ -216,9 +207,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       end
 
       sample = {}
-      if endpoint
-        sample[:transaction_endpoint_id] = endpoint.id
-      end
       if database_call
         sample[:grouping_id] = database_call.uuid.to_s
         sample[:grouping_type] = "DatabaseCall"
