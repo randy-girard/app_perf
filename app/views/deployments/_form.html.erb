@@ -1,0 +1,38 @@
+<%= form_for([@current_application, @deployment]) do |f| %>
+  <div class="box-body">
+    <% if @deployment.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@deployment.errors.count, "error") %> prohibited this application from being saved:</h2>
+
+        <ul>
+        <% @deployment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= f.label :title %>
+      <%= f.text_field :title, :class => "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :description %>
+      <%= f.text_field :description, :class => "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :event_time %>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-clock-o"></i>
+        </div>
+        <%= f.text_field :event_time, :class => "form-control pull-right singledatetime" %>
+      </div>
+    </div>
+  </div>
+    <div class="box-footer">
+      <%= f.submit :class => "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

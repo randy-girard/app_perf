@@ -4,8 +4,8 @@ class Reporter
     { :label => "4h", :past => 4 * 60, :period => "minute" },
     { :label => "8h", :past => 8 * 60, :period => "hour" },
     { :label => "1d", :past => 1 * 60 * 24, :period => "hour" },
-    { :label => "3h", :past => 3 * 60 * 24, :period => "hour" },
-    { :label => "7h", :past => 7 * 60 * 24, :period => "hour" }
+    { :label => "3d", :past => 3 * 60 * 24, :period => "hour" },
+    { :label => "7d", :past => 7 * 60 * 24, :period => "hour" }
   ]
 
   def initialize(application, params, view_context)

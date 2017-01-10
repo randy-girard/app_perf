@@ -23,6 +23,7 @@
 //= require jvectormap/jquery-jvectormap-world-mill-en
 //= require bootstrap
 //= require datepicker/bootstrap-datepicker
+//= require timepicker/bootstrap-timepicker
 //= require daterangepicker/moment
 //= require daterangepicker/daterangepicker
 //= require morris/morris
@@ -58,6 +59,14 @@ function updateQueryStringParameter(uri, key, value) {
 }
 
 $(function() {
+  $(".singledatetime").daterangepicker({
+    singleDatePicker: true,
+    timePicker: true,
+    locale: {
+      format: 'YYYY-MM-DD h:mm A'
+    }
+  });
+
   $('[data-remote="true"]').each(function() {
     var self = $(this);
     var url = self.data("url");

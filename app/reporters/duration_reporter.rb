@@ -48,20 +48,19 @@ class DurationReporter < Reporter
       hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
     end
 
-    events = application
-      .events
-      .where(:type => "Event::Deployment")
+    deployments = application
+      .deployments
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
 
     {
       :data => hash,
-      :events => events.map {|event|
+      :events => deployments.map {|deployment|
         {
-          :min => event.start_time.to_i * 1000,
-          :max => event.end_time.to_i * 1000,
+          :min => deployment.start_time.to_i * 1000,
+          :max => deployment.end_time.to_i * 1000,
           :eventType => "Deployment",
-          :title => event.title,
-          :description => event.description
+          :title => deployment.title,
+          :description => deployment.description
         }
       }
     }

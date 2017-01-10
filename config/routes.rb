@@ -26,6 +26,7 @@ Rails.application.routes.draw do
 
     resources :traces, :only => [:index, :show]
     resources :database, :controller => "database", :only => [:index]
+    resources :deployments, :only => [:index, :new, :create]
 
     resources :reports, :only => [:index, :show, :new, :error] do
       collection do
