@@ -1,6 +1,6 @@
-class CreateAnalyticEventData < ActiveRecord::Migration
+class CreateMetrics < ActiveRecord::Migration
   def change
-    create_table :analytic_event_data do |t|
+    create_table :metrics do |t|
       t.references :application, index: true, foreign_key: true
       t.references :host, index: true, foreign_key: true
       t.datetime :timestamp

@@ -1,7 +1,7 @@
 class Host < ActiveRecord::Base
   belongs_to :application
 
-  has_many :analytic_event_data
+  has_many :metrics
   has_many :traces
   has_many :transaction_sample_data
   has_many :error_data

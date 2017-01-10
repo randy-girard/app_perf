@@ -34,6 +34,11 @@
             <i class="fa fa-database"></i> <span>Database</span>
           <% end %>
         </li>
+        <li class="<%= 'active' if @current_page["MetricsController"] %>">
+          <%= link_to application_metrics_path(@current_application) do  %>
+            <i class="fa fa-area-chart"></i> <span>Metrics</span>
+          <% end %>
+        </li>
 
         <li class="header">Events</li>
         <li class="<%= 'active' if @current_page["ErrorsController"] || @current_page["ErrorInstancesController"] %>">
@@ -43,7 +48,7 @@
         </li>
         <li class="<%= 'active' if @current_page["DeploymentsController"] %>">
           <%= link_to application_deployments_path(@current_application) do %>
-            <i class="fa fa-archive"></i> <span>Deployments</span>
+            <i class="fa fa-rocket"></i> <span>Deployments</span>
           <% end %>
         </li>
       <% end %>

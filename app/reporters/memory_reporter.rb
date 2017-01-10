@@ -5,7 +5,7 @@ class MemoryReporter < Reporter
   end
 
   def report_data
-    data = application.analytic_event_data.where(:name => "Memory")
+    data = application.metrics.where(:name => "Memory")
 
     [{
       :name => "Memory Usage",

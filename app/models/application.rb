@@ -1,6 +1,6 @@
 class Application < ActiveRecord::Base
   belongs_to :user
-  has_many :analytic_event_data, :dependent => :delete_all
+  has_many :metrics, :dependent => :delete_all
   has_many :database_calls, :dependent => :delete_all
   has_many :transaction_sample_data, :dependent => :delete_all
   has_many :error_data, :dependent => :delete_all

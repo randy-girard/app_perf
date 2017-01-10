@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       resources :instances, :controller => "error_instances", :only => [:index, :show]
     end
 
+    resources :metrics, :only => [:index]
     resources :traces, :only => [:index, :show]
     resources :database, :controller => "database", :only => [:index]
     resources :deployments, :only => [:index, :new, :create]

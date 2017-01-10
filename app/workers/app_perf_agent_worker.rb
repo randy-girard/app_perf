@@ -338,18 +338,18 @@ class AppPerfAgentWorker < ActiveJob::Base
   end
 
   def process_metric_data(data)
-    metric_data = []
+    metrics = []
     data.select {|d| d.first.eql?("metric") }.each do |datum|
       _, timestamp, data = datum
 
-      metric_data << application.analytic_event_data.new do |datum|
-        datum.host = host
-        datum.name = data["name"]
-        datum.value = data["value"]
-        datum.timestamp = Time.at(timestamp)
+      metrics << application.metrics.new do |metric|
+        metric.host = host
+        metric.name = data["name"]
+        metric.value = data["value"]
+        metric.timestamp = Time.at(timestamp)
       end
     end
-    AnalyticEventDatum.import(metric_data)
+    Metric.import(metrics)
   end
 
   def generate_fingerprint(message, backtrace)

@@ -38,6 +38,7 @@ $(function() {
     var legend = element.data("legend");
     var duration = element.data("duration");
     var url = element.data("url");
+    var unit = element.data("unit");
     var range = "";
     var data = [];
 
@@ -82,7 +83,7 @@ $(function() {
       },
       yaxis: {
         tickFormatter: function(value, axis) {
-            return value + "ms";
+            return value + unit;
         }
       },
       selection: { mode: "x" },
