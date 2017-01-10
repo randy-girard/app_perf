@@ -40,7 +40,7 @@ SQLite has some limitation with concurrency in this app, as well as various date
 ./bin/setup_psql
 ```
 
-**Note: Don't forget to update your `config/datbase.yml` file.**
+**Note: Don't forget to update your `config/database.yml` file.**
 
 ## Adding Applications
 
