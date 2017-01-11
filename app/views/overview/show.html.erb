@@ -38,7 +38,8 @@
                class="dynamic-chart"
                data-legend="#average-request-time-legend"
                data-url="<%= dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "average_duration" }) %>"
-               data-duration="15000"></div>
+               data-duration="15000"
+               data-unit="ms"></div>
           <div id="average-request-time-legend" class="chart-legend"></div>
         </div>
       </div>

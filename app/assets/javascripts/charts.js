@@ -83,7 +83,7 @@ $(function() {
       },
       yaxis: {
         tickFormatter: function(value, axis) {
-            return value + unit;
+            return value + (unit || "");
         }
       },
       selection: { mode: "x" },

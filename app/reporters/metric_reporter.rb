@@ -21,7 +21,7 @@ class MetricReporter < Reporter
 
     {
       :data => [{
-        :label => "Memory",
+        :label => params[:name],
         :data => hash
       }],
       :events => deployments.map {|deployment|

@@ -346,6 +346,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         metric.host = host
         metric.name = data["name"]
         metric.value = data["value"]
+        metric.unit = data["unit"]
         metric.timestamp = Time.at(timestamp)
       end
     end

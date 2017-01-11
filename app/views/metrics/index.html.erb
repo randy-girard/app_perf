@@ -7,24 +7,24 @@
 
 <!-- Main content -->
 <section class="content">
-  <% @metric_names.in_groups_of(2, false) do |metric_names| %>
+  <% @metrics.in_groups_of(2, false) do |metrics| %>
     <div class="row">
-      <% metric_names.each do |metric_name| %>
+      <% metrics.each do |metric| %>
         <section class="col-lg-6 connectedSortable">
           <div class="box">
             <div class="box-header">
               <i class="fa fa-clock"></i>
-              <h3 class="box-title"><%= metric_name %></h3>
+              <h3 class="box-title"><%= metric.name %></h3>
             </div>
             <div class="box-body">
-              <div id="<%= metric_name %>-chart"
+              <div id="<%= metric.name %>-chart"
                    style="height: 300px;"
                    class="dynamic-chart"
-                   data-legend="#<%= metric_name %>-legend"
-                   data-url="<%= dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "metrics", :name => metric_name }) %>"
-                   data-unit="kb"
+                   data-legend="#<%= metric.name %>-legend"
+                   data-url="<%= dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "metrics", :name => metric.name }) %>"
+                   data-unit="<%= metric.unit %>"
                    data-duration="15000"></div>
-              <div id="<%= metric_name %>-legend" class="chart-legend"></div>
+              <div id="<%= metric.name %>-legend" class="chart-legend"></div>
             </div>
           </div>
         </section>

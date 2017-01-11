@@ -1,5 +1,9 @@
 class MetricsController < ApplicationController
   def index
-    @metric_names = @current_application.metrics.pluck(:name).uniq
+    @metrics = @current_application
+      .metrics
+      .where("name IS NOT NULL AND unit IS NOT NULL")
+      .select("name, unit")
+      .uniq
   end
 end
