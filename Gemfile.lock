@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: 4e41d708d36566224c0424e38b751d10bff883ef
+  revision: eb723d268f21026733ad206e7d0eec18f818ec81
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -162,7 +162,7 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    oj (2.18.0)
+    oj (2.18.1)
     passenger (5.0.28)
       rack
       rake (>= 0.8.1)

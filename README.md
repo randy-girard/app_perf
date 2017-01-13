@@ -8,8 +8,9 @@ There is an instance of this running at https://app-perf.herokuapp.com. Please n
 
 To log in use the email address of "user@example.com" and a password of "password".
 
-![Overview](/doc/overview.png?raw=true "Overview")
+**More images are at the bottom.**
 
+![Overview](/doc/overview.png?raw=true "Overview")
 
 
 <b>NOTE: This application is in extremely beginning stages and I am still working out flows and learning the data model. I will be cleaning code up as I go.</b>
@@ -87,3 +88,11 @@ To remove this configuration, run the following command:
 ```
 bundle config --delete local.app_perf_rpm
 ```
+
+![Trace](/doc/trace.png?raw=true "Overview")
+
+![Database](/doc/database.png?raw=true "Overview")
+
+![Metrics](/doc/metrics.png?raw=true "Overview")
+
+![Error](/doc/error.png?raw=true "Overview")

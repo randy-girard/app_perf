@@ -40,6 +40,7 @@
 //= require flot/jquery.flot.curvedlines
 //= require flot/jquery.flot.navigate
 //= require flot/jquery.flot.events
+//= require vis/vis
 //= require AdminLTE
 //= require charts
 

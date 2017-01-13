@@ -23,9 +23,6 @@
     <% else %>
       <%= transaction_sample_datum.layer.name %>
     <% end %>
-    <% if transaction_sample_datum.payload["source"] %>
-      <%= render "shared/render_source", :source => transaction_sample_datum.payload["source"] %>
-    <% end %>
   </td>
   <td width="200">
     <div class="progress progress-xs">

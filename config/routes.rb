@@ -26,6 +26,7 @@ Rails.application.routes.draw do
 
     resources :metrics, :only => [:index]
     resources :traces, :only => [:index, :show]
+    resources :samples, :only => [:show]
     resources :database, :controller => "database", :only => [:index]
     resources :deployments, :only => [:index, :new, :create]
 

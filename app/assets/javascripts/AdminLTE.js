@@ -221,6 +221,16 @@ $(function () {
   });
 });
 
+$(document).on('page:load', function() {
+   var o;
+   o = $.AdminLTE.options;
+   if (o.sidebarPushMenu) {
+       $.AdminLTE.pushMenu.activate(o.sidebarToggleSelector);
+   }
+   $.AdminLTE.layout.activate();
+});
+
+
 /* ----------------------------------
  * - Initialize the AdminLTE Object -
  * ----------------------------------
