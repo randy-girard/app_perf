@@ -217,6 +217,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       sample[:timestamp] = timestamp
       sample[:duration] = _duration
       sample[:trace_key] = _trace_key
+      sample[:uuid] = SecureRandom.uuid.to_s
       sample[:payload] = _opts
       sample[:url] = url
       sample[:domain] = domain
@@ -226,7 +227,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       if _backtrace
         backtrace = Backtrace.new
         backtrace.backtrace = _backtrace
-        backtrace.backtraceable_id = _trace_key
+        backtrace.backtraceable_id = sample[:uuid]
         backtrace.backtraceable_type = "TransactionSampleDatum"
         backtraces << backtrace
       end

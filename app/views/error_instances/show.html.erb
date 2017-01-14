@@ -29,7 +29,7 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="app-backtrace">
-                <pre class="text-wrap"><%= @error_instance.backtrace.select {|line| line.include?(Rails.root.to_s) }.join("\n") %></pre>
+                <pre class="text-wrap"><%= @error_instance.backtrace.select {|line| line.match(/\[APP_PATH\]/) }.join("\n") %></pre>
               </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="full-backtrace">

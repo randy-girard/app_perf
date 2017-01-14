@@ -6,7 +6,7 @@ class TransactionSampleDatum < ActiveRecord::Base
   belongs_to :trace
 
   has_one :database_call, :foreign_key => :uuid, :primary_key => :grouping_id
-  has_one :backtrace, :as => :backtraceable, :primary_key => :trace_key
+  has_one :backtrace, :as => :backtraceable, :primary_key => :uuid
 
   delegate :name, :to => :layer, :prefix => true
 

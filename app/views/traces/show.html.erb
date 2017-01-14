@@ -58,23 +58,30 @@
         </div>
       </div>
 
-      <div id="sample"></div>
-    </div>
-  </div>
-  <% if false %>
-  <div class="row">
-    <div class="col-lg-12 connectedSortable">
-      <div class="box">
-        <div class="box-header">
-          <h3 class="box-title">Transaction Sample <%= @trace.duration.to_f %></h3>
-        </div>
-        <div class="box-body" style="overflow-y: scroll; height: 300px;">
-          <table class="table">
-            <%= render @root_with_children, :depth => 0, :version => 1 %>
-          </table>
+      <div id="sample">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Database Calls</h3>
+          </div>
+          <div class="box-body">
+            <table class="table">
+              <tr>
+                <th>Query</th>
+                <th class="text-center">Count</th>
+                <th class="text-center">Avg</th>
+                <th class="text-center">Total</th>
+              </tr>
+              <% @database_calls.sort_by(&:total_duration).reverse.each do |database_call| %>
+              <tr>
+                <td class="ellipsis"><%= database_call.query %></td>
+                <td width="100" class="text-center"><%= database_call.count %></td>
+                <td width="100" class="text-center"><%= number_with_precision(database_call.avg_duration, :precision => 2) %>ms</td>
+                <td width="100" class="text-center"><%= number_with_precision(database_call.total_duration, :precision => 2) %>ms</td>
+              </tr>
+              <% end %>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <% end %>
-</section>

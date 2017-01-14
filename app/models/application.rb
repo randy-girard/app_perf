@@ -19,4 +19,8 @@ class Application < ActiveRecord::Base
   before_validation do |record|
     record.license_key ||= record.user.license_key
   end
+
+  def test
+    y caller(0)
+  end
 end

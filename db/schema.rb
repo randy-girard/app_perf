@@ -169,6 +169,7 @@ ActiveRecord::Schema.define(version: 20170111003940) do
     t.float    "duration"
     t.float    "exclusive_duration"
     t.string   "trace_key"
+    t.string   "uuid"
     t.string   "url"
     t.string   "domain"
     t.string   "controller"

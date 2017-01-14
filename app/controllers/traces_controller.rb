@@ -20,6 +20,13 @@ class TracesController < ApplicationController
     @samples = @trace.transaction_sample_data.sort_by(&:timestamp)
     @sample = @samples.find {|s| s.id == params[:sample_id].to_i }
 
+    @database_calls = @current_application
+      .database_calls
+      .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
+      .joins(:database_sample)
+      .where(:transaction_sample_data => { :id => @samples })
+      .group("database_calls.statement")
+
     group_index = 0
     item_index = 0
     @groups = []
