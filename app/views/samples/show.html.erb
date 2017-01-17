@@ -6,7 +6,7 @@
     <div class="nav-tabs-custom">
       <ul class="nav nav-tabs">
         <li class="active"><a href="#sample-overview" data-toggle="tab">Overview</a></li>
-        <% if @sample.payload["source"] %>
+        <% if @sample.payload["source"].present? %>
         <li><a href="#sample-source" data-toggle="tab">Source</a></li>
         <% end %>
         <% if (backtrace = @sample.backtrace) && backtrace.backtrace.present? %>
@@ -32,7 +32,7 @@
             </div>
           <% end %>
         </div>
-        <% if @sample.payload["source"] %>
+        <% if @sample.payload["source"].present? %>
           <div class="tab-pane" id="sample-source">
             <%= render "shared/render_source", :source => @sample.payload["source"] %>
           </div>

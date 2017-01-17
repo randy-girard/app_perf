@@ -64,7 +64,6 @@ class Reporter
 
   def self.time_range(params)
     params.delete(:_past) if params[:_st] && params[:_se]
-    params.delete(:_interval) if params[:_st] && params[:_se]
 
     if params[:_past]
       time_ago, @period = Reporter.parse_past_intervals(params)

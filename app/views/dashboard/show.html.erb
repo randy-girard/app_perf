@@ -17,7 +17,7 @@
           <h3 class="box-title">Applications</h3>
         </div>
         <div class="box-body">
-          <table class="table">
+          <table class="table table-condensed">
             <% @applications.each do |application| %>
             <tr>
               <td><%= link_to application.name, application_overview_path(application) %></td>

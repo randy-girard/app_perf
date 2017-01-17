@@ -50,4 +50,20 @@ class TracesController < ApplicationController
 
     @root_with_children = @trace.arrange_samples
   end
+
+  def database
+    @trace = @current_application
+      .traces
+      .includes(:transaction_sample_data => :layer)
+      .where(:trace_key => params[:id])
+      .first
+    @samples = @trace.transaction_sample_data
+    @database_calls = @current_application
+      .database_calls
+      .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
+      .joins(:database_sample)
+      .where(:transaction_sample_data => { :id => @samples })
+      .group("database_calls.statement")
+    render :layout => false
+  end
 end

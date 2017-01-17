@@ -59,6 +59,42 @@ function updateQueryStringParameter(uri, key, value) {
   }
 }
 
+$(document).on("click", '[data-remote-element]', function(e) {
+  e.preventDefault();
+
+  var self = $(this);
+  var url = self.attr("href");
+  var remoteElement = self.data("remote-element");
+  var element = $(remoteElement);
+  var limit = element.data("limit");
+  var order = element.data("order");
+
+  var newLimit = self.data("limit");
+  if(newLimit)
+    limit = newLimit;
+  var newOrder = self.data("order");
+  if(newOrder)
+    order = newOrder;
+
+  element.data("limit", limit);
+  element.data("order", order);
+
+  element.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
+  $.ajax({
+    url: url,
+    data: {
+      _limit: limit,
+      _order: order
+    },
+  }).success(function(data) {
+    element.html(data);
+    var newUrl = element.find("table").data("url");
+    element.attr("url", newUrl);
+  }).done(function() {
+    element.next(".overlay").remove();
+  });
+});
+
 $(function() {
   $(".singledatetime").daterangepicker({
     singleDatePicker: true,
@@ -68,7 +104,7 @@ $(function() {
     }
   });
 
-  $('[data-remote="true"]').each(function() {
+  $('div[data-remote="true"]').each(function() {
     var self = $(this);
     var url = self.data("url");
 

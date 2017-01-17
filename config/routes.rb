@@ -25,14 +25,19 @@ Rails.application.routes.draw do
     end
 
     resources :metrics, :only => [:index]
-    resources :traces, :only => [:index, :show]
+    resources :traces, :only => [:index, :show, :database] do
+      member do
+        get :database
+      end
+    end
     resources :samples, :only => [:show]
     resources :database, :controller => "database", :only => [:index]
     resources :deployments, :only => [:index, :new, :create]
 
-    resources :reports, :only => [:index, :show, :new, :error] do
+    resources :reports, :only => [:index, :show, :new, :error, :profile] do
       collection do
         get :error
+        get :profile
       end
     end
   end

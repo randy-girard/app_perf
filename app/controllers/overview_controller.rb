@@ -1,5 +1,17 @@
 class OverviewController < ApplicationController
 
+  LIMITS = {
+    "10" => 10,
+    "20" => 20,
+    "50" => 50
+  }
+
+  ORDERS = {
+    "Freq" => "COUNT(DISTINCT trace_id) DESC",
+    "Avg" => "(SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC",
+    "FreqAvg" => "(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC"
+  }
+
   before_filter :set_traces, :only => [:urls, :layers, :database_calls, :traces, :controllers, :hosts]
 
   def show
@@ -7,14 +19,15 @@ class OverviewController < ApplicationController
   end
 
   def urls
+    sleep 1
     @urls = @current_application
       .transaction_sample_data
       .select("domain, url, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
       .where(:trace_id => @_traces)
       .where("domain IS NOT NULL AND url IS NOT NULL")
       .group("domain, url")
-      .order("(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC")
-      .limit("10")
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false
   end
@@ -25,8 +38,9 @@ class OverviewController < ApplicationController
       .select("layers.id, layers.name, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
       .joins(:transaction_sample_data)
       .where(:transaction_sample_data => { :trace_id => @_traces })
-      .order("(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC")
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
       .group("layers.id, layers.name")
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
     if params[:_layer].present?
       @layers = @layers.where("transaction_sample_data.layer_id = ?", params[:_layer])
     end
@@ -42,8 +56,8 @@ class OverviewController < ApplicationController
       .where(:transaction_sample_data => { :trace_id => @_traces })
       .where("statement IS NOT NULL")
       .group("database_calls.statement")
-      .order("SUM(database_calls.duration) / COUNT(*) DESC")
-      .limit(10)
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false
   end
@@ -52,8 +66,8 @@ class OverviewController < ApplicationController
     @traces = @current_application
       .traces
       .where(:id => @_traces)
-      .order("traces.timestamp DESC")
-      .limit(10)
+      .order("traces.duration DESC")
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false
   end
@@ -65,8 +79,8 @@ class OverviewController < ApplicationController
       .select("controller, action, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
       .where(:trace_id => @_traces)
       .group("controller, action")
-      .order("(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC")
-      .limit("10")
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false
   end
@@ -79,8 +93,8 @@ class OverviewController < ApplicationController
       .where(:transaction_sample_data => { :trace_id => @_traces })
       .where("hosts.name IS NOT NULL")
       .group("hosts.id, hosts.name")
-      .order("(COUNT(DISTINCT transaction_sample_data.trace_id) * SUM(transaction_sample_data.exclusive_duration) / COUNT(DISTINCT transaction_sample_data.trace_id)) DESC")
-      .limit(10)
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false
   end
