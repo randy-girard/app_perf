@@ -1,4 +1,4 @@
-<% Array(source).each do |source_extract| %>
+<% Array(source).select {|s| s["code"].present? }.each do |source_extract| %>
 <pre class="source small">
 <% if source_extract["code"] %>
 Extracted source (around line #<%= source_extract["line_number"] %> of <%= source_extract["file"] %>):

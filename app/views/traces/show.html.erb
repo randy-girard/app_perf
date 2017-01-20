@@ -43,6 +43,13 @@
               order: function(a, b) {
                 return a.id - b.id;
               },
+              //min: <%= @trace.timestamp.to_f * 1000 %>,
+              //max: <%= @trace.timestamp.to_f * 1000 + @trace.duration * 1000 %>,
+              margin: {
+                  item : {
+                      horizontal : 0
+                  }
+              },
               format: {
                 minorLabels: {
                   millisecond:'SSS',
