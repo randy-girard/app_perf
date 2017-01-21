@@ -238,22 +238,20 @@ class AppPerfAgentWorker < ActiveJob::Base
     all_events = []
     samples.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
       trace = traces.find {|t| t.trace_key == trace_key }
-      timestamp = events.map {|e| e[:timestamp] }.min
-      duration = events.map {|e| e[:duration] }.max
-      url = (events.find {|e| e[:url] } || {}).fetch(:url) { nil }
-      domain = (events.find {|e| e[:domain] } || {}).fetch(:domain) { nil }
-      controller = (events.find {|e| e[:controller] } || {}).fetch(:controller) { nil }
-      action = (events.find {|e| e[:action] } || {}).fetch(:action) { nil }
+      timestamp = events.map {|e| e["timestamp"] }.min
+      duration = events.map {|e| e["duration"] }.max
+      url = (events.find {|e| e["url"] } || {}).fetch("url") { nil }
+      domain = (events.find {|e| e["domain"] } || {}).fetch("domain") { nil }
+      controller = (events.find {|e| e["controller"] } || {}).fetch("controller") { nil }
+      action = (events.find {|e| e["action"] } || {}).fetch("action") { nil }
       events.each { |e|
-        e[:url] ||= url
-        e[:domain] ||= domain
-        e[:controller] ||= controller
-        e[:action] ||= action
-        e[:trace_id] = trace.id
+        e["url"] ||= url
+        e["domain"] ||= domain
+        e["controller"] ||= controller
+        e["action"] ||= action
+        e["trace_id"] = trace.id
       }
 
-      #root = arrange(events, trace)
-      #flattened_sample = flatten_sample(root)
       existing_samples = trace.transaction_sample_data.all
       new_samples = events.map {|s| application.transaction_sample_data.new(s) }
       all_samples = existing_samples + new_samples
@@ -281,21 +279,6 @@ class AppPerfAgentWorker < ActiveJob::Base
     root
   end
 
-  def arrange(events, trace)
-    while event = events.shift
-      if parent = events.find { |n|
-          start = (n[:timestamp] - event[:timestamp])
-          start <= 0 && (start + n[:duration] >= event[:duration])
-        }
-        parent[:children] ||= []
-        parent[:children] << event
-      elsif events.empty?
-        root = event
-      end
-    end
-    root
-  end
-
   def generate_trace_id(seed = nil)
     if seed.nil?
       Digest::SHA1.hexdigest([Time.now, rand].join)
@@ -317,10 +300,10 @@ class AppPerfAgentWorker < ActiveJob::Base
     error_data = []
     data.select {|d| d.first.eql?("error") }.each do |datum|
       _, trace_key, timestamp, data = datum
-      message, backtrace, fingerprint = generate_fingerprint(data[:message], data[:backtrace])
+      message, backtrace, fingerprint = generate_fingerprint(data["message"], data["backtrace"])
 
       error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
-      error_message.error_class ||= data[:error_class]
+      error_message.error_class ||= data["error_class"]
       error_message.error_message ||= message
       error_message.last_error_at = Time.now
       error_message.save
@@ -331,7 +314,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         error_datum.transaction_id = trace_key
         error_datum.message = message
         error_datum.backtrace = backtrace
-        error_datum.source = data[:source]
+        error_datum.source = data["source"]
         error_datum.timestamp = timestamp
       end
     end
