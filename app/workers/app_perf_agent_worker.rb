@@ -238,18 +238,18 @@ class AppPerfAgentWorker < ActiveJob::Base
     all_events = []
     samples.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
       trace = traces.find {|t| t.trace_key == trace_key }
-      timestamp = events.map {|e| e["timestamp"] }.min
-      duration = events.map {|e| e["duration"] }.max
-      url = (events.find {|e| e["url"] } || {}).fetch("url") { nil }
-      domain = (events.find {|e| e["domain"] } || {}).fetch("domain") { nil }
-      controller = (events.find {|e| e["controller"] } || {}).fetch("controller") { nil }
-      action = (events.find {|e| e["action"] } || {}).fetch("action") { nil }
+      timestamp = events.map {|e| e[:timestamp] }.min
+      duration = events.map {|e| e[:duration] }.max
+      url = (events.find {|e| e[:url] } || {}).fetch(:url) { nil }
+      domain = (events.find {|e| e[:domain] } || {}).fetch(:domain) { nil }
+      controller = (events.find {|e| e[:controller] } || {}).fetch(:controller) { nil }
+      action = (events.find {|e| e[:action] } || {}).fetch(:action) { nil }
       events.each { |e|
-        e["url"] ||= url
-        e["domain"] ||= domain
-        e["controller"] ||= controller
-        e["action"] ||= action
-        e["trace_id"] = trace.id
+        e[:url] ||= url
+        e[:domain] ||= domain
+        e[:controller] ||= controller
+        e[:action] ||= action
+        e[:trace_id] = trace.id
       }
 
       existing_samples = trace.transaction_sample_data.all
