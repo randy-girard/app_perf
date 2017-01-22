@@ -49,6 +49,12 @@ class OverviewController < ApplicationController
   end
 
   def database_calls
+    orders = {
+      "Freq" => "COUNT(*) DESC",
+      "Avg" => "(SUM(exclusive_duration) / COUNT(*)) DESC",
+      "FreqAvg" => "(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(*)) DESC"
+    }
+
     @database_calls = @current_application
       .database_calls
       .select("database_calls.statement, MAX(database_calls.id) AS id, COUNT(*) AS freq, SUM(database_calls.duration) / COUNT(*) AS average")
@@ -56,7 +62,7 @@ class OverviewController < ApplicationController
       .where(:transaction_sample_data => { :trace_id => @_traces })
       .where("statement IS NOT NULL")
       .group("database_calls.statement")
-      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .order(orders[params[:_order]] || orders["FreqAvg"])
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 
     render :layout => false

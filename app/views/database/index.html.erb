@@ -37,7 +37,8 @@
                class="dynamic-chart"
                data-legend="#database-time-legend"
                data-url="<%= dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "database" }) %>"
-               data-duration="15000"></div>
+               data-duration="15000"
+               data-unit="ms"></div>
           <div id="database-time-legend" class="chart-legend"></div>
         </div>
       </div>
