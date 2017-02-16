@@ -9,12 +9,14 @@ class AppPerfAgentWorker < ActiveJob::Base
                 :application,
                 :protocol_version
 
-  def perform(params)
+  def perform(params, body)
     AppPerfRpm.without_tracing do
-      self.license_key      = params.fetch(:license_key) { nil }
-      self.protocol_version = params.fetch(:protocol_version) { nil }
-      self.host             = params.fetch(:host)
-      self.name             = params.fetch(:name) { nil }
+      json = decompress_params(body)
+
+      self.license_key      = params.fetch("license_key") { nil }
+      self.protocol_version = params.fetch("protocol_version") { nil }
+      self.host             = json.fetch("host")
+      self.name             = json.fetch("name") { nil }
 
       if self.license_key.nil? ||
          self.protocol_version.nil? ||
@@ -22,7 +24,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         return
       end
 
-      self.data             = Array(params.fetch(:data))
+      self.data             = Array(json.fetch("data"))
       self.user             = User.find_by_license_key(license_key)
       self.application      = user.applications.where(:name => name).first_or_initialize
       self.application.license_key = license_key
@@ -59,6 +61,12 @@ class AppPerfAgentWorker < ActiveJob::Base
   end
 
   private
+
+  def decompress_params(body)
+    compressed_body = Base64.decode64(body)
+    data = Zlib::Inflate.inflate(compressed_body)
+    JSON.load(data)
+  end
 
   def perform_data_retention_cleanup
     DataRetentionJanitor.new.perform(application.id)

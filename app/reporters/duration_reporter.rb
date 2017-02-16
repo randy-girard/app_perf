@@ -45,7 +45,7 @@ class DurationReporter < Reporter
     end
 
     layers.each_pair do |layer, data|
-      hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
+      hash.push({ :label => layer , :data => data, :id => "ID-#{layer}" }) rescue nil
     end
 
     deployments = application
