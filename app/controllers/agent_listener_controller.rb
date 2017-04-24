@@ -14,12 +14,6 @@ class AgentListenerController < ApplicationController
     render :text => "", :status => :ok
   end
 
-  def invoke_raw_method
-    #NewRelicAgentWorker.perform_later(params)
-
-    render :json => "", :status => :ok
-  end
-
   private
 
   def parse_body(request)

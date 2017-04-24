@@ -44,16 +44,6 @@ Rails.application.routes.draw do
 
   post "/api/listener/:protocol_version/:license_key" => "agent_listener#create"
 
-  # NewRelic RPM support
-  # get "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
-  # post "/agent_listener/:protocol_version/:license_key/:method" => "agent_listener#invoke_raw_method"
-  # resources :agent_listener, :only => [:create, :invoke_raw_method] do
-  #   collection do
-  #     get :invoke_raw_method
-  #     post :invoke_raw_method
-  #   end
-  # end
-
   root :to => "dashboard#show"
 
 end

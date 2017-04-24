@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: daf760e728945df0382c32d40025f28283a6f493
+  revision: 545aecc9bf9523823f2db15f35aced338d9395b0
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -115,7 +115,7 @@ GEM
       railties (>= 3.0.0)
     faker (1.7.1)
       i18n (~> 0.5)
-    ffi (1.9.17)
+    ffi (1.9.18)
     font-awesome-rails (4.6.1.0)
       railties (>= 3.2, < 5.1)
     foreman (0.78.0)
@@ -162,7 +162,7 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    oj (2.18.1)
+    oj (2.18.5)
     passenger (5.0.28)
       rack
       rake (>= 0.8.1)
@@ -343,4 +343,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.12.5
+   1.14.6

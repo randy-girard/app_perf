@@ -30,7 +30,6 @@ gem 'bcrypt', '~> 3.1.7'
 # gem 'unicorn'
 gem 'foreman'
 gem 'passenger'
-#gem 'newrelic_rpm'
 gem 'kaminari'
 gem "chartkick"
 gem "groupdate"
