@@ -1,0 +1,31 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Error Backtrace
+  %ol.breadcrumb
+    %li= link_to "Errors", application_errors_path(@current_application)
+    %li= link_to @error_message.error_class, application_error_instances_path(@current_application, @error_message)
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title
+            = @error_instance.message
+        .box-body
+          - if @error_instance.source
+            = render "shared/render_source", :source => @error_instance.source
+          .nav-tabs-custom
+            %ul.nav.nav-tabs
+              %li.active
+                %a{"data-toggle" => "tab", :href => "#app-backtrace"} Application Backtrace
+              %li
+                %a{"data-toggle" => "tab", :href => "#full-backtrace"} Full Backtrace
+            .tab-content
+              #app-backtrace.tab-pane.active
+                %pre.text-wrap= @error_instance.backtrace.select {|line| line.match(/\[APP_PATH\]/) }.join("\n")
+              / /.tab-pane
+              #full-backtrace.tab-pane
+                %pre.text-wrap= @error_instance.backtrace.join("\n")
+              / /.tab-pane
+            / /.tab-content

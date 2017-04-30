@@ -24,14 +24,21 @@ class AppPerfAgentWorker < ActiveJob::Base
         return
       end
 
-      self.data             = Array(json.fetch("data"))
-      self.user             = User.find_by_license_key(license_key)
-      self.application      = user.applications.where(:name => name).first_or_initialize
-      self.application.license_key = license_key
-      if self.application.new_record?
-        self.application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
+      self.data = Array(json.fetch("data"))
+
+      # Can we find a user by the license?
+      self.user = User.where(:license_key => license_key).first
+
+      if user
+        self.application = user.applications.where(:name => name).first_or_initialize
+        if application.new_record?
+          application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
+        end
+        application.save
+      else
+        # We couldn't find a user, so lets find an application
+        self.application = Application.where(:license_key => license_key).first
       end
-      self.application.save
 
       if application
         self.host = application.hosts.where(:name => host).first_or_create

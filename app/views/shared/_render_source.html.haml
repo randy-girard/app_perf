@@ -1,0 +1,9 @@
+- Array(source).select {|s| s["code"].present? }.each do |source_extract|
+  %pre.source.small
+    - if source_extract["code"]
+      %div<
+        Extracted source (around line ##{source_extract["line_number"]} of #{source_extract["file"]}):
+      = preserve do
+        - source_extract["code"].each do |line, source|
+          %div{:class => "line #{"active" if source.first.to_i == source_extract["line_number"].to_i}"}<
+            = "#{(source.first.to_s + ":").ljust(8)} #{source.last}"

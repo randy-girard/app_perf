@@ -1,0 +1,24 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Error Instances
+  %ol.breadcrumb
+    %li= link_to "Errors", application_errors_path(@current_application)
+    %li.active= @error_message.error_class
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Error Instaces
+        .box-body
+          %table.table.table-condensed
+            %tr
+              %th{:width => "100"}
+              %th Message
+              %th{:width => "200"} Errored At
+            - @error_instances.each do |error_instance|
+              %tr
+                %td= link_to 'View Error', application_error_instance_path(@current_application, @error_message, error_instance)
+                %td= error_instance.message
+                %td= error_instance.created_at

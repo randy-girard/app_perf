@@ -1,0 +1,33 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Errors
+  %ol.breadcrumb
+    %li.active Errors
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      - if @errors.empty?
+        .alert.alert-success
+          %h4 No errors!
+          Congratulation! There are currently no errors!
+      - else
+        .box
+          .box-header
+            %h3.box-title Errors
+          .box-body
+            %table.table.table-condensed
+              %tr
+                %th
+                %th Error Message
+                %th Latest
+                %th Count
+              - @errors.each do |error|
+                %tr
+                  %td= link_to 'View Error', application_error_instances_path(@current_application, error)
+                  %td
+                    = error.error_class
+                    %br/
+                    = error.error_message[0..100]
+                  %td= error.last_error_at
+                  %td= error.instances_count
