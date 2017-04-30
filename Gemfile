@@ -47,6 +47,9 @@ gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :bra
 gem 'faker'
 gem "activeuuid"
 gem "oj"
+gem "haml"
+gem "devise"
+gem "devise_invitable"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

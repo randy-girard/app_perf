@@ -1,0 +1,25 @@
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Profile
+        .box-body
+          %table.table
+            %tr
+              %th Line
+              %th.text-center Number of calls
+              %th.text-center
+                Total duration (#{number_with_precision(@profile.map {|p| p[:duration] }.sum, :precision => 4)})
+              %th.text-center Avg duration
+            - @profile.group_by {|p| ["#{p[:line]}:#{p[:line_number]} in `#{p[:method]}`"] }.sort_by {|group, profiles| profiles.size }.reverse.each do |group, profiles|
+              %tr
+                %td
+                  = group.first
+                %td.text-center{:width => "150"}= profiles.size
+                %td.text-center{:width => "150"}
+                  = number_with_precision(profiles.map {|p| p[:duration] }.sum, :precision => 4)
+                  ms
+                %td.text-center{:width => "150"}
+                  = number_with_precision(profiles.map {|p| p[:duration] }.sum / profiles.size.to_f * 100, :precision => 2)
+                  ms

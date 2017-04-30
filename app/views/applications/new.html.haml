@@ -1,0 +1,37 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Applications
+  %ol.breadcrumb
+    %li= link_to "Applications", applications_path
+    %li.active New Application
+%section.content
+  .row
+    .col-lg-12
+      .nav-tabs-custom
+        %ul.nav.nav-tabs
+          %li.active= link_to "Manually Create New Application", "#new-application", :data => { :toggle => "tab" }
+          %li= link_to "Automatically Create Application", "#auto-application", :data => { :toggle => "tab" }
+        %div.tab-content
+          %div#new-application.tab-pane.active
+            = render 'form'
+          %div#auto-application.tab-pane
+            %p
+              Add the following gem to your project:
+            %p
+            %div
+              %pre.text-wrap
+                :preserve
+                  # Gemfile
+                  gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"
+            %p
+              Copy and paste the contents below into your application setup or initializer:
+            %div
+              %pre.text-wrap
+                :preserve
+                  require 'app_perf_rpm'
+
+                  AppPerfRpm.configure do |rpm|
+                    rpm.license_key = "#{current_user.license_key}"
+                    rpm.application_name = "Application Name"
+                  end

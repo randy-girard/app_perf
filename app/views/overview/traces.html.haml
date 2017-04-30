@@ -1,0 +1,8 @@
+%table.table.table-condensed
+  - @traces.each do |trace|
+    %tr
+      %td.ellipsis= link_to trace.arrange_samples.payload["url"], application_trace_path(@current_application, :id => trace.trace_key)
+      %td{:width => "100"}= link_to "#{number_with_precision(trace.duration, :precision => 2)}s", application_trace_path(@current_application, :id => trace.trace_key)
+      %td.small{:width => "100"}
+        = time_ago_in_words(trace.timestamp)
+        ago.

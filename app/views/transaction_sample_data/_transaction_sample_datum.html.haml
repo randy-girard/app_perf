@@ -1,0 +1,33 @@
+%tr{:class => "#{"info" if transaction_sample_datum.is_query?(params[:query])}"}
+  %td{:width => "20"}= link_to transaction_sample_datum.id, application_trace_path(@current_application, @trace.trace_key, :sample_id => transaction_sample_datum.id)
+  %td{:width => "150"}= transaction_sample_datum.layer.name
+  %td.ellipsis{:style => "padding-left: #{depth * 40}px;"}
+    - if transaction_sample_datum.payload.present?
+      - if transaction_sample_datum.layer.name.eql?("nginx")
+        = transaction_sample_datum.payload["url"]
+      - elsif transaction_sample_datum.layer.name.eql?("rack")
+        = transaction_sample_datum.payload["url"]
+      - elsif transaction_sample_datum.layer.name.eql?("actioncontroller")
+        = transaction_sample_datum.payload["controller"]
+        = transaction_sample_datum.payload["action"]
+      - elsif transaction_sample_datum.layer.database?
+        = transaction_sample_datum.payload["name"]
+        %br/
+        = transaction_sample_datum.payload["query"]
+      - elsif transaction_sample_datum.layer.name.eql?("actionview")
+        = transaction_sample_datum.payload["name"].to_s.gsub(Rails.root.to_s, "")
+        = transaction_sample_datum.payload["type"]
+        %br/
+      - elsif transaction_sample_datum.layer.http?
+        = transaction_sample_datum.payload["remote_host"]
+      - else
+    - else
+      = transaction_sample_datum.layer.name
+  %td{:width => "200"}
+    .progress.progress-xs
+      .progress-bar.progress-bar-danger{:style => "width: #{number_to_percentage(transaction_sample_datum.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 2)}"}
+  %td
+    %span.badge= number_to_percentage(transaction_sample_datum.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 1)
+  %td{:width => "50"}= number_with_precision(transaction_sample_datum.duration, :precision => 2)
+  %td{:width => "50"}= number_with_precision(transaction_sample_datum.exclusive_duration, :precision => 2)
+= render transaction_sample_datum.children, :depth => depth + 1, :version => 1 if transaction_sample_datum.children

@@ -1,0 +1,21 @@
+.login-box
+  .login-logo
+    %b> App
+    Perf
+  / /.login-logo
+  .login-box-body
+    %p.login-box-msg Sign in to start your session
+    = form_tag user_sessions_path do
+      .form-group.has-feedback
+        %input.form-control{:name => "email", :placeholder => "Email", :type => "email"}/
+        %span.glyphicon.glyphicon-envelope.form-control-feedback
+      .form-group.has-feedback
+        %input.form-control{:name => "password", :placeholder => "Password", :type => "password"}/
+        %span.glyphicon.glyphicon-lock.form-control-feedback
+      .row
+        / /.col
+        .col-xs-12
+          = submit_tag "Sign In", :class => "btn btn-primary btn-block btn-flat"
+        / /.col
+  / /.login-box-body
+/ /.login-box
