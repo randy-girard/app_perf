@@ -1,0 +1,37 @@
+
+%section.content-header
+  %h1
+    Edit Account
+
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-body
+          = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
+            .box-body
+              = devise_error_messages!
+
+              .form-group.has-feedback
+                = f.text_field :name, :class => "form-control", :placeholder => "Full Name", :autofocus => true
+                %span.glyphicon.glyphicon-user.form-control-feedback
+
+              .form-group.has-feedback
+                = f.email_field :email, :class => "form-control", :placeholder => "Email"
+                %span.glyphicon.glyphicon-envelope.form-control-feedback
+
+              .form-group.has-feedback
+                = f.password_field :password, :class => "form-control", :placeholder => "New Password"
+                %span.glyphicon.glyphicon-lock.form-control-feedback
+
+              .form-group.has-feedback
+                = f.password_field :password_confirmation, :class => "form-control", :placeholder => "Confirm New Password"
+                %span.glyphicon.glyphicon-lock.form-control-feedback
+
+              .form-group.has-feedback
+                = f.password_field :current_password, :class => "form-control", :placeholder => "Current Password"
+                %span.glyphicon.glyphicon-lock.form-control-feedback
+                %p.help-block
+                  We need your current password to confirm your changes.
+
+              = f.submit "Update", :class => "btn btn-primary"

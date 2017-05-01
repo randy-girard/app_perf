@@ -1,0 +1,23 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Applications
+  %ol.breadcrumb
+    %li.active Applications
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Applications
+          .box-tools
+            = link_to new_application_path, :class => "btn btn-primary" do
+              %i.fa.fa-plus
+              New Application
+        .box-body
+          %table.table.table-condensed
+            %tr
+              %th Name
+            - @applications.each do |application|
+              %tr
+                %td= link_to application.name, application_overview_path(application)

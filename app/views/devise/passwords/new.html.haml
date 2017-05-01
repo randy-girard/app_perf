@@ -1,0 +1,16 @@
+.login-box
+  .login-logo
+    %b> App
+    Perf
+  / /.login-logo
+  .login-box-body
+    %p.login-box-msg Forgot your password?
+    = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+      = devise_error_messages!
+      .form-group.has-feedback
+        = f.email_field :email, :class => "form-control", :placeholder => "Email", :autofocus => true
+        %span.glyphicon.glyphicon-envelope.form-control-feedback
+
+      .actions
+        = f.submit "Send me reset password instructions", :class => "btn btn-primary btn-block btn-flat"
+    = render "devise/shared/links"

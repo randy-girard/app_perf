@@ -12,19 +12,10 @@ class ApplicationController < ActionController::Base
 
   layout :set_layout
 
-  helper_method :current_user
-  def current_user
-    @current_user ||= User.find(session[:user_id]) if session[:user_id]
-  end
-
-  def authenticate_user!
-    redirect_to new_user_session_url unless current_user
-  end
-
   def set_current_application
-    if @current_user
+    if current_user
       if params[:application_id]
-        @current_application ||= @current_user.applications.find(params[:application_id])
+        @current_application ||= current_user.applications.find(params[:application_id])
       end
     end
   end
@@ -37,7 +28,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_layout
-    if @current_user
+    if current_user
       "application"
     else
       "public"

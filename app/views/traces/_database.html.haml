@@ -1,0 +1,20 @@
+.box
+  .box-header
+    %h3.box-title Database Calls
+  .box-body
+    %table.table.table-condensed
+      %tr
+        %th Query
+        %th.text-center Count
+        %th.text-center Avg
+        %th.text-center Total
+      - @database_calls.sort_by(&:total_duration).reverse.each do |database_call|
+        %tr
+          %td.ellipsis= database_call.query
+          %td.text-center{:width => "100"}= database_call.count
+          %td.text-center{:width => "100"}
+            = number_with_precision(database_call.avg_duration, :precision => 2)
+            ms
+          %td.text-center{:width => "100"}
+            = number_with_precision(database_call.total_duration, :precision => 2)
+            ms
