@@ -41,11 +41,15 @@ Rails.application.configure do
 
   config.sass.inline_source_maps = true
 
-  config.action_mailer.default_url_options = { host: 'localhost', port: 5000 }
+  config.action_mailer.default_url_options = { :host => ENV["HOST"] }
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: '127.0.0.1',
-    port:    1025
+    address:              ENV["SMTP_HOST"],
+    port:                 ENV["SMTP_PORT"],
+    domain:               ENV["SMTP_DOMAIN"],
+    user_name:            ENV["SMTP_USERNAME"],
+    password:             ENV["SMTP_PASSWORD"],
+    authentication:       ENV["SMTP_AUTHENTICATION"],
+    enable_starttls_auto: ENV["SMTP_TLS"] == "true"
   }
 end
