@@ -10,10 +10,6 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
-  #get '/users/sign_in' => 'sessions#new', :as => :new_user_session
-  #post '/users/sign_in' => 'sessions#create', :as => :user_sessions
-  #delete '/users/sign_out' => 'sessions#destroy', :as => :user_session
-
   resource :dashboard, :controller => "dashboard", :only => [:show]
 
   resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do

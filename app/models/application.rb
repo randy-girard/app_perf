@@ -13,7 +13,7 @@ class Application < ActiveRecord::Base
   has_many :events, :dependent => :delete_all
   has_many :deployments
 
-  has_many :application_users
+  has_many :application_users, :dependent => :delete_all
   has_many :users, :through => :application_users
 
   validates :name, :uniqueness => { :scope => :user_id }
