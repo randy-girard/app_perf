@@ -1,14 +1,19 @@
 Rails.application.routes.draw do
+  devise_for :users,
+    :skip => [:registrations],
+    :controllers => { :invitations => 'user/invitations' }
+  as :user do
+    get 'users/edit' => 'user/registrations#edit', :as => 'edit_user_registration'
+    put ':id' => 'user/registrations#update', :as => 'registration'
+  end
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
-  get '/users/sign_in' => 'sessions#new', :as => :new_user_session
-  post '/users/sign_in' => 'sessions#create', :as => :user_sessions
-  delete '/users/sign_out' => 'sessions#destroy', :as => :user_session
-
   resource :dashboard, :controller => "dashboard", :only => [:show]
 
-  resources :applications, :only => [:index, :new, :edit, :update, :destroy] do
+  resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do
+    resources :users
     resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts] do
       member do
         get :urls

@@ -1,0 +1,26 @@
+.login-box
+  .login-logo
+    %b> App
+    Perf
+  / /.login-logo
+  .login-box-body
+    %p.login-box-msg Sign in to start your session
+    = form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+      = devise_error_messages!
+      .form-group.has-feedback
+        = f.email_field :email, :class => "form-control", :placeholder => "Email", :autofocus => true
+        %span.glyphicon.glyphicon-envelope.form-control-feedback
+
+      .form-group.has-feedback
+        = f.password_field :password, :class => "form-control", :placeholder => "Password", :autocomplete => "off"
+        %span.glyphicon.glyphicon-lock.form-control-feedback
+
+      - if devise_mapping.rememberable?
+        .checkbox
+          = f.label :remember_me do
+            = f.check_box :remember_me
+            Remember Me
+
+      = f.submit "Sign In", :class => "btn btn-primary btn-block btn-flat"
+
+    = render "devise/shared/links"

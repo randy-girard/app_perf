@@ -1,0 +1,24 @@
+.login-box
+  .login-logo
+    %b> App
+    Perf
+  / /.login-logo
+  .login-box-body
+    %p.login-box-msg Please update your personal information
+    = form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => { :method => :put } do |f|
+      = devise_error_messages!
+      = f.hidden_field :invitation_token
+
+      .form-group.has-feedback
+        = f.text_field :name, :class => "form-control", :placeholder => "Enter your name", :autofocus => true
+        %span.glyphicon.glyphicon-user.form-control-feedback
+
+      .form-group.has-feedback
+        = f.password_field :password, :class => "form-control", :placeholder => "New Password"
+        %span.glyphicon.glyphicon-lock.form-control-feedback
+
+      .form-group.has-feedback
+        = f.password_field :password_confirmation, :class => "form-control", :placeholder => "Confirm Password", :autocomplete => "off"
+        %span.glyphicon.glyphicon-lock.form-control-feedback
+
+      = f.submit "Submit", :class => "btn btn-primary btn-block btn-flat"

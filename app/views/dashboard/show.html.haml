@@ -1,0 +1,18 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Dashboard
+  %ol.breadcrumb
+    %li.active Dashboard
+%section.content
+  .row
+    %section.col-lg-12.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Applications
+        .box-body
+          %table.table.table-condensed
+            - @applications.each do |application|
+              %tr
+                %td= link_to application.name, application_overview_path(application)

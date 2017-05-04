@@ -1,0 +1,12 @@
+%table.table.table-condensed
+  %tr
+    %th{:width => "30%"} Controller
+    %th Action
+    %th{:width => "100"} Freq
+    %th{:width => "100"} Avg (ms)
+  - @controllers.each do |controller|
+    %tr
+      %td.ellipsis= link_to controller.controller, dynamic_report_url({ :controller => controller.controller }, { :controller => "overview", :action => "show" })
+      %td.ellipsis= link_to controller.action, dynamic_report_url({ :action => controller.action }, { :controller => "overview", :action => "show" })
+      %td= controller.freq
+      %td= number_with_precision(controller.average, :precision => 2)

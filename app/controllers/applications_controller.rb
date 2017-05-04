@@ -5,12 +5,27 @@ class ApplicationsController < ApplicationController
   # GET /applications
   # GET /applications.json
   def index
-    @applications = @current_user.applications
+    @applications = current_user.applications
   end
 
   # GET /applications/new
   def new
+    @application = current_user.applications.new
     @root_uri = URI.parse(root_url)
+  end
+
+  def create
+    @application = current_user.applications.new(application_params)
+
+    respond_to do |format|
+      if @application.save
+        format.html { redirect_to @application, notice: 'Application was successfully created.' }
+        format.json { render :show, status: :ok, location: @application }
+      else
+        format.html { render :new }
+        format.json { render json: @application.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   # GET /applications/1/edit
@@ -44,11 +59,12 @@ class ApplicationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_application
-      @application = @current_user.applications.find(params[:id])
+      @application = current_user.applications.find(params[:id])
+      @current_application = @application
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def application_params
-      params.require(:application).permit(:data_retention_hours)
+      params.require(:application).permit(:name, :data_retention_hours)
     end
 end

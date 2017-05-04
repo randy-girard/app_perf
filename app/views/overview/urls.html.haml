@@ -1,0 +1,12 @@
+%table.table.table-condensed{"data-url" => "#{dynamic_report_url({}, { :controller => "overview", :action => "urls" })}"}
+  %tr
+    %th{:width => "30%"} Domain
+    %th Url
+    %th{:width => "100"} Freq
+    %th{:width => "100"} Avg (ms)
+  - @urls.each do |url|
+    %tr
+      %td= link_to url.domain, dynamic_report_url({ :domain => url.domain }, { :controller => "overview", :action => "show" })
+      %td.ellipsis= link_to url.url, dynamic_report_url({ :url => url.url }, { :controller => "overview", :action => "show" })
+      %td= url.freq
+      %td= number_with_precision(url.average, :precision => 2)

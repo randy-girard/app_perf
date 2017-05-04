@@ -13,11 +13,14 @@ class Application < ActiveRecord::Base
   has_many :events, :dependent => :delete_all
   has_many :deployments
 
+  has_many :application_users, :dependent => :delete_all
+  has_many :users, :through => :application_users
+
   validates :name, :uniqueness => { :scope => :user_id }
   validates :data_retention_hours, :numericality => { :greater_than => 0, :allow_nil => true }
 
   before_validation do |record|
-    record.license_key ||= record.user.license_key
+    record.license_key ||= SecureRandom.uuid
   end
 
   def test

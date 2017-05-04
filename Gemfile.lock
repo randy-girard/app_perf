@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: e3c85b8e4abd33fd460eddc71494f759849f5fa6
+  revision: 89c7c6ca4cc68175b9c6a7105604bb77cd74dc03
   branch: master
   specs:
     app_perf_rpm (0.0.1)
@@ -100,6 +100,15 @@ GEM
     concurrent-ruby (1.0.1)
     connection_pool (2.2.0)
     debug_inspector (0.0.2)
+    devise (4.2.0)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0, < 5.1)
+      responders
+      warden (~> 1.2.3)
+    devise_invitable (1.7.2)
+      actionmailer (>= 4.1.0)
+      devise (>= 4.0.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
     dotenv (2.1.1)
@@ -128,6 +137,8 @@ GEM
       activesupport (>= 4.1.0)
     groupdate (3.1.1)
       activesupport (>= 3)
+    haml (4.0.7)
+      tilt
     highcharts-rails (4.2.5)
       railties (>= 3.1)
     i18n (0.7.0)
@@ -162,7 +173,8 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    oj (2.18.5)
+    oj (3.0.4)
+    orm_adapter (0.5.0)
     passenger (5.0.28)
       rack
       rake (>= 0.8.1)
@@ -215,6 +227,8 @@ GEM
     rdoc (4.2.2)
       json (~> 1.4)
     redis (3.3.0)
+    responders (2.3.0)
+      railties (>= 4.2.0, < 5.1)
     rspec-core (3.4.4)
       rspec-support (~> 3.4.0)
     rspec-expectations (3.4.0)
@@ -286,6 +300,8 @@ GEM
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
     uuidtools (2.1.5)
+    warden (1.2.7)
+      rack (>= 1.0)
     web-console (2.3.0)
       activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
@@ -311,6 +327,8 @@ DEPENDENCIES
   capistrano3-puma
   chartkick
   coffee-rails (~> 4.1.0)
+  devise
+  devise_invitable
   dotenv-rails
   factory_girl_rails
   faker
@@ -318,6 +336,7 @@ DEPENDENCIES
   foreman
   foundation-rails
   groupdate
+  haml
   highcharts-rails
   jbuilder (~> 2.0)
   jquery-rails
