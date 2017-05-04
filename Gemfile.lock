@@ -1,11 +1,12 @@
 GIT
   remote: https://github.com/randy-girard/app_perf_rpm
-  revision: 89c7c6ca4cc68175b9c6a7105604bb77cd74dc03
+  revision: ed8a4e2f379b3619d41596621e20aabbed5c9a94
   branch: master
   specs:
     app_perf_rpm (0.0.1)
       oj
       sys-cpu
+      sys-filesystem
 
 GEM
   remote: https://rubygems.org/
@@ -173,7 +174,7 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    oj (3.0.4)
+    oj (3.0.5)
     orm_adapter (0.5.0)
     passenger (5.0.28)
       rack
@@ -289,6 +290,8 @@ GEM
     sucker_punch (2.0.2)
       concurrent-ruby (~> 1.0.0)
     sys-cpu (0.7.2)
+      ffi
+    sys-filesystem (1.1.7)
       ffi
     thor (0.19.1)
     thread_safe (0.3.5)

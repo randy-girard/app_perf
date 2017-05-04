@@ -13,5 +13,5 @@
               %i.fa.fa-clock
               %h3.box-title= metric.name
             .box-body
-              .dynamic-chart{"data-duration" => "15000", "data-legend" => "##{metric.name}-legend", "data-unit" => "#{metric.unit}", "data-url" => "#{dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "metrics", :name => metric.name })}", :id => "#{metric.name}-chart", :style => "height: 300px;"}
-              .chart-legend{:id => "#{metric.name}-legend"}
+              .dynamic-chart{"data-duration" => "15000", "data-legend" => "##{metric.clean_name}-legend", "data-unit" => "#{metric.unit}", "data-url" => "#{dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "metrics", :name => metric.name })}", :id => "#{metric.name}-chart", :style => "height: 300px;"}
+              .chart-legend{:id => "#{metric.clean_name}-legend"}
