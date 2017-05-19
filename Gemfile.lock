@@ -176,9 +176,6 @@ GEM
       pkg-config (~> 1.1.7)
     oj (3.0.6)
     orm_adapter (0.5.0)
-    passenger (5.0.28)
-      rack
-      rake (>= 0.8.1)
     pg (0.18.4)
     pkg-config (1.1.7)
     progressive_render (0.3.0)
@@ -346,10 +343,10 @@ DEPENDENCIES
   jquery-turbolinks
   kaminari
   oj
-  passenger
   pg
   progressive_render
   pry
+  puma
   rails (= 4.2.5.2)
   rspec-rails
   sass-rails (~> 5.0)

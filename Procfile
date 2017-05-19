@@ -1,2 +1,2 @@
-web: bundle exec passenger start -p $PORT
+web: bundle exec rails s -p $PORT
 worker: bundle exec sidekiq
