@@ -22,7 +22,6 @@ class Organizations::Applications::OverviewController < ApplicationController
   end
 
   def urls
-    raise @current_application.inspect
     @urls = @current_application
       .transaction_sample_data
       .select("domain, url, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
