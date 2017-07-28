@@ -6,9 +6,5 @@ FactoryGirl.define do
     transient do
       user nil
     end
-
-    after(:create) do |application, evaluator|
-      application.users << evaluator.user if evaluator.user
-    end
   end
 end

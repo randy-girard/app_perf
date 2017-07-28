@@ -10,7 +10,6 @@ class Application < ActiveRecord::Base
   has_many :database_types, :dependent => :delete_all
   has_many :traces, :dependent => :delete_all
   has_many :layers, :dependent => :delete_all
-  has_many :hosts, :dependent => :delete_all
 
   has_many :events, :dependent => :delete_all
   has_many :deployments

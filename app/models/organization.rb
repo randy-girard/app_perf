@@ -11,7 +11,7 @@ class Organization < ActiveRecord::Base
   has_many :database_types
   has_many :traces
   has_many :layers
-  has_many :hosts
+  has_many :hosts, :dependent => :delete_all
   has_many :deployments
 
   has_many :organization_users, :dependent => :delete_all

@@ -13,8 +13,6 @@ RSpec.describe "organizations/new", type: :view do
 
     assert_select "form[action=?][method=?]", organizations_path, "post" do
 
-      assert_select "input#organization_user_id[name=?]", "organization[user_id]"
-
       assert_select "input#organization_name[name=?]", "organization[name]"
     end
   end
