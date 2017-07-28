@@ -1,29 +1,49 @@
 class MetricReporter < Reporter
+  include ActionView::Helpers::NumberHelper
+
+  attr_accessor :host
+
+  def initialize(host, params, view_context)
+    params[:period] ||= "minute"
+
+    self.host = host
+    self.params = params
+    self.view_context = view_context
+  end
 
   def report_data
     time_range, period = Reporter.time_range(params)
 
-    metrics = application
-      .metrics
-      .where(:name => params[:name])
-      .joins(:host)
+    data_type = params[:type]
+
+    relation = @host
+      .metric_data
+      .joins(:metric)
+      .where("metrics.data_type = ?", data_type)
+      .group(:name)
+
+    metrics = relation
       .group_by_period(*report_params("timestamp"))
-      .average(:value)
+      .average("metric_data.value")
 
     hash = []
-    metrics.each_pair do |timestamp, value|
-      hash << [timestamp.to_i * 1000, value]
+    labels = {}
+    metrics.each_pair do |label, value|
+      labels[label.first] ||= []
+      labels[label.first] << [label.second.to_i * 1000, Metric.metricify(data_type, value)]
     end
 
-    deployments = application
+    labels.each_pair do |label, data|
+      hash.push({ :label => label , :data => data, :id => "ID-#{label}" }) rescue nil
+    end
+
+    deployments = @host
+      .organization
       .deployments
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
 
     {
-      :data => [{
-        :label => params[:name],
-        :data => hash
-      }],
+      :data => hash,
       :events => deployments.map {|deployment|
         {
           :min => deployment.start_time.to_i * 1000,

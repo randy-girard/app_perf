@@ -17,6 +17,6 @@
         %span.sr-only Toggle navigation
       .navbar-custom-menu
         %ul.nav.navbar-nav
-          %li{:class => "#{'active' if @current_page["UserRegistrationController"]}"}= link_to "My Account", edit_user_registration_path
-          %li{:class => "#{'active' if @current_page["ApplicationsController"]}"}= link_to "Applications", applications_path
+          %li{:class => "#{'active' if @current_page["User::RegistrationsController"]}"}= link_to "My Account", edit_user_registration_path
+          %li{:class => "#{'active' if @current_page["OrganizationsController"]}"}= link_to "Organizations", organizations_path
           %li= link_to 'Sign Out', destroy_user_session_path, :method => :delete

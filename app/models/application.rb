@@ -1,6 +1,8 @@
 class Application < ActiveRecord::Base
   belongs_to :user
+  belongs_to :organization
   has_many :metrics, :dependent => :delete_all
+  has_many :metric_data
   has_many :database_calls, :dependent => :delete_all
   has_many :transaction_sample_data, :dependent => :delete_all
   has_many :error_data, :dependent => :delete_all
@@ -13,10 +15,7 @@ class Application < ActiveRecord::Base
   has_many :events, :dependent => :delete_all
   has_many :deployments
 
-  has_many :application_users, :dependent => :delete_all
-  has_many :users, :through => :application_users
-
-  validates :name, :uniqueness => { :scope => :user_id }
+  validates :name, :uniqueness => { :scope => :organization_id }
   validates :data_retention_hours, :numericality => { :greater_than => 0, :allow_nil => true }
 
   before_validation do |record|

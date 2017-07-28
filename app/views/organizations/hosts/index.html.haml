@@ -1,0 +1,19 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Hosts
+  %ol.breadcrumb
+    %li.active Hosts
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Hosts
+        .box-body
+          %table.table.table-condensed
+            %tr
+              %th Name
+            - @hosts.each do |host|
+              %tr
+                %td= link_to host.name, organization_host_path(@current_organization, host)

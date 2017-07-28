@@ -4,8 +4,8 @@ class User < ActiveRecord::Base
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  has_many :application_users
-  has_many :applications, :through => :application_users, :dependent => :destroy
+  has_many :organization_users
+  has_many :organizations, :through => :organization_users, :dependent => :destroy
 
   before_validation do |record|
     record.license_key ||= SecureRandom.uuid

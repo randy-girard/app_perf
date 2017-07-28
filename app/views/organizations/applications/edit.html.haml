@@ -1,0 +1,40 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Applications
+  %ol.breadcrumb
+    %li= link_to "Applications", organization_applications_path(@current_organization)
+    %li.active Edit Application
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header.with-border
+          %h3.box-title Edit Application
+
+        = render 'form'
+
+      .box
+        .box-body
+          %p
+            Add the following gem to your project:
+          %p
+          %div
+            %pre.text-wrap
+              :preserve
+                # Gemfile
+                gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"
+          %p
+            Copy and paste the contents below into your application setup or initializer:
+          %div
+            %pre.text-wrap
+              :preserve
+                require 'app_perf_rpm'
+
+                AppPerfRpm.configure do |rpm|
+                  rpm.license_key = "#{@application.license_key}"
+                end
+
+      %hr
+
+      = link_to 'Delete Application', [@current_organization, @application], method: :delete, data: { confirm: 'Deleting this Application will remove all existing metrics and they will not be able to be recovered. Are you sure?' }, :class => "btn btn-danger"

@@ -11,20 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170428180924) do
+ActiveRecord::Schema.define(version: 20170728002503) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "application_users", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "user_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
-
-  add_index "application_users", ["application_id"], name: "index_application_users_on_application_id", using: :btree
-  add_index "application_users", ["user_id"], name: "index_application_users_on_user_id", using: :btree
 
   create_table "applications", force: :cascade do |t|
     t.integer  "user_id"
@@ -33,9 +23,11 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.decimal  "data_retention_hours", precision: 6, scale: 1
+    t.integer  "organization_id"
   end
 
   add_index "applications", ["name", "user_id"], name: "index_applications_on_name_and_user_id", unique: true, using: :btree
+  add_index "applications", ["organization_id"], name: "index_applications_on_organization_id", using: :btree
   add_index "applications", ["user_id"], name: "index_applications_on_user_id", using: :btree
 
   create_table "backtraces", force: :cascade do |t|
@@ -59,22 +51,26 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.float    "duration"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.integer  "organization_id"
   end
 
   add_index "database_calls", ["application_id"], name: "index_database_calls_on_application_id", using: :btree
   add_index "database_calls", ["database_type_id"], name: "index_database_calls_on_database_type_id", using: :btree
   add_index "database_calls", ["host_id"], name: "index_database_calls_on_host_id", using: :btree
   add_index "database_calls", ["layer_id"], name: "index_database_calls_on_layer_id", using: :btree
+  add_index "database_calls", ["organization_id"], name: "index_database_calls_on_organization_id", using: :btree
   add_index "database_calls", ["uuid"], name: "index_database_calls_on_uuid", using: :btree
 
   create_table "database_types", force: :cascade do |t|
     t.integer  "application_id"
     t.string   "name"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
   add_index "database_types", ["application_id"], name: "index_database_types_on_application_id", using: :btree
+  add_index "database_types", ["organization_id"], name: "index_database_types_on_organization_id", using: :btree
 
   create_table "error_data", force: :cascade do |t|
     t.integer  "application_id"
@@ -87,11 +83,13 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
     t.text     "source"
+    t.integer  "organization_id"
   end
 
   add_index "error_data", ["application_id"], name: "index_error_data_on_application_id", using: :btree
   add_index "error_data", ["error_message_id"], name: "index_error_data_on_error_message_id", using: :btree
   add_index "error_data", ["host_id"], name: "index_error_data_on_host_id", using: :btree
+  add_index "error_data", ["organization_id"], name: "index_error_data_on_organization_id", using: :btree
 
   create_table "error_messages", force: :cascade do |t|
     t.integer  "application_id"
@@ -99,11 +97,13 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.string   "error_class"
     t.string   "error_message"
     t.datetime "last_error_at"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
   add_index "error_messages", ["application_id"], name: "index_error_messages_on_application_id", using: :btree
+  add_index "error_messages", ["organization_id"], name: "index_error_messages_on_organization_id", using: :btree
 
   create_table "events", force: :cascade do |t|
     t.string   "type"
@@ -112,45 +112,79 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.datetime "end_time"
     t.string   "title"
     t.string   "description"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
   add_index "events", ["application_id"], name: "index_events_on_application_id", using: :btree
+  add_index "events", ["organization_id"], name: "index_events_on_organization_id", using: :btree
 
   create_table "hosts", force: :cascade do |t|
-    t.integer  "application_id"
     t.string   "name"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
-  add_index "hosts", ["application_id"], name: "index_hosts_on_application_id", using: :btree
-  add_index "hosts", ["name", "application_id"], name: "index_hosts_on_name_and_application_id", unique: true, using: :btree
+  add_index "hosts", ["organization_id"], name: "index_hosts_on_organization_id", using: :btree
 
   create_table "layers", force: :cascade do |t|
     t.integer  "application_id"
     t.string   "name"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
   add_index "layers", ["application_id"], name: "index_layers_on_application_id", using: :btree
   add_index "layers", ["name", "application_id"], name: "index_layers_on_name_and_application_id", unique: true, using: :btree
+  add_index "layers", ["organization_id"], name: "index_layers_on_organization_id", using: :btree
+
+  create_table "metric_data", force: :cascade do |t|
+    t.integer  "host_id"
+    t.integer  "metric_id"
+    t.datetime "timestamp"
+    t.float    "value"
+  end
+
+  add_index "metric_data", ["host_id"], name: "index_metric_data_on_host_id", using: :btree
+  add_index "metric_data", ["metric_id"], name: "index_metric_data_on_metric_id", using: :btree
 
   create_table "metrics", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
-    t.datetime "timestamp"
     t.string   "name"
-    t.float    "value"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.string   "unit"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.string   "data_type",       default: "custom"
+    t.string   "label"
+    t.integer  "organization_id"
   end
 
   add_index "metrics", ["application_id"], name: "index_metrics_on_application_id", using: :btree
   add_index "metrics", ["host_id"], name: "index_metrics_on_host_id", using: :btree
+  add_index "metrics", ["organization_id"], name: "index_metrics_on_organization_id", using: :btree
+
+  create_table "organization_users", force: :cascade do |t|
+    t.integer  "organization_id"
+    t.integer  "user_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  add_index "organization_users", ["organization_id"], name: "index_organization_users_on_organization_id", using: :btree
+  add_index "organization_users", ["user_id"], name: "index_organization_users_on_user_id", using: :btree
+
+  create_table "organizations", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "license_key"
+    t.string   "name"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "organizations", ["user_id"], name: "index_organizations_on_user_id", using: :btree
 
   create_table "traces", force: :cascade do |t|
     t.integer  "application_id"
@@ -158,12 +192,14 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.string   "trace_key"
     t.datetime "timestamp"
     t.float    "duration"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
   end
 
   add_index "traces", ["application_id"], name: "index_traces_on_application_id", using: :btree
   add_index "traces", ["host_id"], name: "index_traces_on_host_id", using: :btree
+  add_index "traces", ["organization_id"], name: "index_traces_on_organization_id", using: :btree
   add_index "traces", ["trace_key", "application_id"], name: "index_traces_on_trace_key_and_application_id", unique: true, using: :btree
 
   create_table "transaction_sample_data", force: :cascade do |t|
@@ -187,12 +223,14 @@ ActiveRecord::Schema.define(version: 20170428180924) do
     t.text     "payload"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.integer  "organization_id"
   end
 
   add_index "transaction_sample_data", ["application_id"], name: "index_transaction_sample_data_on_application_id", using: :btree
   add_index "transaction_sample_data", ["grouping_type", "grouping_id"], name: "index_transaction_sample_data_on_grouping_type_and_grouping_id", using: :btree
   add_index "transaction_sample_data", ["host_id"], name: "index_transaction_sample_data_on_host_id", using: :btree
   add_index "transaction_sample_data", ["layer_id"], name: "index_transaction_sample_data_on_layer_id", using: :btree
+  add_index "transaction_sample_data", ["organization_id"], name: "index_transaction_sample_data_on_organization_id", using: :btree
   add_index "transaction_sample_data", ["trace_id"], name: "index_transaction_sample_data_on_trace_id", using: :btree
 
   create_table "users", force: :cascade do |t|
@@ -226,8 +264,6 @@ ActiveRecord::Schema.define(version: 20170428180924) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
-  add_foreign_key "application_users", "applications"
-  add_foreign_key "application_users", "users"
   add_foreign_key "applications", "users"
   add_foreign_key "database_calls", "applications"
   add_foreign_key "database_calls", "database_types"
@@ -239,10 +275,14 @@ ActiveRecord::Schema.define(version: 20170428180924) do
   add_foreign_key "error_data", "hosts"
   add_foreign_key "error_messages", "applications"
   add_foreign_key "events", "applications"
-  add_foreign_key "hosts", "applications"
   add_foreign_key "layers", "applications"
+  add_foreign_key "metric_data", "hosts"
+  add_foreign_key "metric_data", "metrics"
   add_foreign_key "metrics", "applications"
   add_foreign_key "metrics", "hosts"
+  add_foreign_key "organization_users", "organizations"
+  add_foreign_key "organization_users", "users"
+  add_foreign_key "organizations", "users"
   add_foreign_key "traces", "applications"
   add_foreign_key "traces", "hosts"
   add_foreign_key "transaction_sample_data", "applications"

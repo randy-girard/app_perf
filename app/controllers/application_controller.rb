@@ -6,16 +6,29 @@ class ApplicationController < ActionController::Base
   around_filter :use_time_zone
   before_filter :authenticate_user!
 
+  before_action :set_current_organization
   before_action :set_current_application
   before_action :set_current_page
   before_action :set_time_range
 
   layout :set_layout
 
+  def set_current_organization
+    if current_user
+      if params[:organization_id]
+        @current_organization ||= current_user.organizations.find(params[:organization_id])
+      elsif session[:organization_id]
+        @current_organization ||= current_user.organizations.find(session[:organization_id])
+      end
+    end
+  end
+
   def set_current_application
     if current_user
       if params[:application_id]
-        @current_application ||= current_user.applications.find(params[:application_id])
+        @current_application ||= @current_organization.applications.find(params[:application_id])
+      elsif session[:application_id]
+        @current_application ||= @current_organization.applications.find(session[:application_id])
       end
     end
   end

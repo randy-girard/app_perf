@@ -1,4 +1,5 @@
 class TransactionSampleDatum < ActiveRecord::Base
+  belongs_to :organization
   belongs_to :application
   belongs_to :host
   belongs_to :grouping, :primary_key => :uuid, :polymorphic => true

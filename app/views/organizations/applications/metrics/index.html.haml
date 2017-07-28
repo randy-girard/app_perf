@@ -1,0 +1,17 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Metrics
+/ Main content
+%section.content
+  - @metrics.in_groups_of(2, false) do |metrics|
+    .row
+      - metrics.each do |metric|
+        %section.col-lg-6.connectedSortable
+          .box
+            .box-header
+              %i.fa.fa-clock
+              %h3.box-title= metric.data_type
+            .box-body
+              .dynamic-chart{"data-duration" => "30000", "data-legend" => "##{metric.clean_name}-legend", "data-unit" => metric.unit, "data-url" => "#{dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "metrics", :type => metric.data_type })}", :id => "#{metric.clean_name}-chart", :style => "height: 200px;"}
+              .chart-legend{:id => "#{metric.clean_name}-legend"}

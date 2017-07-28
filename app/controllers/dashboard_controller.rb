@@ -1,7 +1,7 @@
 class DashboardController < ApplicationController
 
   def show
-    @applications = current_user.applications
+    @organizations = current_user.organizations
   end
 
 end

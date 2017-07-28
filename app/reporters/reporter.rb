@@ -33,7 +33,6 @@ class Reporter
 
   def parse(items)
     items.map do |item|
-      raise item.inspect
       [
         item.first.to_i * 1000,
         item.last

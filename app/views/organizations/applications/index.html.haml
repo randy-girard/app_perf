@@ -1,0 +1,24 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Applications
+  %ol.breadcrumb
+    %li.active Applications
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Applications
+          .box-tools
+            = link_to new_organization_application_path(@current_organization), :class => "btn btn-primary" do
+              %i.fa.fa-plus
+              New Application
+        .box-body
+          %table.table.table-condensed
+            %tr
+              %th Name
+            - @applications.each do |application|
+              %tr
+                %td= link_to application.name, organization_application_overview_path(@current_organization, application)
+                %td= link_to "Edit", edit_organization_application_path(@current_organization, application), :class => "btn btn-default"

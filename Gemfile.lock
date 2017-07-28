@@ -5,8 +5,6 @@ GIT
   specs:
     app_perf_rpm (0.0.1)
       oj
-      sys-cpu
-      sys-filesystem
 
 GEM
   remote: https://rubygems.org/
@@ -125,7 +123,6 @@ GEM
       railties (>= 3.0.0)
     faker (1.7.1)
       i18n (~> 0.5)
-    ffi (1.9.18)
     font-awesome-rails (4.6.1.0)
       railties (>= 3.2, < 5.1)
     foreman (0.78.0)
@@ -286,10 +283,6 @@ GEM
       net-ssh (>= 2.8.0)
     sucker_punch (2.0.2)
       concurrent-ruby (~> 1.0.0)
-    sys-cpu (0.7.2)
-      ffi
-    sys-filesystem (1.1.7)
-      ffi
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (2.0.2)

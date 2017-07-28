@@ -1,4 +1,5 @@
 class Layer < ActiveRecord::Base
+  belongs_to :organization
   belongs_to :application
 
   has_many :transaction_sample_data
