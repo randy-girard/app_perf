@@ -15,27 +15,44 @@
         .box-body
           = render 'form'
 
-      .box
-        .box-body
-          %p
-            Add the following gem to your project:
-          %p
-          %div
-            %pre.text-wrap
-              :preserve
-                # Gemfile
-                gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"
-          %p
-            Copy and paste the contents below into your organization setup or initializer:
-          %div
-            %pre.text-wrap
-              :preserve
-                require 'app_perf_rpm'
+      .nav-tabs-custom
+        %ul.nav.nav-tabs
+          %li.active= link_to "Ruby APM", "#ruby-apm", :data => { :toggle => "tab" }
+          %li= link_to "System Agent", "#system-agent", :data => { :toggle => "tab" }
+        %div.tab-content
+          %div#ruby-apm.tab-pane.active
+            %p
+              Add the following gem to your project:
+            %p
+            %div
+              %pre.text-wrap
+                :preserve
+                  # Gemfile
+                  gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"
+            %p
+              Copy and paste the contents below into your organization setup or initializer:
+            %div
+              %pre.text-wrap
+                :preserve
+                  require 'app_perf_rpm'
 
-                AppPerfRpm.configure do |rpm|
-                  rpm.license_key = "#{@organization.license_key}"
-                  rpm.application_name = "Application Name"
-                end
+                  AppPerfRpm.configure do |rpm|
+                    rpm.license_key = "#{@organization.license_key}"
+                    rpm.application_name = "Application Name"
+                  end
+          %div#system-agent.tab-pane
+            %p
+              Install the App Perf Agent:
+            %div
+              %pre.text-wrap
+                gem install app_perf_agent
+            %p
+              Run the following command:
+            %div
+              %pre.text-wrap
+                app_perf_agent --license #{@organization.license_key} --host #{ENV["HOST"]}
+
+
 
       %hr
 
