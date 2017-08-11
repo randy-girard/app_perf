@@ -1,0 +1,11 @@
+%table.table.table-condensed
+  %tr
+  - @data[:data][:headers].each do |header|
+    %th= header
+  - @data[:data][:data].each do |datum|
+    %tr
+      - datum.each_with_index do |item, index|
+        - if item.is_a?(Numeric)
+          %td= number_with_precision(item, :precision => 2)
+        - else
+          %td.ellipsis= link_to item, dynamic_report_url({ @data[:data][:headers][index].downcase.to_sym => item  }, { :controller => "overview", :action => "show" })

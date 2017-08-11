@@ -1,5 +1,10 @@
 module ApplicationHelper
   def dynamic_report_url(options = {}, base_params = {})
+    params = metric_params(options, base_params)
+    url_for(params)
+  end
+
+  def metric_params(options = {}, base_params = {})
     without = options[:without]
 
     controller  = base_params[:controller] || params[:controller]
@@ -43,7 +48,7 @@ module ApplicationHelper
       end
     end
 
-    url_for(base_params)
+    base_params
   end
 
   def selected_filters
@@ -66,7 +71,7 @@ module ApplicationHelper
     base_params.merge!("Action"     => _action)     if _action
 
     if _host
-      host = @current_application.hosts.find(_host)
+      host = @current_organization.hosts.find(_host)
       base_params.merge!("Host" => host.name)
     end
 

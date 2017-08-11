@@ -1,0 +1,33 @@
+%tr{:class => "#{"info" if span.is_query?(params[:query])}"}
+  %td{:width => "20"}= link_to span.id, application_trace_path(@current_application, @trace.trace_key, :sample_id => span.id)
+  %td{:width => "150"}= span.layer.name
+  %td.ellipsis{:style => "padding-left: #{depth * 40}px;"}
+    - if span.payload.present?
+      - if span.layer.name.eql?("nginx")
+        = span.payload["url"]
+      - elsif span.layer.name.eql?("rack")
+        = span.payload["url"]
+      - elsif span.layer.name.eql?("actioncontroller")
+        = span.payload["controller"]
+        = span.payload["action"]
+      - elsif span.layer.database?
+        = span.payload["name"]
+        %br/
+        = span.payload["query"]
+      - elsif span.layer.name.eql?("actionview")
+        = span.payload["name"].to_s.gsub(Rails.root.to_s, "")
+        = span.payload["type"]
+        %br/
+      - elsif span.layer.http?
+        = span.payload["remote_host"]
+      - else
+    - else
+      = span.layer.name
+  %td{:width => "200"}
+    .progress.progress-xs
+      .progress-bar.progress-bar-danger{:style => "width: #{number_to_percentage(span.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 2)}"}
+  %td
+    %span.badge= number_to_percentage(span.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 1)
+  %td{:width => "50"}= number_with_precision(span.duration, :precision => 2)
+  %td{:width => "50"}= number_with_precision(span.exclusive_duration, :precision => 2)
+= render span.children, :depth => depth + 1, :version => 1 if span.children

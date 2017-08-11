@@ -34,7 +34,7 @@ class MetricReporter < Reporter
     end
 
     labels.each_pair do |label, data|
-      hash.push({ :label => label , :data => data, :id => "ID-#{label}" }) rescue nil
+      hash.push({ :name => label , :data => data, :id => "ID-#{label}" }) rescue nil
     end
 
     deployments = @host

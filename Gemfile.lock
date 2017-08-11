@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/randy-girard/app_perf_rpm
-  revision: 0d4c263fd0bec9933d9abd6bd5a71863b2ca4638
-  branch: master
-  specs:
-    app_perf_rpm (0.0.1)
-      oj
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -51,7 +43,9 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    arel (6.0.3)
+    app_perf_rpm (0.0.2)
+      oj (= 3.3.2)
+    arel (6.0.4)
     babel-source (5.8.35)
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
@@ -59,9 +53,9 @@ GEM
     bcrypt (3.1.11)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    builder (3.2.2)
+    builder (3.2.3)
     byebug (8.2.4)
-    calculate-all (0.1.1)
+    calculate-all (0.2.0)
       activerecord
     capistrano (3.5.0)
       airbrussh (>= 1.0.0)
@@ -87,7 +81,6 @@ GEM
     capistrano3-puma (1.2.1)
       capistrano (~> 3.0)
       puma (>= 2.6)
-    chartkick (1.4.2)
     coderay (1.1.1)
     coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
@@ -95,7 +88,7 @@ GEM
     coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.10.0)
+    coffee-script-source (1.12.2)
     concurrent-ruby (1.0.1)
     connection_pool (2.2.0)
     debug_inspector (0.0.2)
@@ -115,7 +108,7 @@ GEM
       dotenv (= 2.1.1)
       railties (>= 4.0, < 5.1)
     erubis (2.7.0)
-    execjs (2.6.0)
+    execjs (2.7.0)
     factory_girl (4.7.0)
       activesupport (>= 3.0.0)
     factory_girl_rails (4.7.0)
@@ -139,7 +132,7 @@ GEM
       tilt
     highcharts-rails (4.2.5)
       railties (>= 3.1)
-    i18n (0.7.0)
+    i18n (0.8.6)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
@@ -147,10 +140,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    jquery-turbolinks (2.1.0)
-      railties (>= 3.1.0)
-      turbolinks
-    json (1.8.3)
+    json (1.8.6)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -162,19 +152,17 @@ GEM
     mime-types (3.0)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0221)
-    mini_portile2 (2.1.0)
-    minitest (5.10.1)
+    mini_portile2 (2.2.0)
+    minitest (5.10.3)
     multi_json (1.11.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (3.2.0)
-    nokogiri (1.6.8)
-      mini_portile2 (~> 2.1.0)
-      pkg-config (~> 1.1.7)
-    oj (3.0.9)
+    nokogiri (1.8.0)
+      mini_portile2 (~> 2.2.0)
+    oj (3.3.2)
     orm_adapter (0.5.0)
     pg (0.18.4)
-    pkg-config (1.1.7)
     progressive_render (0.3.0)
       coffee-rails
       jquery-rails
@@ -189,7 +177,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     puma (2.15.3)
-    rack (1.6.4)
+    rack (1.6.8)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
@@ -207,9 +195,9 @@ GEM
       sprockets-rails
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.7)
+    rails-dom-testing (1.0.8)
       activesupport (>= 4.2.0.beta, < 5.0)
-      nokogiri (~> 1.6.0)
+      nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
@@ -221,6 +209,12 @@ GEM
     rake (12.0.0)
     rdoc (4.2.2)
       json (~> 1.4)
+    react-rails (2.2.1)
+      babel-transpiler (>= 0.7.0)
+      connection_pool
+      execjs
+      railties (>= 3.2)
+      tilt
     redis (3.3.0)
     responders (2.3.0)
       railties (>= 4.2.0, < 5.1)
@@ -283,12 +277,10 @@ GEM
       net-ssh (>= 2.8.0)
     sucker_punch (2.0.2)
       concurrent-ruby (~> 1.0.0)
-    thor (0.19.1)
-    thread_safe (0.3.5)
+    thor (0.19.4)
+    thread_safe (0.3.6)
     tilt (2.0.2)
-    turbolinks (2.5.3)
-      coffee-rails
-    tzinfo (1.2.2)
+    tzinfo (1.2.3)
       thread_safe (~> 0.1)
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
@@ -307,7 +299,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   activeuuid
-  app_perf_rpm!
+  app_perf_rpm (= 0.0.2)
   bcrypt (~> 3.1.7)
   byebug
   calculate-all
@@ -318,7 +310,6 @@ DEPENDENCIES
   capistrano-rvm
   capistrano-sidekiq
   capistrano3-puma
-  chartkick
   coffee-rails (~> 4.1.0)
   devise
   devise_invitable
@@ -333,7 +324,6 @@ DEPENDENCIES
   highcharts-rails
   jbuilder (~> 2.0)
   jquery-rails
-  jquery-turbolinks
   kaminari
   oj
   pg
@@ -341,6 +331,7 @@ DEPENDENCIES
   pry
   puma
   rails (= 4.2.5.2)
+  react-rails
   rspec-rails
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
@@ -350,7 +341,6 @@ DEPENDENCIES
   spring
   sqlite3
   sucker_punch
-  turbolinks
   uglifier (>= 1.3.0)
   web-console (~> 2.0)
 

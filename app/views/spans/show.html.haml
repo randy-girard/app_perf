@@ -1,0 +1,36 @@
+.box
+  .box-header
+    %h3.box-title
+      Sample Detail (#{number_with_precision(@span.duration, :precision => 2)}ms)
+  .box-body
+    .nav-tabs-custom
+      %ul.nav.nav-tabs
+        %li.active
+          %a{"data-toggle" => "tab", :href => "#sample-overview"} Overview
+        - if @span.payload["source"].present?
+          %li
+            %a{"data-toggle" => "tab", :href => "#sample-source"} Source
+        - if (backtrace = @span.backtrace) && backtrace.backtrace.present?
+          %li
+            %a{"data-toggle" => "tab", :href => "#sample-backtrace"} Backtrace
+      .tab-content
+        #sample-overview.tab-pane.active
+          - @span.attributes.each_pair do |key, value|
+            %div
+              = key
+              \:
+              - if value.is_a?(Hash)
+                - value.except("source").each_pair do |subkey, subvalue|
+                  %div
+                        #{subkey}: #{subvalue}
+              - else
+                - if key.eql?("timestamp")
+                  = value.to_f * 1000
+                - else
+                  = value.inspect
+        - if @span.payload["source"].present?
+          #sample-source.tab-pane
+            = render "shared/render_source", :source => @span.payload["source"]
+        - if @span.backtrace.present?
+          #sample-backtrace.tab-pane
+            %pre.text-wrap= @span.backtrace.backtrace.join("\n")

@@ -42,10 +42,6 @@
             = link_to organization_application_database_index_path(@current_organization, @current_application) do
               %i.fa.fa-database
               %span Database
-          %li{:class => "#{'active' if @current_page["Organizations::Applications::MetricsController"]}"}
-            = link_to organization_application_metrics_path(@current_organization, @current_application) do
-              %i.fa.fa-area-chart
-              %span Metrics
           %li.header Events
           %li{:class => "#{'active' if @current_page["Organizations::Applications::ErrorsController"] || @current_page["Organizations::Applications::ErrorInstancesController"]}"}
             = link_to organization_application_errors_path(@current_organization, @current_application) do

@@ -4,9 +4,29 @@ class Host < ActiveRecord::Base
 
   has_many :metric_data
   has_many :traces
-  has_many :transaction_sample_data
+  has_many :spans
   has_many :error_data
   has_many :raw_data
 
   validates :name, :uniqueness => { :scope => :organization_id }
+
+  def cpu_usage
+    sys = system_cpu("system").value
+    user = system_cpu("user").value
+    idle = system_cpu("idle").value
+
+    if sys && user && idle
+      (sys + user).to_f / ((sys + user).to_f + idle.to_f)
+    else
+      nil
+    end
+  end
+
+  def system_cpu(type)
+    values = metric_data
+      .joins(:metric)
+      .where(:metrics => { :name => "system.cpu.#{type}" })
+      .order(:timestamp)
+      .last || MetricDatum.new
+   end
 end

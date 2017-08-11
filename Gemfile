@@ -16,9 +16,6 @@ gem 'coffee-rails', '~> 4.1.0'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-gem 'turbolinks'
-gem 'jquery-turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
@@ -32,7 +29,6 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'foreman'
 gem 'puma'
 gem 'kaminari'
-gem "chartkick"
 gem "groupdate"
 gem 'calculate-all'
 gem "pg"
@@ -44,13 +40,14 @@ gem "sidekiq"
 gem "sucker_punch"
 gem "activerecord-import"
 gem "progressive_render"
-gem "app_perf_rpm", :git => "https://github.com/randy-girard/app_perf_rpm", :branch => "master"
+gem "app_perf_rpm", "0.0.2"
 gem 'faker'
 gem "activeuuid"
 gem "oj"
 gem "haml"
 gem "devise"
 gem "devise_invitable"
+gem "react-rails"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

@@ -1,0 +1,27 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Hosts
+  %ol.breadcrumb
+    %li.active Hosts
+%section.content
+  .row
+    .col-lg-12.connectedSortable
+      .box
+        .box-header
+          %h3.box-title Hosts
+        .box-body
+          %table.table.table-condensed
+            %tr
+              %th Name
+              %th CPU Usage
+            - @hosts.each do |host|
+              %tr
+                %td= link_to host.name, organization_host_path(@current_organization, host)
+                %td
+                  - if host.cpu_usage
+                    .progress
+                      .progress-bar.progress-bar-aqua{ :style => "width: #{number_to_percentage(host.cpu_usage * 100.to_f, :precision => 0)}" }
+                        %span= number_to_percentage(host.cpu_usage * 100.to_f, :precision => 0)
+                  - else
+                    N/A

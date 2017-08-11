@@ -13,11 +13,9 @@
 //= require jquery
 //= require jquery_ujs
 //= require jQueryUI/jquery-ui
-//= require jquery.turbolinks
-//= require chartkick
+//= require axios
 //= require pace/pace
 //= require progressive_render
-//= require turbolinks
 //= require knob/jquery.knob
 //= require jvectormap/jquery-jvectormap-1.2.2.min
 //= require jvectormap/jquery-jvectormap-world-mill-en
@@ -30,70 +28,63 @@
 //= require sparkline/jquery.sparkline.min
 //= require slimScroll/jquery.slimscroll
 //= require fastclick/fastclick
-//= require flot/jquery.flot
-//= require flot/jquery.flot.resize
-//= require flot/jquery.flot.categories
-//= require flot/jquery.flot.selection
-//= require flot/jquery.flot.time
-//= require flot/jquery.flot.stack
-//= require flot/jquery.flot.fillbetween
-//= require flot/jquery.flot.curvedlines
-//= require flot/jquery.flot.navigate
-//= require flot/jquery.flot.events
 //= require vis/vis
 //= require AdminLTE
-//= require charts
 
-function updateQueryStringParameter(uri, key, value) {
-  var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
-  var separator = uri.indexOf('?') !== -1 ? "&" : "?";
-  if (uri.match(re)) {
-    if(value == "")
-      return uri.replace(re, '$1');
-    else {
-      return uri.replace(re, '$1' + key + "=" + value + '$2');
-    }
-  }
-  else {
-    return uri + separator + key + "=" + value;
-  }
-}
+//= require utils
+//= require charts/charts
+//= require react.init
 
-$(document).on("click", '[data-remote-element]', function(e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", function() {
+  /*$('div[data-remote="true"]').each(function() {
+    var self = $(this);
+    var url = self.data("url");
 
-  var self = $(this);
-  var url = self.attr("href");
-  var remoteElement = self.data("remote-element");
-  var element = $(remoteElement);
-  var limit = element.data("limit");
-  var order = element.data("order");
-
-  var newLimit = self.data("limit");
-  if(newLimit)
-    limit = newLimit;
-  var newOrder = self.data("order");
-  if(newOrder)
-    order = newOrder;
-
-  element.data("limit", limit);
-  element.data("order", order);
-
-  element.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
-  $.ajax({
-    url: url,
-    data: {
-      _limit: limit,
-      _order: order
-    },
-  }).success(function(data) {
-    element.html(data);
-    var newUrl = element.find("table").data("url");
-    element.attr("url", newUrl);
-  }).done(function() {
-    element.next(".overlay").remove();
+    self.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
+    self.load(url, function() {
+      self.next(".overlay").remove();
+    });
   });
-});
+  */
+})
+
+document.addEventListener('click', function(e) {
+  if (e.target.matches('[data-remote-element]')) {
+    e.preventDefault();
+
+    var self = $(e.target);
+    var url = self.attr("href");
+    var remoteElement = self.data("remote-element");
+    var element = $(remoteElement);
+    var limit = element.data("limit");
+    var order = element.data("order");
+
+    var newLimit = self.data("limit");
+    if(newLimit)
+      limit = newLimit;
+    var newOrder = self.data("order");
+    if(newOrder)
+      order = newOrder;
+
+    element.data("limit", limit);
+    element.data("order", order);
+
+    element.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
+    $.ajax({
+      url: url,
+      data: {
+        _limit: limit,
+        _order: order
+      },
+    }).success(function(data) {
+      element.html(data);
+      var newUrl = element.find("table").data("url");
+      element.attr("url", newUrl);
+    }).done(function() {
+      element.next(".overlay").remove();
+    });
+  }
+}, false);
 
 $(function() {
   $(".singledatetime").daterangepicker({
@@ -104,13 +95,5 @@ $(function() {
     }
   });
 
-  $('div[data-remote="true"]').each(function() {
-    var self = $(this);
-    var url = self.data("url");
 
-    self.after("<div class='overlay'><i class='fa fa-spinner fa-spin'></i></div>");
-    self.load(url, function() {
-      self.next(".overlay").remove();
-    });
-  });
 });

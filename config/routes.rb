@@ -13,11 +13,15 @@ Rails.application.routes.draw do
   resource :dashboard, :controller => "dashboard", :only => [:show]
 
   resources :organizations, :only => [:index, :new, :create, :edit, :update, :destroy] do
-    resources :hosts, :module => "organizations"
-    resources :users, :module => "organizations"
-    resources :metrics, :only => [:index], :module => "organizations"
-    resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy], :module => "organizations" do
-      resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts], :module => "applications" do
+    resources :hosts
+    resources :users
+    resources :metrics, :only => [:index, :show] do
+      member do
+        get "/(:id)" => "metrics#show", :id => /.*/
+      end
+    end
+    resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do
+      resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts] do
         member do
           get :urls
           get :layers
@@ -28,21 +32,21 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :errors, :only => [:index, :show], :module => "applications" do
+      resources :errors, :only => [:index, :show] do
         resources :instances, :controller => "error_instances", :only => [:index, :show]
       end
 
-      resources :metrics, :only => [:index], :module => "applications"
-      resources :traces, :only => [:index, :show, :database], :module => "applications" do
+      resources :metrics, :only => [:index]
+      resources :traces, :only => [:index, :show, :database] do
         member do
           get :database
         end
       end
-      resources :samples, :only => [:show], :module => "applications"
-      resources :database, :controller => "database", :only => [:index], :module => "applications"
-      resources :deployments, :only => [:index, :new, :create], :module => "applications"
+      resources :spans, :only => [:show]
+      resources :database, :controller => "database", :only => [:index]
+      resources :deployments, :only => [:index, :new, :create]
 
-      resources :reports, :only => [:index, :show, :new, :error, :profile], :module => "applications" do
+      resources :reports, :only => [:index, :show, :new, :error, :profile] do
         collection do
           get :error
           get :profile

@@ -49,7 +49,7 @@ class AppPerfAgentWorker < ActiveJob::Base
 
         if protocol_version.to_i.eql?(2)
           errors, remaining_data = data.partition {|d| d[0] == "error" }
-          metrics, samples = Array(remaining_data).partition {|d| d[0] == "metric" }
+          metrics, spans = Array(remaining_data).partition {|d| d[0] == "metric" }
 
           if metrics.present?
             process_metric_data(metrics)
@@ -59,8 +59,8 @@ class AppPerfAgentWorker < ActiveJob::Base
             process_error_data(errors)
           end
 
-          if samples.present? && application.present?
-            process_version_2(samples)
+          if spans.present? && application.present?
+            process_version_2(spans)
           end
         end
 
@@ -193,7 +193,7 @@ class AppPerfAgentWorker < ActiveJob::Base
 
   def process_version_2(data)
     events = []
-    samples = []
+    spans = []
     database_calls = []
     backtraces = []
 
@@ -215,7 +215,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       action = _opts.fetch("action") { nil }
       query = _opts.fetch("query") { nil }
       adapter = _opts.fetch("adapter") { nil }
-      sample_type = _opts.fetch("type") { "web" }
+      span_type = _opts.fetch("type") { "web" }
       _backtrace = _opts.delete("backtrace")
 
       timestamp = Time.at(_start)
@@ -236,38 +236,38 @@ class AppPerfAgentWorker < ActiveJob::Base
         database_calls << database_call
       end
 
-      sample = {}
+      span = {}
       if database_call
-        sample[:grouping_id] = database_call.uuid.to_s
-        sample[:grouping_type] = "DatabaseCall"
+        span[:grouping_id] = database_call.uuid.to_s
+        span[:grouping_type] = "DatabaseCall"
       end
-      sample[:sample_type] = sample_type
-      sample[:host_id] = host.id
-      sample[:layer_id] = layer.id
-      sample[:timestamp] = timestamp
-      sample[:duration] = _duration
-      sample[:trace_key] = _trace_key
-      sample[:uuid] = SecureRandom.uuid.to_s
-      sample[:payload] = _opts
-      sample[:url] = url
-      sample[:domain] = domain
-      sample[:controller] = controller
-      sample[:action] = action
-      sample[:organization_id] = organization.id
+      span[:span_type] = span_type
+      span[:host_id] = host.id
+      span[:layer_id] = layer.id
+      span[:timestamp] = timestamp
+      span[:duration] = _duration
+      span[:trace_key] = _trace_key
+      span[:uuid] = SecureRandom.uuid.to_s
+      span[:payload] = _opts
+      span[:url] = url
+      span[:domain] = domain
+      span[:controller] = controller
+      span[:action] = action
+      span[:organization_id] = organization.id
 
       if _backtrace
         backtrace = Backtrace.new
         backtrace.backtrace = _backtrace
-        backtrace.backtraceable_id = sample[:uuid]
-        backtrace.backtraceable_type = "TransactionSampleDatum"
+        backtrace.backtraceable_id = span[:uuid]
+        backtrace.backtraceable_type = "Span"
         backtraces << backtrace
       end
 
-      samples << sample
+      spans << span
     end
 
     all_events = []
-    samples.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
+    spans.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
       trace = traces.find {|t| t.trace_key == trace_key }
       next if trace.nil?
       timestamp = events.map {|e| e[:timestamp] }.min
@@ -285,20 +285,20 @@ class AppPerfAgentWorker < ActiveJob::Base
         e[:organization_id] = organization.id
       }
 
-      existing_samples = trace.transaction_sample_data.all
-      new_samples = events.map {|s| application.transaction_sample_data.new(s) }
-      all_samples = existing_samples + new_samples
-      root_event = trace.arrange_samples(all_samples)
+      existing_spans = trace.spans.all
+      new_spans = events.map {|s| application.spans.new(s) }
+      all_spans = existing_spans + new_spans
+      root_event = trace.arrange_spans(all_spans)
       set_exclusive_durations(root_event)
 
-      all_samples.select {|s| s.id.present? }.each(&:save)
+      all_spans.select {|s| s.id.present? }.each(&:save)
 
-      all_events += new_samples
+      all_events += new_spans
     end
 
 
     Backtrace.import(backtraces)
-    TransactionSampleDatum.import(all_events)
+    Span.import(all_events)
     DatabaseCall.import(database_calls)
   end
 
@@ -359,18 +359,17 @@ class AppPerfAgentWorker < ActiveJob::Base
   def process_metric_data(data)
     metric_data = []
     data.select {|d| d.first.eql?("metric") }.each do |datum|
-      _, timestamp, data = datum
+      _, timestamp, key, value, tags = datum
 
       metric = organization.metrics.where(
         :application_id => application.try(:id),
-        :data_type => data["type"],
-        :name => data["name"],
-        :label => data["label"]
+        :name => key,
       ).first_or_create
 
       metric_data << metric.metric_data.new do |metric_datum|
         metric_datum.host = host
-        metric_datum.value = data["value"]
+        metric_datum.value = value
+        metric_datum.tags = tags || {}
         metric_datum.timestamp = Time.at(timestamp)
       end
     end

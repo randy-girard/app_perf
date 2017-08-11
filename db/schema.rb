@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170728002503) do
+ActiveRecord::Schema.define(version: 20170803200634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -146,19 +146,19 @@ ActiveRecord::Schema.define(version: 20170728002503) do
     t.integer  "metric_id"
     t.datetime "timestamp"
     t.float    "value"
+    t.jsonb    "tags",      default: {}
   end
 
   add_index "metric_data", ["host_id"], name: "index_metric_data_on_host_id", using: :btree
   add_index "metric_data", ["metric_id"], name: "index_metric_data_on_metric_id", using: :btree
+  add_index "metric_data", ["tags"], name: "idx_metric_data_tags", using: :gin
 
   create_table "metrics", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
     t.string   "name"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.string   "data_type",       default: "custom"
-    t.string   "label"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.integer  "organization_id"
   end
 
@@ -186,30 +186,14 @@ ActiveRecord::Schema.define(version: 20170728002503) do
 
   add_index "organizations", ["user_id"], name: "index_organizations_on_user_id", using: :btree
 
-  create_table "traces", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.string   "trace_key"
-    t.datetime "timestamp"
-    t.float    "duration"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.integer  "organization_id"
-  end
-
-  add_index "traces", ["application_id"], name: "index_traces_on_application_id", using: :btree
-  add_index "traces", ["host_id"], name: "index_traces_on_host_id", using: :btree
-  add_index "traces", ["organization_id"], name: "index_traces_on_organization_id", using: :btree
-  add_index "traces", ["trace_key", "application_id"], name: "index_traces_on_trace_key_and_application_id", unique: true, using: :btree
-
-  create_table "transaction_sample_data", force: :cascade do |t|
+  create_table "spans", force: :cascade do |t|
     t.integer  "application_id"
     t.integer  "host_id"
     t.string   "grouping_id"
     t.string   "grouping_type"
     t.integer  "layer_id"
     t.integer  "trace_id"
-    t.string   "sample_type",        default: "web"
+    t.string   "span_type",          default: "web"
     t.string   "name"
     t.datetime "timestamp"
     t.float    "duration"
@@ -226,12 +210,28 @@ ActiveRecord::Schema.define(version: 20170728002503) do
     t.integer  "organization_id"
   end
 
-  add_index "transaction_sample_data", ["application_id"], name: "index_transaction_sample_data_on_application_id", using: :btree
-  add_index "transaction_sample_data", ["grouping_type", "grouping_id"], name: "index_transaction_sample_data_on_grouping_type_and_grouping_id", using: :btree
-  add_index "transaction_sample_data", ["host_id"], name: "index_transaction_sample_data_on_host_id", using: :btree
-  add_index "transaction_sample_data", ["layer_id"], name: "index_transaction_sample_data_on_layer_id", using: :btree
-  add_index "transaction_sample_data", ["organization_id"], name: "index_transaction_sample_data_on_organization_id", using: :btree
-  add_index "transaction_sample_data", ["trace_id"], name: "index_transaction_sample_data_on_trace_id", using: :btree
+  add_index "spans", ["application_id"], name: "index_spans_on_application_id", using: :btree
+  add_index "spans", ["grouping_type", "grouping_id"], name: "index_spans_on_grouping_type_and_grouping_id", using: :btree
+  add_index "spans", ["host_id"], name: "index_spans_on_host_id", using: :btree
+  add_index "spans", ["layer_id"], name: "index_spans_on_layer_id", using: :btree
+  add_index "spans", ["organization_id"], name: "index_spans_on_organization_id", using: :btree
+  add_index "spans", ["trace_id"], name: "index_spans_on_trace_id", using: :btree
+
+  create_table "traces", force: :cascade do |t|
+    t.integer  "application_id"
+    t.integer  "host_id"
+    t.string   "trace_key"
+    t.datetime "timestamp"
+    t.float    "duration"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "organization_id"
+  end
+
+  add_index "traces", ["application_id"], name: "index_traces_on_application_id", using: :btree
+  add_index "traces", ["host_id"], name: "index_traces_on_host_id", using: :btree
+  add_index "traces", ["organization_id"], name: "index_traces_on_organization_id", using: :btree
+  add_index "traces", ["trace_key", "application_id"], name: "index_traces_on_trace_key_and_application_id", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
@@ -283,10 +283,10 @@ ActiveRecord::Schema.define(version: 20170728002503) do
   add_foreign_key "organization_users", "organizations"
   add_foreign_key "organization_users", "users"
   add_foreign_key "organizations", "users"
+  add_foreign_key "spans", "applications"
+  add_foreign_key "spans", "hosts"
+  add_foreign_key "spans", "layers"
+  add_foreign_key "spans", "traces"
   add_foreign_key "traces", "applications"
   add_foreign_key "traces", "hosts"
-  add_foreign_key "transaction_sample_data", "applications"
-  add_foreign_key "transaction_sample_data", "hosts"
-  add_foreign_key "transaction_sample_data", "layers"
-  add_foreign_key "transaction_sample_data", "traces"
 end

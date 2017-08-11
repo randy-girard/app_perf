@@ -5,7 +5,7 @@ class DatabaseReporter < Reporter
   end
 
   def report_data
-
+    time_range, period = Reporter.time_range(params)
 
     data = application
       .database_calls
@@ -16,17 +16,29 @@ class DatabaseReporter < Reporter
 
     hash = []
     layers = {}
+    labels = []
     data.each_pair do |layer, event|
       layers[layer.first] ||= []
-      layers[layer.first] << [layer.second.to_i * 1000, event]
+      layers[layer.first] << [layer.second, event]
     end
 
     layers.each_pair do |layer, data|
-      hash.push({ :label => layer , :data => data, :id => "DATA1" }) rescue nil
+      hash.push({ :name => layer , :data => data, :id => "DATA1" }) rescue nil
     end
 
+    deployments = application
+      .deployments
+      .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
+
     {
-      :data => hash
+      :data => hash,
+      :annotations => deployments.map {|deployment|
+        {
+          :value => deployment.start_time.to_i * 1000,
+          :color => '#FF0000',
+          :width => 2
+        }
+      }
     }
   end
 

@@ -20,32 +20,38 @@ class DurationReporter < Reporter
 
     relation = application
       .layers
-      .joins("LEFT JOIN transaction_sample_data ON transaction_sample_data.layer_id = layers.id")
-      .joins("LEFT JOIN database_calls ON database_calls.uuid = transaction_sample_data.grouping_id AND transaction_sample_data.grouping_type = 'DatabaseCall'")
-      .where("transaction_sample_data.sample_type = ?", "web")
+      .joins("LEFT JOIN spans ON spans.layer_id = layers.id")
+      .joins("LEFT JOIN database_calls ON database_calls.uuid = spans.grouping_id AND spans.grouping_type = 'DatabaseCall'")
       .group("layers.name")
 
-    relation = relation.where("transaction_sample_data.domain = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("transaction_sample_data.url = ?", params[:_url]) if params[:_url]
-    relation = relation.where("transaction_sample_data.controller = ?", params[:_controller]) if params[:_controller]
-    relation = relation.where("transaction_sample_data.action = ?", params[:_action]) if params[:_action]
-    relation = relation.where("transaction_sample_data.layer_id = ?", params[:_layer]) if params[:_layer]
-    relation = relation.where("transaction_sample_data.host_id = ?", params[:_host]) if params[:_host]
+    relation = relation.where("spans.span_type = ?", "web") if params[:_layer].nil?
+
+    relation = relation.where("spans.domain = ?", params[:_domain]) if params[:_domain]
+    relation = relation.where("spans.url = ?", params[:_url]) if params[:_url]
+    relation = relation.where("spans.controller = ?", params[:_controller]) if params[:_controller]
+    relation = relation.where("spans.action = ?", params[:_action]) if params[:_action]
+    relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
+    relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]
     relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]
 
     data = relation
       .group_by_period(*report_params)
-      .calculate_all("CASE COUNT(DISTINCT trace_id) WHEN 0 THEN 0 ELSE SUM(transaction_sample_data.exclusive_duration) / COUNT(DISTINCT trace_id) END")
+      .calculate_all("CASE COUNT(DISTINCT trace_id) WHEN 0 THEN 0 ELSE SUM(spans.exclusive_duration) / COUNT(DISTINCT trace_id) END")
 
     hash = []
     layers = {}
     data.each_pair do |layer, event|
       layers[layer.first] ||= []
-      layers[layer.first] << [layer.second.to_i * 1000, event]
+      layers[layer.first] << [layer.second, event]
     end
 
     layers.each_pair do |layer, data|
-      hash.push({ :label => layer , :data => data, :id => "ID-#{layer}" }) rescue nil
+      hash.push({
+        :name => layer,
+        :data => data,
+        :color => "##{Digest::MD5.hexdigest(layer)[0..5]}",
+        :id => "ID-#{layer}"
+      }) rescue nil
     end
 
     deployments = application
@@ -54,13 +60,11 @@ class DurationReporter < Reporter
 
     {
       :data => hash,
-      :events => deployments.map {|deployment|
+      :annotations => deployments.map {|deployment|
         {
-          :min => deployment.start_time.to_i * 1000,
-          :max => deployment.end_time.to_i * 1000,
-          :eventType => "Deployment",
-          :title => deployment.title,
-          :description => deployment.description
+          :value => deployment.start_time.to_i * 1000,
+          :color => '#FF0000',
+          :width => 2
         }
       }
     }

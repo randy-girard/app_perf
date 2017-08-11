@@ -1,0 +1,45 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Overview
+  %ol.breadcrumb.breadcrumb-as-navigation
+    %li.active View Past:
+    - Reporter::PAST_OPTIONS.each do |option|
+      %li= link_to option[:label], dynamic_report_url(:past => option[:past])
+- if selected_filters.present?
+  %section.content-header
+    - selected_filters.each_pair do |key, value|
+      = link_to dynamic_report_url(:without => key), :class => "btn btn-info btn-sm", :title => value do
+        = key
+        \: #{truncate(value, :length => 40)}
+        %i.fa.fa-remove
+/ Main content
+
+%section.content
+  .row
+    %section.col-lg-12.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Average Request Time
+        .box-body
+          = react_component("AreaChart", { :refresh => 15,
+                                           :legend => "bottom",
+                                           :curve => true,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} },
+                                           :data => dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "average_duration" }) })
+
+  .row
+    %section.col-lg-6.connectedSortable
+      = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "controllers", :format => "json" }))
+      = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "urls", :format => "json" }))
+      = react_component("HostDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "hosts", :format => "json" }))
+      = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "database_calls", :format => "json" }))
+    %section.col-lg-6.connectedSortable
+      = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "layers", :format => "json" }))
+      = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "traces", :format => "json" }), :traces_url => organization_application_traces_path(@current_organization, @current_application))

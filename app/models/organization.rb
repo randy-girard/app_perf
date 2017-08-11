@@ -5,7 +5,7 @@ class Organization < ActiveRecord::Base
 
   has_many :metrics
   has_many :database_calls
-  has_many :transaction_sample_data
+  has_many :spans
   has_many :error_data
   has_many :error_messages
   has_many :database_types

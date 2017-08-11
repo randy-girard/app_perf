@@ -4,7 +4,7 @@ class Application < ActiveRecord::Base
   has_many :metrics, :dependent => :delete_all
   has_many :metric_data
   has_many :database_calls, :dependent => :delete_all
-  has_many :transaction_sample_data, :dependent => :delete_all
+  has_many :spans, :dependent => :delete_all
   has_many :error_data, :dependent => :delete_all
   has_many :error_messages, :dependent => :delete_all
   has_many :database_types, :dependent => :delete_all

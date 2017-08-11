@@ -1,5 +1,7 @@
 class Reporter
   PAST_OPTIONS = [
+    { :label => "10m", :past => 1 * 10, :period => "minute" },
+    { :label => "30m", :past => 1 * 30, :period => "minute" },
     { :label => "1h", :past => 1 * 60, :period => "minute" },
     { :label => "4h", :past => 4 * 60, :period => "minute" },
     { :label => "8h", :past => 8 * 60, :period => "hour" },
@@ -44,7 +46,7 @@ class Reporter
     []
   end
 
-  def report_params(timestamp = "transaction_sample_data.timestamp")
+  def report_params(timestamp = "spans.timestamp")
     options = { }
     options[:permit] = %w[minute hour day]
     time_range, period = Reporter.time_range(params)

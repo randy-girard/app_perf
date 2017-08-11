@@ -44,11 +44,11 @@ describe AppPerfAgentWorker do
         .to change {Application.count}.by(1)
         .and change{DatabaseType.count}.by(1)
         .and change{Trace.count}.by(2)
-        .and change{TransactionSampleDatum.count}.by(10)
+        .and change{Span.count}.by(10)
 
       trace = Trace.first
-      samples = trace.arrange_samples.dump_attribute_tree(:layer_name)
-      expect(samples).to eq([
+      spans = trace.arrange_spans.dump_attribute_tree(:layer_name)
+      expect(spans).to eq([
         "rack", {
           :children=>[
             "actioncontroller", {
@@ -57,7 +57,7 @@ describe AppPerfAgentWorker do
           ]
         }
       ])
-      expect(trace.transaction_sample_data.all? {|s| s.controller == "TestController" }).to be(true)
+      expect(trace.spans.all? {|s| s.controller == "TestController" }).to be(true)
     end
 
     it 'works with existing application' do
@@ -97,10 +97,10 @@ describe AppPerfAgentWorker do
         .to change {Application.count}.by(0)
         .and change{DatabaseType.count}.by(1)
         .and change{Trace.count}.by(1)
-        .and change{TransactionSampleDatum.count}.by(10)
+        .and change{Span.count}.by(10)
 
-      samples = Trace.first.arrange_samples.dump_attribute_tree(:layer_name)
-      expect(samples).to eq([
+      spans = Trace.first.arrange_spans.dump_attribute_tree(:layer_name)
+      expect(spans).to eq([
         "rack", {
           :children=>[
             "actioncontroller", {
@@ -109,8 +109,8 @@ describe AppPerfAgentWorker do
           ]
         }
       ])
-      samples = Trace.first.arrange_samples.dump_attribute_tree([:exclusive_duration, [:round, 5]])
-      expect(samples).to eq([
+      spans = Trace.first.arrange_spans.dump_attribute_tree([:exclusive_duration, [:round, 5]])
+      expect(spans).to eq([
         26.87812, {
           :children=>[
             112.78582, {

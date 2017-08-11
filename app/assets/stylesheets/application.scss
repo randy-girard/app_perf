@@ -5,7 +5,6 @@
  *= require bootstrap
  *= require AdminLTE
  *= require skins/_all-skins
- *= require bootstrap-wysihtml5/bootstrap3-wysihtml5
  *= require jvectormap/jquery-jvectormap-1.2.2
  *= require daterangepicker/daterangepicker
  *= require morris/morris
@@ -93,14 +92,3 @@ pre.source {
     background-color: #FFCCCC;
   }
 }
-
-.app-perf-color-1 { background-color: #df494e; border-color: #df494e; }
-.app-perf-color-2 { background-color: #68a5b7; border-color: #68a5b7; }
-.app-perf-color-3 { background-color: #8f978e; border-color: #8f978e; }
-.app-perf-color-4 { background-color: #d8b6ad; border-color: #d8b6ad; }
-.app-perf-color-5 { background-color: #677b94; border-color: #677b94; }
-.app-perf-color-6 { background-color: #677b94; border-color: #677b94; }
-.app-perf-color-7 { background-color: #66be98; border-color: #66be98; }
-.app-perf-color-8 { background-color: #fcd06d; border-color: #fcd06d; }
-.app-perf-color-9 { background-color: #f8a427; border-color: #f8a427; }
-.app-perf-color-10 { background-color: #d42b14; border-color: #d42b14; }
