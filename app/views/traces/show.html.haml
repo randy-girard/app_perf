@@ -9,7 +9,7 @@
     Trace Details
   %ol.breadcrumb
     %li= link_to "Traces", organization_application_traces_path(@current_organization, @current_application)
-    %li.active= @trace.root_span.url
+    %li.active= @trace.root_span.payload[:url]
 %section.content
   .row
     .col-lg-12.connectedSortable
@@ -47,8 +47,8 @@
               //min: #{@trace.timestamp.to_f * 1000},
               //max: #{@trace.timestamp.to_f * 1000 + @trace.duration * 1000},
               margin: {
-                  item : {
-                      horizontal : 0
+                  item: {
+                      horizontal: -1
                   }
               },
               format: {

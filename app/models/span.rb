@@ -11,6 +11,8 @@ class Span < ActiveRecord::Base
 
   delegate :name, :to => :layer, :prefix => true
 
+  serialize :payload, HashSerializer
+
   def is_query?(uuid)
     grouping_type.eql?("DatabaseCall") &&
     grouping_id.to_s.eql?(uuid)
@@ -30,8 +32,6 @@ class Span < ActiveRecord::Base
   def children
     @children ||= []
   end
-
-  serialize :payload, JSON
 
   def ancestors
     ancestors = []

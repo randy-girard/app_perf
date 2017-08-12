@@ -249,10 +249,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       span[:trace_key] = _trace_key
       span[:uuid] = SecureRandom.uuid.to_s
       span[:payload] = _opts
-      span[:url] = url
-      span[:domain] = domain
-      span[:controller] = controller
-      span[:action] = action
       span[:organization_id] = organization.id
 
       if _backtrace
@@ -272,15 +268,15 @@ class AppPerfAgentWorker < ActiveJob::Base
       next if trace.nil?
       timestamp = events.map {|e| e[:timestamp] }.min
       duration = events.map {|e| e[:duration] }.max
-      url = (events.find {|e| e[:url] } || {}).fetch(:url) { nil }
-      domain = (events.find {|e| e[:domain] } || {}).fetch(:domain) { nil }
-      controller = (events.find {|e| e[:controller] } || {}).fetch(:controller) { nil }
-      action = (events.find {|e| e[:action] } || {}).fetch(:action) { nil }
+      url = (events.find {|e| e[:payload]["url"] } || {}).fetch(:payload, {}).fetch("url") { nil }
+      domain = (events.find {|e| e[:payload]["domain"] } || {}).fetch(:payload, {}).fetch("domain") { nil }
+      controller = (events.find {|e| e[:payload]["controller"] } || {}).fetch(:payload, {}).fetch("controller") { nil }
+      action = (events.find {|e| e[:payload]["action"] } || {}).fetch(:payload, {}).fetch("action") { nil }
       events.each { |e|
-        e[:url] ||= url
-        e[:domain] ||= domain
-        e[:controller] ||= controller
-        e[:action] ||= action
+        e[:payload]["url"] ||= url
+        e[:payload]["domain"] ||= domain
+        e[:payload]["controller"] ||= controller
+        e[:payload]["action"] ||= action
         e[:trace_id] = trace.id
         e[:organization_id] = organization.id
       }

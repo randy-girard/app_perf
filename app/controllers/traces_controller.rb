@@ -2,10 +2,10 @@ class TracesController < ApplicationController
   def index
     @traces = @current_application
       .traces
-      .select("traces.*, spans.url AS url, COUNT(spans.id) AS spans_count")
+      .select("traces.*, spans.payload->>'url' AS url, COUNT(spans.id) AS spans_count")
       .joins(:spans)
       .order("timestamp DESC")
-      .group("traces.id, spans.url")
+      .group("traces.id, spans.payload->>'url'")
       .distinct
       .page(params[:page])
   end

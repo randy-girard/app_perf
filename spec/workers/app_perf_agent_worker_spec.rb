@@ -57,7 +57,7 @@ describe AppPerfAgentWorker do
           ]
         }
       ])
-      expect(trace.spans.all? {|s| s.controller == "TestController" }).to be(true)
+      expect(trace.spans.all? {|s| s.payload[:controller] == "TestController" }).to be(true)
     end
 
     it 'works with existing application' do

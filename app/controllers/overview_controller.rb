@@ -24,10 +24,10 @@ class OverviewController < ApplicationController
   def urls
     @urls = @current_application
       .spans
-      .select("domain, url, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
+      .select("spans.payload->>'domain' AS domain, spans.payload->>'url' AS url, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
       .where(:trace_id => @_traces)
-      .where("domain IS NOT NULL AND url IS NOT NULL")
-      .group("domain, url")
+      .where("spans.payload->>'domain' IS NOT NULL AND spans.payload->>'url' IS NOT NULL")
+      .group("spans.payload->>'domain', spans.payload->>'url'")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
   end
@@ -81,10 +81,10 @@ class OverviewController < ApplicationController
   def controllers
     @controllers = @current_application
       .spans
-      .where("controller IS NOT NULL AND action IS NOT NULL")
-      .select("controller, action, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
+      .where("spans.payload->>'controller' IS NOT NULL AND spans.payload->>'action' IS NOT NULL")
+      .select("spans.payload->>'controller' AS controller, spans.payload->>'action' AS action, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
       .where(:trace_id => @_traces)
-      .group("controller, action")
+      .group("spans.payload->>'controller', spans.payload->>'action'")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
   end
@@ -112,10 +112,10 @@ class OverviewController < ApplicationController
   end
 
   def with_filters(relation)
-    relation = relation.where("spans.domain = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("spans.url = ?", params[:_url]) if params[:_url]
-    relation = relation.where("spans.controller = ?", params[:_controller]) if params[:_controller]
-    relation = relation.where("spans.action = ?", params[:_action]) if params[:_action]
+    relation = relation.where("spans.payload->>'domain' = ?", params[:_domain]) if params[:_domain]
+    relation = relation.where("spans.payload->>'url' = ?", params[:_url]) if params[:_url]
+    relation = relation.where("spans.payload->>'controller' = ?", params[:_controller]) if params[:_controller]
+    relation = relation.where("spans.payload->>'action' = ?", params[:_action]) if params[:_action]
     relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]
     if params[:_sql]

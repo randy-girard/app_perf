@@ -26,10 +26,10 @@ class DurationReporter < Reporter
 
     relation = relation.where("spans.span_type = ?", "web") if params[:_layer].nil?
 
-    relation = relation.where("spans.domain = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("spans.url = ?", params[:_url]) if params[:_url]
-    relation = relation.where("spans.controller = ?", params[:_controller]) if params[:_controller]
-    relation = relation.where("spans.action = ?", params[:_action]) if params[:_action]
+    relation = relation.where("spans.payload->>'domain' = ?", params[:_domain]) if params[:_domain]
+    relation = relation.where("spans.payload->>'url' = ?", params[:_url]) if params[:_url]
+    relation = relation.where("spans.payload->>'controller' = ?", params[:_controller]) if params[:_controller]
+    relation = relation.where("spans.payload->>'action' = ?", params[:_action]) if params[:_action]
     relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]
     relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]

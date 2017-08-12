@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170803200634) do
+ActiveRecord::Schema.define(version: 20170812162234) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -200,11 +200,7 @@ ActiveRecord::Schema.define(version: 20170803200634) do
     t.float    "exclusive_duration"
     t.string   "trace_key"
     t.string   "uuid"
-    t.string   "url"
-    t.string   "domain"
-    t.string   "controller"
-    t.string   "action"
-    t.text     "payload"
+    t.jsonb    "payload"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "organization_id"
@@ -215,6 +211,7 @@ ActiveRecord::Schema.define(version: 20170803200634) do
   add_index "spans", ["host_id"], name: "index_spans_on_host_id", using: :btree
   add_index "spans", ["layer_id"], name: "index_spans_on_layer_id", using: :btree
   add_index "spans", ["organization_id"], name: "index_spans_on_organization_id", using: :btree
+  add_index "spans", ["payload"], name: "idx_spans_payload", using: :gin
   add_index "spans", ["trace_id"], name: "index_spans_on_trace_id", using: :btree
 
   create_table "traces", force: :cascade do |t|
