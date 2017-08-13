@@ -15,7 +15,6 @@ class Application < ActiveRecord::Base
   has_many :deployments
 
   validates :name, :uniqueness => { :scope => :organization_id }
-  validates :data_retention_hours, :numericality => { :greater_than => 0, :allow_nil => true }
 
   before_validation do |record|
     record.license_key ||= SecureRandom.uuid

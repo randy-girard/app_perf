@@ -32,9 +32,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       if organization
         if name.present?
           self.application = organization.applications.where(:name => name).first_or_initialize
-          if application.new_record?
-            application.data_retention_hours = DEFAULT_DATA_RETENTION_HOURS
-          end
           application.save
         end
         # We couldn't find a user, so lets find an application
@@ -63,11 +60,6 @@ class AppPerfAgentWorker < ActiveJob::Base
             process_version_2(spans)
           end
         end
-
-        # TODO: Move this to a job/cron to run for all
-        # apps on a regular basis.
-        # FIXME: Also fix this. doesn't work well.
-        # perform_data_retention_cleanup
       end
     end
   end
@@ -78,12 +70,6 @@ class AppPerfAgentWorker < ActiveJob::Base
     compressed_body = Base64.decode64(body)
     data = Zlib::Inflate.inflate(compressed_body)
     JSON.load(data)
-  end
-
-  def perform_data_retention_cleanup
-    if application
-      DataRetentionJanitor.new.perform(application.id)
-    end
   end
 
   def load_data(data)

@@ -39,7 +39,6 @@ describe AppPerfAgentWorker do
       encoded_body = Base64.encode64(compressed_body)
 
       app_perf_agent_worker = AppPerfAgentWorker.new
-      expect(app_perf_agent_worker).to receive(:perform_data_retention_cleanup).never
       expect { app_perf_agent_worker.perform(params, encoded_body) }
         .to change {Application.count}.by(1)
         .and change{DatabaseType.count}.by(1)
@@ -63,7 +62,7 @@ describe AppPerfAgentWorker do
     it 'works with existing application' do
       user = User.create(:email => "user@example.com", :password => "password")
       organization = create(:organization, :user => user)
-      application = create(:application, :organization => organization, :user => user, :name => "App Name", :data_retention_hours => nil)
+      application = create(:application, :organization => organization, :user => user, :name => "App Name")
       application.traces.create(:trace_key => "b07994fb2ece323877895abf7634479f6dfbac42")
 
       params = {
@@ -92,7 +91,6 @@ describe AppPerfAgentWorker do
       encoded_body = Base64.encode64(compressed_body)
 
       app_perf_agent_worker = AppPerfAgentWorker.new
-      expect(app_perf_agent_worker).to receive(:perform_data_retention_cleanup).never
       expect { app_perf_agent_worker.perform(params, encoded_body) }
         .to change {Application.count}.by(0)
         .and change{DatabaseType.count}.by(1)
