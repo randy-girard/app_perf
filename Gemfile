@@ -40,7 +40,7 @@ gem "sidekiq"
 gem "sucker_punch"
 gem "activerecord-import"
 gem "progressive_render"
-gem "app_perf_rpm", "0.0.3"
+gem "app_perf_rpm", "0.0.4"
 gem 'faker'
 gem "activeuuid"
 gem "oj"
@@ -48,6 +48,7 @@ gem "haml"
 gem "devise"
 gem "devise_invitable"
 gem "react-rails"
+gem 'vanilla-ujs'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

@@ -11,7 +11,7 @@
 // about supported directives.
 //
 //= require jquery
-//= require jquery_ujs
+//= require vanilla-ujs
 //= require jQueryUI/jquery-ui
 //= require axios
 //= require pace/pace
