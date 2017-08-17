@@ -40,7 +40,7 @@ gem "sidekiq"
 gem "sucker_punch"
 gem "activerecord-import"
 gem "progressive_render"
-gem "app_perf_rpm", "0.0.2"
+gem "app_perf_rpm", "0.0.3"
 gem 'faker'
 gem "activeuuid"
 gem "oj"
