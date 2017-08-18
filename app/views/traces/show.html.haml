@@ -2,7 +2,7 @@
 %style
   - @layer_names.each do |layer_name|
     - color = "#{Digest::MD5.hexdigest(layer_name)[0..5]}"
-    = ".app-perf-color-#{layer_name} { background-color: ##{color}; border-color: ##{color}; }"
+    = ".app-perf-color-#{layer_name} { background-color: ##{color}; border-color: ##{darken_hex(color)}; }"
 
 %section.content-header
   %h1
