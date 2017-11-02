@@ -6,6 +6,10 @@ class DatabaseController < ApplicationController
       .where(:timestamp => @time_range)
       .order("timestamp DESC")
       .page(params[:page])
+
+    if params[:_layer]
+      @database_calls = @database_calls.joins(:span).where("spans.layer_id = ?", params[:_layer])
+    end
   end
 
 end

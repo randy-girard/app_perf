@@ -5,7 +5,9 @@ gem 'dotenv-rails'
 gem 'rails', '4.2.5.2'
 # Use sqlite3 as the database for Active Record
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails'
+gem 'sassc-rails'
+gem 'bootstrap-sass'
 # gem 'sassc-rails' # Doesn't compile on old OS
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -32,6 +34,8 @@ gem 'kaminari'
 gem "groupdate"
 gem 'calculate-all'
 gem "pg"
+gem "pg_histogram"
+gem "postgres_ext"
 gem 'foundation-rails'
 gem "font-awesome-rails"
 gem "highcharts-rails"
@@ -39,7 +43,6 @@ gem 'sinatra', :require => nil
 gem "sidekiq"
 gem "sucker_punch"
 gem "activerecord-import"
-gem "progressive_render"
 gem "app_perf_rpm"
 gem 'faker'
 gem "activeuuid"

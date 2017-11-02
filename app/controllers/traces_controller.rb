@@ -2,11 +2,10 @@ class TracesController < ApplicationController
   def index
     @traces = @current_application
       .traces
-      .select("traces.*, spans.payload->>'url' AS url, COUNT(spans.id) AS spans_count")
-      .joins(:spans)
-      .order("timestamp DESC")
-      .group("traces.id, spans.payload->>'url'")
-      .distinct
+      .includes(:root_span)
+      .where("traces.duration IS NOT NULL")
+      .where("traces.timestamp IS NOT NULL")
+      .order("traces.timestamp DESC")
       .page(params[:page])
   end
 
@@ -19,12 +18,12 @@ class TracesController < ApplicationController
       .where(:trace_key => params[:id])
       .first
     @spans = @trace.spans.sort_by(&:timestamp)
-    @span = @spans.find {|s| s.id == params[:sample_id].to_i }
+    @span = @spans.find {|s| s.id == params[:span_id].to_i }
 
     @database_calls = @current_application
       .database_calls
       .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
-      .joins(:database_span)
+      .joins(:span)
       .where(:spans => { :id => @spans })
       .group("database_calls.statement")
 
@@ -46,15 +45,12 @@ class TracesController < ApplicationController
           :content => "",
           :start => span.timestamp.to_f * 1000,
           :end => (span.timestamp.to_f * 1000) + duration.to_f,
-          :className => "app-perf-color-#{layer_name}"
+          :className => "app-perf-color-#{layer_name}#{span.has_error? ? " span-error" : ""}"
         }
         item_index += 1
       end
       group_index += 1
     end
-
-
-    @root_with_children = @trace.arrange_spans
   end
 
   def database
@@ -67,7 +63,7 @@ class TracesController < ApplicationController
     @database_calls = @current_application
       .database_calls
       .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
-      .joins(:database_span)
+      .joins(:span)
       .where(:spans => { :id => @spans })
       .group("database_calls.statement")
     render :layout => false

@@ -1,21 +1,15 @@
 // Place all the styles related to the Applications controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-/*
- *= require bootstrap
- *= require AdminLTE
- *= require skins/_all-skins
- *= require jvectormap/jquery-jvectormap-1.2.2
- *= require daterangepicker/daterangepicker
- *= require morris/morris
- *= require timepicker/bootstrap-timepicker
- *= require datepicker/datepicker3
- *= require pace/pace
- *= require vis/vis
- *= require_self
- */
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "adminlte/AdminLTE";
+@import "adminlte/skins/skin-blue";
+@import "pace/pace";
+@import "vis/vis";
+@import "daterangepicker/daterangepicker";
 
- .table tbody tr.success > td {
+.table tbody tr.success > td {
   background-color: #dff0d8 !important;
 }
 

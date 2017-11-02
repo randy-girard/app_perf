@@ -21,7 +21,7 @@ Rails.application.routes.draw do
       end
     end
     resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do
-      resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts] do
+      resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts, :percentiles, :distributions] do
         member do
           get :urls
           get :layers
@@ -29,6 +29,8 @@ Rails.application.routes.draw do
           get :hosts
           get :controllers
           get :traces
+          get :percentiles
+          get :distributions
         end
       end
 

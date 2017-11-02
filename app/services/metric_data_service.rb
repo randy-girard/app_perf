@@ -88,6 +88,7 @@ class MetricDataService
     end
 
     data = data.group_by_period(period, "timestamp", options)
+    
     if params[:group] == "name"
       data.group("name")
     elsif params[:group].present?

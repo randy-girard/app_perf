@@ -14,10 +14,15 @@
           %table.table.table-condensed
             %tr
               %th Name
+              %th Activity
               %th CPU Usage
             - @hosts.each do |host|
               %tr
                 %td= link_to host.name, organization_host_path(@current_organization, host)
+                %td
+                  - if last_metric_activity = host.last_metric_activity
+                    = time_ago_in_words(last_metric_activity)
+                    ago
                 %td
                   - if host.cpu_usage
                     .progress

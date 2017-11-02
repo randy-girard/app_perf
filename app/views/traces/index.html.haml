@@ -23,8 +23,7 @@
             - @traces.each do |trace|
               %tr
                 %td.ellipsis
-                  = link_to trace.url, organization_application_trace_path(@current_organization, @current_application, :id => trace.trace_key)
-                  (#{trace.spans_count.to_i})
+                  = link_to trace.root_span.tag("http.url"), organization_application_trace_path(@current_organization, @current_application, :id => trace.trace_key)
                 %td.text-center= number_with_precision(trace.duration, :precision => 2)
                 %td.text-center
                   = time_ago_in_words(trace.timestamp)

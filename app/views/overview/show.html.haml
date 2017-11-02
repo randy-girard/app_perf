@@ -24,7 +24,7 @@
           %h3.box-title Average Request Time
         .box-body
           = react_component("AreaChart", { :refresh => 15,
-                                           :legend => "bottom",
+                                           :legend => true,
                                            :curve => true,
                                            :library => { :chart => { :zoomType => "x" },
                                                          :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
@@ -36,10 +36,39 @@
 
   .row
     %section.col-lg-6.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Latency
+        .box-body
+          = react_component("LineChart", { :refresh => 15,
+                                           :legend => false,
+                                           :height => 200,
+                                           :curve => true,
+                                           :points => false,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} },
+                                           :data => dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "percentiles" }) })
+
       = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "controllers", :format => "json" }))
       = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "urls", :format => "json" }))
       = react_component("HostDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "hosts", :format => "json" }))
       = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "database_calls", :format => "json" }))
     %section.col-lg-6.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Latency Distribution
+        .box-body
+          = react_component("ColumnChart", { :refresh => 15,
+                                             :height => 200,
+                                             :legend => false,
+                                             :library => { :xAxis => { :labels => { :enabled => false } } },
+                                             :data => dynamic_report_url({}, { :controller => "overview", :action => "distributions", :format => "json" }) })
+
       = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "layers", :format => "json" }))
       = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :controller => "overview", :action => "traces", :format => "json" }), :traces_url => organization_application_traces_path(@current_organization, @current_application))

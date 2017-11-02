@@ -4,14 +4,46 @@ class Span < ActiveRecord::Base
   belongs_to :host
   belongs_to :grouping, :primary_key => :uuid, :polymorphic => true
   belongs_to :layer
-  belongs_to :trace
+  belongs_to :trace, :primary_key => :trace_key
 
-  has_one :database_call, :foreign_key => :uuid, :primary_key => :grouping_id
+  belongs_to :parent, :primary_key => :uuid, :class_name => "Span"
+  has_many :children, :primary_key => :uuid, :foreign_key => :parent_id, :class_name => "Span"
+
+  has_many :log_entries, :primary_key => :uuid
+
+  has_one :database_call, :primary_key => :uuid
   has_one :backtrace, :as => :backtraceable, :primary_key => :uuid
+  has_one :error, :primary_key => :uuid, :class_name => "ErrorDatum"
 
   delegate :name, :to => :layer, :prefix => true
 
   serialize :payload, HashSerializer
+
+  def tags
+    payload
+  end
+
+  def has_error?
+    tag("error") == true
+  end
+
+  def tag(key)
+    if payload.is_a?(Hash)
+      payload[key.to_s]
+    else
+      nil
+    end
+  end
+
+  # TODO: Fix this eval issue.
+  def source
+    @log_entry ||= log_entries.where(:event => "source").first
+    @log_entry["fields"]["stack"] || @log_entry["fields"][":stack"]
+  end
+
+  def is_root?
+    parent_id == nil
+  end
 
   def is_query?(uuid)
     grouping_type.eql?("DatabaseCall") &&
@@ -19,18 +51,11 @@ class Span < ActiveRecord::Base
   end
 
   def end
-    timestamp + duration
+    timestamp.to_f + duration.to_f
   end
 
-  attr_accessor :parent, :children
-  def add_child(child)
-    child.parent = self
-    self.children ||= []
-    self.children << child
-  end
-
-  def children
-    @children ||= []
+  def exclusive_duration
+    duration - children.inject(0.0) { |sum, child| sum + child.duration }
   end
 
   def ancestors

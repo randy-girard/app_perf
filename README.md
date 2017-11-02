@@ -2,12 +2,6 @@
 
 [![Build Status](https://travis-ci.org/randy-girard/app_perf.svg?branch=master)](https://travis-ci.org/randy-girard/app_perf)
 
-### Demo
-
-There is an instance of this running at https://app-perf.herokuapp.com. Please note that there is a low data retention setting so that it doesn't go over the allowed total row count with Heroku.
-
-To log in use the email address of "user@example.com" and a password of "password".
-
 **More images are at the bottom.**
 
 ![Overview](/doc/overview.png?raw=true "Overview")
@@ -50,7 +44,7 @@ App Perf will automatically detect new applications that are posting data and di
 In order to monitor an application, you have to add the Ruby Agent gem to the Gemfile:
 
 ```
-gem "app_perf_rpm", :git => "git@github.com:randy-girard/app_perf_rpm"
+gem "app_perf_rpm"
 ```
 
 Once you have add the gem, Add the following lines to your project (or in an initializer):
@@ -66,6 +60,21 @@ end
 
 You can get your license key by visiting the Applications tab and clicking the "New Application" button.
 
+## Adding servers
+
+Install the App Perf Agent gem:
+```
+gem install app_perf_agent
+```
+
+Then run the following command on your server:
+
+```
+app_perf_agent --license LICENSE_KEY --host HOST
+```
+
+More information is on the Edit Organization page.
+
 ## How the data model works
 
 Adding metrics to App Perf is as simple as posting data to the following endpoint:
@@ -76,9 +85,9 @@ Currently the only protocol version supported is 2. License key is generated whe
 
 ##### TODO: Add examples of how to submit data.
 
-## Contributing to the App Perf Ruby Agent
+## Contributing to the App Perf RPM or Agent
 
-Clone the github project at https://github.com/randy-girard/app_perf_rpm somewhere locally, then run the following command to force bundler to look at that specific path:
+Clone the github project at https://github.com/randy-girard/app_perf_rpm or https://github.com/randy-girard/app_perf_agent somewhere locally, then run the following command for the RPM to force bundler to look at that specific path:
 
 ```
 bundle config local.app_perf_rpm /path/to/local/app_perf_rpm
@@ -89,10 +98,10 @@ To remove this configuration, run the following command:
 bundle config --delete local.app_perf_rpm
 ```
 
-![Trace](/doc/trace.png?raw=true "Overview")
+![Trace](/doc/trace.png?raw=true "Traces")
 
-![Database](/doc/database.png?raw=true "Overview")
+![Database](/doc/database.png?raw=true "Database")
 
-![Metrics](/doc/metrics.png?raw=true "Overview")
+![Host](/doc/hosts.png?raw=true "Hosts")
 
 ![Error](/doc/error.png?raw=true "Overview")
