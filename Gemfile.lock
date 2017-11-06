@@ -43,8 +43,9 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    app_perf_rpm (0.0.5)
-      oj (= 3.3.2)
+    app_perf_rpm (0.0.6)
+      oj
+      opentracing (= 0.3.1)
     arel (6.0.4)
     autoprefixer-rails (7.1.1.2)
       execjs
@@ -169,7 +170,8 @@ GEM
     net-ssh (3.2.0)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
-    oj (3.3.2)
+    oj (3.3.9)
+    opentracing (0.3.1)
     orm_adapter (0.5.0)
     passenger (5.1.4)
       rack
