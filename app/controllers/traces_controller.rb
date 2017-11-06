@@ -11,28 +11,35 @@ class TracesController < ApplicationController
 
   def show
     @database_call = params[:query]
-    @layer_names = @current_application.layers.pluck(:name)
-    @trace = @current_application
+    @layer_names = @current_organization.layers.pluck(:name)
+    @trace = @current_organization
       .traces
       .includes(:spans => :layer)
       .where(:trace_key => params[:id])
       .first
     @spans = @trace.spans.sort_by(&:timestamp)
-    @span = @spans.find {|s| s.id == params[:span_id].to_i }
+    @span = @spans.find {|s| s.id == params[:span_id] }
 
     @database_calls = @current_application
       .database_calls
       .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
       .joins(:span)
-      .where(:spans => { :id => @spans })
+      .where(:spans => { :id => @trace.spans.select(:id) })
       .group("database_calls.statement")
 
     group_index = 0
     item_index = 0
     @groups = []
     @items = []
-    @spans.group_by {|s| s.layer.name }.each_pair do |layer_name, spans|
-      @groups << { :id => group_index, :content => layer_name, :value => group_index + 1 }
+    @spans.group_by {|s| [s.application, s.layer.name] }.each_pair do |(application, layer_name), spans|
+
+      content = []
+      if @current_application.name != application.name
+        content << view_context.link_to(application.name, organization_application_trace_path(@current_organization, application, @trace.trace_key))
+      end
+      content << layer_name
+
+      @groups << { :id => group_index, :content => content.join(": "), :value => group_index + 1 }
       spans.each do |span|
         if layer_name == "rack-middleware"
           duration = span.exclusive_duration

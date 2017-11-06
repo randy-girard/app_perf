@@ -21,7 +21,7 @@ describe TracesController, :type => :controller do
     it 'works' do
       organization = create(:organization, :user => subject.current_user)
       application = create(:application, :organization => organization)
-      trace = create(:trace, :application => application)
+      trace = create(:trace, :organization => organization, :application => application)
 
       get :show, :organization_id => organization, :application_id => application, :id => trace.trace_key
 

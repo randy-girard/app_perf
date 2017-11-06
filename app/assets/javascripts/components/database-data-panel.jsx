@@ -15,7 +15,7 @@ window.DatabaseDataPanel = React.createClass({
               <a href={db_url}>{datum.statement}</a>
             </td>
             <td width="100" key={`host-${datum.id}-2`}>{datum.freq}</td>
-            <td width="100" key={`host-${datum.id}-3`}>{datum.avg.toFixed(2)}</td>
+            <td width="100" key={`host-${datum.id}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })

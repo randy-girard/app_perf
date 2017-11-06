@@ -21,10 +21,22 @@ describe OpenTracingWorker do
         .and change { LogEntry.count }.by(14)
         .and change { Trace.count }.by(2)
 
-      span = Span.find_by_uuid("67a169f8dc7c355d")
-      expect(span.source.to_s.length).to eq(2)
-      expect(span.backtrace.backtrace.to_s.length).to eq(500)
-      expect(span.duration).to eq(2.39777565002441)
+      data = [
+        ["6445831bae7fcafe", 2, 500, 5138.04697990417, 11.208057403559906],
+        ["5be9cc485d202d0", 2, 4716, 5126.83892250061, 11.83009147643861],
+        ["7dc84d604a73ad78", 316, 8985, 10.3209018707275, 10.3209018707275],
+        ["762f86b1c423dce2", 809, 9096, 12.437105178833, 12.437105178833],
+        ["31e8c10792c9ce0b", 828, 9095, 11.9228363037109, 11.9228363037109],
+        ["a5f32654a51d6ffa", 623, 9068, 5080.3279876709, 5080.3279876709],
+        ["67a169f8dc7c355d", 2, 500, 2.39777565002441, 2.39777565002441]
+      ]
+      data.each_with_index do |datum, index|
+        span = Span.find_by_uuid(datum[0])
+        expect(span.source.to_s.length).to eq(datum[1])
+        expect(span.backtrace.backtrace.to_s.length).to eq(datum[2])
+        expect(span.duration).to eq(datum[3])
+        expect(span.exclusive_duration).to eq(datum[4])
+      end
     end
 
     it "should process log entry as error" do
@@ -51,44 +63,30 @@ describe OpenTracingWorker do
       expect(span.backtrace.backtrace.to_s.length).to eq(4716)
       expect(span.duration).to eq(45.8791255950928)
       expect(span.error).to eq(ErrorDatum.last)
-
-    end
-  end
-
-  describe "children_duration" do
-    it "should sum up durations" do
-      children = [
-        { "duration" => 1000 },
-        { "duration" => 2000 },
-        { "duration" => 3000 }
-      ]
-
-      worker = OpenTracingWorker.new
-      expect(worker.send(:children_duration, children)).to eq(6.0)
     end
   end
 
   describe "#span_children_data" do
     it "should gather children" do
-      span = Span.new(:uuid => "1")
+      span = { "id" => "1" }
       data = [
-        { "id" => "1", "parentId" => "1" },
-        { "id" => "2", "parentId" => "2" },
-        { "id" => "3", "parentId" => "3" },
-        { "id" => "4", "parentId" => "1" }
+        { "id" => "2", "parentId" => "1" },
+        { "id" => "3", "parentId" => "2" },
+        { "id" => "4", "parentId" => "3" },
+        { "id" => "5", "parentId" => "1" }
       ]
 
       worker = OpenTracingWorker.new
       expect(worker.send(:span_children_data, span, data)).to eq([
-        { "id" => "1", "parentId" => "1" },
-        { "id" => "4", "parentId" => "1" }
+        { "id" => "2", "parentId" => "1" },
+        { "id" => "5", "parentId" => "1" }
       ])
     end
   end
 
   describe "#get_exclusive_duration" do
-    it "should calculate exclusive duration properly" do
-      span = Span.new(:uuid => "1", :duration => 6.0)
+    it "should not infinite loop if child and span have same id" do
+      span = { "id" => "1", "duration" => 6000 }
       data = [
         { "id" => "1", "parentId" => "1", "duration" => 1000 },
         { "id" => "2", "parentId" => "2", "duration" => 2000 },
@@ -97,7 +95,20 @@ describe OpenTracingWorker do
       ]
 
       worker = OpenTracingWorker.new
-      expect(worker.send(:get_exclusive_duration, span, data)).to eq(1.0)
+      expect(worker.send(:get_exclusive_duration, span, data)).to eq(2000)
+    end
+
+    it "should calculate exclusive duration properly" do
+      span = { "id" => "1", "duration" => 10000 }
+      data = [
+        { "id" => "2", "parentId" => "1", "duration" => 1000 }, # 0
+        { "id" => "3", "parentId" => "2", "duration" => 3000 }, # 1000
+        { "id" => "4", "parentId" => "3", "duration" => 2000 }, # 2000
+        { "id" => "5", "parentId" => "1", "duration" => 4000 }  # 4000
+      ]
+
+      worker = OpenTracingWorker.new
+      expect(worker.send(:get_exclusive_duration, span, data)).to eq(5000)
     end
   end
 end

@@ -1,4 +1,6 @@
 class Span < ActiveRecord::Base
+  include ActiveUUID::UUID
+
   belongs_to :organization
   belongs_to :application
   belongs_to :host
@@ -35,10 +37,9 @@ class Span < ActiveRecord::Base
     end
   end
 
-  # TODO: Fix this eval issue.
   def source
-    @log_entry ||= log_entries.where(:event => "source").first
-    @log_entry["fields"]["stack"] || @log_entry["fields"][":stack"]
+    @log_entry ||= log_entries.where(:event => "source").first || LogEntry.new
+    @log_entry.fields.fetch("stack", nil) || @log_entry.fields.fetch(":stack", nil)
   end
 
   def is_root?
@@ -69,19 +70,19 @@ class Span < ActiveRecord::Base
   end
 
   def send_chain(arr)
-    Array(arr).inject(self) { |o, a| o.send(*a) }
+    Array(arr).inject({}) { |o, a| o.merge(a => self.send(a)) }
   end
 
-  def dump_attribute_tree(attribute = :id)
+  def dump_attribute_tree(attributes = [:id])
     if children.present?
       [
-        self.send_chain(attribute),
+        self.send_chain(attributes),
         :children => children.map {|c|
-          c.dump_attribute_tree(attribute)
+          c.dump_attribute_tree(attributes)
         }.flatten
       ]
     else
-      [self.send_chain(attribute)]
+      [self.send_chain(attributes)]
     end
   end
 

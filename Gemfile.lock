@@ -30,8 +30,8 @@ GEM
       activemodel (= 4.2.5.2)
       activesupport (= 4.2.5.2)
       arel (~> 6.0)
-    activerecord-import (0.13.0)
-      activerecord (>= 3.0)
+    activerecord-import (0.20.2)
+      activerecord (>= 3.2)
     activesupport (4.2.5.2)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -139,7 +139,7 @@ GEM
       tilt
     highcharts-rails (4.2.5)
       railties (>= 3.1)
-    i18n (0.9.0)
+    i18n (0.9.1)
       concurrent-ruby (~> 1.0)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
@@ -171,6 +171,9 @@ GEM
       mini_portile2 (~> 2.3.0)
     oj (3.3.2)
     orm_adapter (0.5.0)
+    passenger (5.1.4)
+      rack
+      rake (>= 0.8.1)
     pg (0.18.4)
     pg_array_parser (0.0.9)
     pg_histogram (0.3)
@@ -348,11 +351,11 @@ DEPENDENCIES
   jquery-rails
   kaminari
   oj
+  passenger
   pg
   pg_histogram
   postgres_ext
   pry
-  puma
   rails (= 4.2.5.2)
   react-rails
   rspec-rails

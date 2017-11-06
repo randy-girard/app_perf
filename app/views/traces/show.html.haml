@@ -10,7 +10,7 @@
     Trace Details
   %ol.breadcrumb
     %li= link_to "Traces", organization_application_traces_path(@current_organization, @current_application)
-    %li.active= @trace.root_span.tag(:url)
+    %li.active= @trace.root_span.tag("http.url")
 %section.content
   .row
     .col-lg-12.connectedSortable

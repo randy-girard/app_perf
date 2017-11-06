@@ -16,7 +16,7 @@ window.ControllerDataPanel = React.createClass({
               <a href={action}>{datum.action}</a>
             </td>
             <td width="100" key={`controller-${index}-2`}>{datum.freq}</td>
-            <td width="100" key={`controller-${index}-3`}>{datum.avg.toFixed(2)}</td>
+            <td width="100" key={`controller-${index}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })

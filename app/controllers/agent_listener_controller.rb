@@ -7,7 +7,7 @@ class AgentListenerController < ApplicationController
   skip_before_action :verify_authenticity_token, :authenticate_user!
 
   def create
-    AppPerfRpm.without_tracing do
+    #AppPerfRpm.without_tracing do
       params.permit!
 
       request.body.rewind
@@ -20,6 +20,6 @@ class AgentListenerController < ApplicationController
       end
 
       render :text => "", :status => :ok
-    end
+    #end
   end
 end

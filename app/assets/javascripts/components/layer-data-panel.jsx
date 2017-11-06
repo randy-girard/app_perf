@@ -11,7 +11,7 @@ window.LayerDataPanel = React.createClass({
               <a href={url}>{datum.name}</a>
             </td>
             <td width="100" key={`layer-${datum.id}-2`}>{datum.freq}</td>
-            <td width="100" key={`layer-${datum.id}-3`}>{datum.avg.toFixed(2)}</td>
+            <td width="100" key={`layer-${datum.id}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })

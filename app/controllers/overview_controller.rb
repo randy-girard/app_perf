@@ -42,9 +42,14 @@ class OverviewController < ApplicationController
   def urls
     @urls = @current_application
       .spans
-      .select("spans.payload->>'peer.address' AS domain, spans.payload->>'http.url' AS url, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
+      .select("
+        spans.payload->>'peer.address' AS domain,
+        spans.payload->>'http.url' AS url,
+        COUNT(DISTINCT traces.id) AS freq,
+        SUM(traces.duration) / COUNT(traces.id) AS average")
       .where(:trace_id => @_traces.select(:trace_key))
       .where("spans.payload->>'peer.address' IS NOT NULL AND spans.payload->>'http.url' IS NOT NULL")
+      .joins(:trace)
       .group("spans.payload->>'peer.address', spans.payload->>'http.url'")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
@@ -52,14 +57,18 @@ class OverviewController < ApplicationController
 
   def layers
     orders = {
-      "Freq" => "COUNT(trace_id) DESC",
-      "Avg" => "(SUM(exclusive_duration) / COUNT(trace_id)) DESC",
-      "FreqAvg" => "(COUNT(trace_id) * SUM(exclusive_duration) / COUNT(trace_id)) DESC"
+      "Freq" => "COUNT(DISTINCT spans.uuid) DESC",
+      "Avg" => "(SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC",
+      "FreqAvg" => "(COUNT(DISTINCT spans.id) * SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC"
     }
 
     @layers = @current_application
       .layers
-      .select("layers.id, layers.name, COUNT(trace_id) AS freq, SUM(exclusive_duration) / COUNT(trace_id) AS average")
+      .select("
+        layers.id,
+        layers.name,
+        COUNT(DISTINCT spans.uuid) AS freq,
+        SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid) AS average")
       .joins(:spans)
       .where(:spans => { :trace_id => @_traces.select(:trace_key) })
       .order(orders[params[:_order]] || orders["FreqAvg"])
@@ -101,8 +110,13 @@ class OverviewController < ApplicationController
       .spans
       .where("length(split_part(spans.operation_name, '#', 1)) > 0")
       .where("length(split_part(spans.operation_name, '#', 2)) > 0")
-      .select("split_part(spans.operation_name, '#', 1) AS controller, split_part(spans.operation_name, '#', 2) as action, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
+      .select("
+        split_part(spans.operation_name, '#', 1) AS controller,
+        split_part(spans.operation_name, '#', 2) as action,
+        COUNT(DISTINCT traces.id) AS freq,
+        SUM(traces.duration) / COUNT(traces.id) AS average")
       .where(:trace_id => @_traces.select(:trace_key))
+      .joins(:trace)
       .group("split_part(spans.operation_name, '#', 1), split_part(spans.operation_name, '#', 2)")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
@@ -111,8 +125,12 @@ class OverviewController < ApplicationController
   def hosts
     @hosts = @current_organization
       .hosts
-      .select("hosts.id, hosts.name, COUNT(DISTINCT trace_id) AS freq, SUM(exclusive_duration) / COUNT(DISTINCT trace_id) AS average")
-      .joins(:spans)
+      .select("
+        hosts.id,
+        hosts.name,
+        COUNT(DISTINCT traces.id) AS freq,
+        SUM(traces.duration) / COUNT(traces.id) AS average")
+      .joins(:spans => :trace)
       .where(:spans => { :trace_id => @_traces.select(:trace_key) })
       .where("hosts.name IS NOT NULL")
       .group("hosts.id, hosts.name")

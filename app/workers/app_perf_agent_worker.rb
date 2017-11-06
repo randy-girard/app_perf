@@ -12,7 +12,7 @@ class AppPerfAgentWorker < ActiveJob::Base
                 :protocol_version
 
   def perform(params, body)
-    AppPerfRpm.without_tracing do
+    #AppPerfRpm.without_tracing do
       json = decompress_params(body)
 
       self.license_key      = params.fetch("license_key") { nil }
@@ -62,7 +62,7 @@ class AppPerfAgentWorker < ActiveJob::Base
           end
         end
       end
-    end
+    #end
   end
 
   private

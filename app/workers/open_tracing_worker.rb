@@ -1,3 +1,5 @@
+require 'securerandom'
+
 class OpenTracingWorker < ActiveJob::Base
   queue_as :app_perf
 
@@ -11,7 +13,7 @@ class OpenTracingWorker < ActiveJob::Base
                 :protocol_version
 
   def perform(params, body)
-    AppPerfRpm.without_tracing do
+    #AppPerfRpm.without_tracing do
       license_key      = params.fetch("license_key") { nil }
       protocol_version = params.fetch("protocol_version") { nil }
 
@@ -35,7 +37,7 @@ class OpenTracingWorker < ActiveJob::Base
           process_data(layers, data)
         end
       end
-    end
+    #end
   end
 
   private
@@ -79,6 +81,7 @@ class OpenTracingWorker < ActiveJob::Base
   end
 
   def process_data(layers, data)
+    data = set_exclusive_durations(data)
     spans = build_spans(layers, data)
     log_entries = build_log_entries(data)
     backtraces = build_backtraces(log_entries)
@@ -115,6 +118,7 @@ class OpenTracingWorker < ActiveJob::Base
   def build_spans(layers, data)
     data.map {|datum|
       span = Span.new
+      # span.id = SecureRandom.uuid.to_s
       span.organization_id = organization.id
       span.application_id = application.id
       span.host_id = host.id
@@ -127,7 +131,7 @@ class OpenTracingWorker < ActiveJob::Base
       span.timestamp = Time.at(datum["timestamp"].to_f)
       span.duration = datum["duration"].to_f
       span.payload = datum["tags"]
-      span.exclusive_duration = get_exclusive_duration(span, data)
+      span.exclusive_duration = datum["exclusiveDuration"].to_f
       span
     }
   end
@@ -237,19 +241,38 @@ class OpenTracingWorker < ActiveJob::Base
       }
   end
 
+  def set_exclusive_durations(data)
+    data.map {|datum|
+      datum["exclusiveDuration"] = get_exclusive_duration(datum, data)
+      datum
+    }
+  end
+
   def get_exclusive_duration(span, data)
+    # return the exclusive duration if we already set it on this span.
+    #return span["exclusiveDuration"] if span.has_key?("exclusiveDuration")
+
+    # does this span have any children?
     children = span_children_data(span, data)
-    span.duration - (children.size > 0 ? children_duration(children) : 0)
+    children_duration = if children.size > 0
+
+      # if the span has children, sum up the durations.
+      Array(children).inject(0) do |sum, child|
+        sum + child["duration"]
+      end
+    else
+      # If the span doesn't have any children, then the exclusive duration
+      # is 0. We will subtract this from the duration later to make the
+      # exclusive duration equal to the duration.
+      0
+    end
+    span["duration"] - children_duration
   end
 
   def span_children_data(span, data)
     data
-      .select {|datum| datum["parentId"] == span.uuid }
-  end
-
-  def children_duration(children)
-    children
-      .map {|datum| datum["duration"].to_f / 1000 }
-      .inject(0) {|sum, x| sum + x }
+      .select {|datum| datum["id"] != span["id"] }
+      .select {|datum| datum["parentId"] != nil }
+      .select {|datum| datum["parentId"] == span["id"] }
   end
 end
