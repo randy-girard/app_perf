@@ -21,18 +21,23 @@ class DurationReporter < Reporter
     relation = application
       .layers
       .joins("LEFT JOIN spans ON spans.layer_id = layers.id")
-      .joins("LEFT JOIN database_calls ON database_calls.uuid = spans.grouping_id AND spans.grouping_type = 'DatabaseCall'")
-      .group("layers.name")
+      .joins("LEFT JOIN traces ON spans.trace_id = traces.trace_key")
+      .joins("LEFT JOIN database_calls ON database_calls.span_id = spans.uuid")
 
-    relation = relation.where("spans.span_type = ?", "web") if params[:_layer].nil?
-
-    relation = relation.where("spans.payload->>'domain' = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("spans.payload->>'url' = ?", params[:_url]) if params[:_url]
-    relation = relation.where("spans.payload->>'controller' = ?", params[:_controller]) if params[:_controller]
-    relation = relation.where("spans.payload->>'action' = ?", params[:_action]) if params[:_action]
+    relation = relation.where("spans.payload->>'peer.address' = ?", params[:_domain]) if params[:_domain]
+    relation = relation.where("spans.payload->>'http.url' = ?", params[:_url]) if params[:_url]
+    if params[:_controller]
+      controllers = relation.where("split_part(spans.operation_name, '#', 1) = ?", params[:_controller])
+      relation = relation.where(:traces => { :trace_key => controllers.select(:trace_id) })
+    end
+    if params[:_action]
+      actions = relation.where("split_part(spans.operation_name, '#', 2) = ?", params[:_action])
+      relation = relation.where(:traces => { :trace_key => actions.select(:trace_id) })
+    end
     relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]
     relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]
+    relation = relation.group("layers.name")
 
     data = relation
       .group_by_period(*report_params)

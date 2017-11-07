@@ -16,7 +16,7 @@ window.UrlDataPanel = React.createClass({
               <a href={url}>{datum.url}</a>
             </td>
             <td width="100" key={`url-${index}-2`}>{datum.freq}</td>
-            <td width="100" key={`url-${index}-3`}>{datum.avg.toFixed(2)}</td>
+            <td width="100" key={`url-${index}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })

@@ -1,36 +1,43 @@
 .box
   .box-header
     %h3.box-title
-      Sample Detail (#{number_with_precision(@span.duration, :precision => 2)}ms)
+      = @span.operation_name
+      Span Detail
+      (#{number_with_precision(@span.duration, :precision => 2)}ms,
+      #{number_with_precision(@span.exclusive_duration, :precision => 2)}ms exclusive)
   .box-body
     .nav-tabs-custom
       %ul.nav.nav-tabs
         %li.active
-          %a{"data-toggle" => "tab", :href => "#sample-overview"} Overview
-        - if @span.payload["source"].present?
+          %a{"data-toggle" => "tab", :href => "#span-overview"} Overview
+        - if @span.source.present?
           %li
-            %a{"data-toggle" => "tab", :href => "#sample-source"} Source
+            %a{"data-toggle" => "tab", :href => "#span-source"} Source
         - if (backtrace = @span.backtrace) && backtrace.backtrace.present?
           %li
-            %a{"data-toggle" => "tab", :href => "#sample-backtrace"} Backtrace
+            %a{"data-toggle" => "tab", :href => "#span-backtrace"} Backtrace
+        - if @span.has_error?
+          %li
+            %a{"data-toggle" => "tab", :href => "#span-error"} Error
       .tab-content
-        #sample-overview.tab-pane.active
-          - @span.attributes.each_pair do |key, value|
-            %div
-              = key
-              \:
-              - if value.is_a?(Hash)
-                - value.except("source").each_pair do |subkey, subvalue|
-                  %div
-                        #{subkey}: #{subvalue}
-              - else
-                - if key.eql?("timestamp")
-                  = value.to_f * 1000
-                - else
-                  = value.inspect
-        - if @span.payload["source"].present?
-          #sample-source.tab-pane
-            = render "shared/render_source", :source => @span.payload["source"]
+        #span-overview.tab-pane.active
+          %table.table.table-striped.table-condensed
+            - @span.tags.sort_by {|k,v| k }.each do |key, value|
+              %tr
+                %td{:width => "200"}
+                  %strong
+                    = key
+                %td
+                  = value
+        - if @span.source.present?
+          #span-source.tab-pane
+            = render "shared/render_source", :source => @span.source
         - if @span.backtrace.present?
-          #sample-backtrace.tab-pane
+          #span-backtrace.tab-pane
             %pre.text-wrap= @span.backtrace.backtrace.join("\n")
+        - if @span.has_error?
+          #span-error.tab-pane
+            %strong
+              = "#{@span.error.error_message.error_class}:"
+              = @span.error.message
+            %pre.text-wrap= @span.error.backtrace.join("\n")

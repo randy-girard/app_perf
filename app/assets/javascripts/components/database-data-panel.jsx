@@ -4,14 +4,18 @@ window.DatabaseDataPanel = React.createClass({
 
     return (
       data.map(function(datum, index) {
-        url = updateQueryStringParameter(baseURI, "_sql", datum.id);
+        layer_url = updateQueryStringParameter(baseURI, "_layer", datum.layer_id);
+        db_url = updateQueryStringParameter(baseURI, "_sql", datum.id);
         return (
           <tr key={`host-${datum.id}`}>
             <td className="ellipsis" key={`host-${datum.id}-0`}>
-              <a href={url}>{datum.statement}</a>
+              <a href={layer_url}>{datum.layer_name}</a>
+            </td>
+            <td className="ellipsis" key={`host-${datum.id}-1`}>
+              <a href={db_url}>{datum.statement}</a>
             </td>
             <td width="100" key={`host-${datum.id}-2`}>{datum.freq}</td>
-            <td width="100" key={`host-${datum.id}-3`}>{datum.avg.toFixed(2)}</td>
+            <td width="100" key={`host-${datum.id}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })
@@ -31,6 +35,7 @@ window.DatabaseDataPanel = React.createClass({
 DatabaseDataPanel.defaultProps = {
   title: "Database",
   headers: [
+    "Layer",
     "Statement",
     "Freq",
     "Avg"

@@ -3,13 +3,13 @@ class Trace < ActiveRecord::Base
   belongs_to :application
   belongs_to :host
 
-  has_many :spans
+  has_many :spans, :primary_key => :trace_key
+  has_one  :root_span,
+    -> { where("spans.parent_id IS NULL") },
+    :primary_key => :trace_key,
+    :class_name => "Span"
 
   validates :trace_key, :uniqueness => { :scope => :application_id }
-
-  def root_span
-    spans.order(:timestamp).first
-  end
 
   def arrange_spans(_spans = nil)
     root = nil

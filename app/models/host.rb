@@ -10,6 +10,10 @@ class Host < ActiveRecord::Base
 
   validates :name, :uniqueness => { :scope => :organization_id }
 
+  def last_metric_activity
+    metric_data.maximum("metric_data.timestamp")
+  end
+
   def cpu_usage
     sys = system_cpu("system").value
     user = system_cpu("user").value

@@ -7,9 +7,9 @@ window.TraceDataPanel = React.createClass({
         return (
           <tr key={`host-${datum.id}`}>
             <td className="ellipsis" key={`host-${datum.id}-0`}>
-              <a href={url}>{datum.url}</a>
+              <a href={url}>{datum.url || datum.trace_key}</a>
             </td>
-            <td width="100" key={`host-${datum.id}-2`}>{datum.duration.toFixed(2)}</td>
+            <td width="100" key={`host-${datum.id}-2`}>{parseFloat(datum.duration).toFixed(2)}</td>
             <td width="120" key={`host-${datum.id}-3`}>{moment(datum.timestamp).fromNow()}</td>
           </tr>
         )

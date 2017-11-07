@@ -7,20 +7,19 @@ class AgentListenerController < ApplicationController
   skip_before_action :verify_authenticity_token, :authenticate_user!
 
   def create
-    params.permit!
+    #AppPerfRpm.without_tracing do
+      params.permit!
 
-    request.body.rewind
-    AppPerfAgentWorker.perform_later(params, request.body.read)
+      request.body.rewind
 
-    render :text => "", :status => :ok
-  end
+      case params[:protocol_version].to_s
+      when "2"
+        AppPerfAgentWorker.perform_later(params, request.body.read)
+      when "3"
+        OpenTracingWorker.perform_later(params, request.body.read)
+      end
 
-  private
-
-  def parse_body(request)
-    request.body.rewind
-    body = request.body.read
-    body = Zlib::Inflate.inflate(body)
-    JSON.parse body
+      render :text => "", :status => :ok
+    #end
   end
 end

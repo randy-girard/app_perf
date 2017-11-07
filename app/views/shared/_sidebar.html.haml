@@ -15,39 +15,39 @@
     %ul.sidebar-menu
       - if @current_organization
         %li.header Administration
-        %li{:class => "#{'active' if @current_page["Organizations::ApplicationsController"]}"}
+        %li{:class => "#{'active' if @current_page["ApplicationsController"]}"}
           = link_to organization_applications_path(@current_organization) do
             %i.fa.fa-cubes
             %span Applications
-        %li{:class => "#{'active' if @current_page["Organizations::UsersController"]}"}
+        %li{:class => "#{'active' if @current_page["UsersController"]}"}
           = link_to organization_users_path(@current_organization) do
             %i.fa.fa-user
             %span Users
         %li.header Monitoring
-        %li{:class => "#{'active' if @current_page["Organizations::HostsController"]}"}
+        %li{:class => "#{'active' if @current_page["HostsController"]}"}
           = link_to organization_hosts_path(@current_organization) do
             %i.fa.fa-server
             %span Hosts
       - if @current_application
         %li.header= @current_application.name
-        %li{:class => "#{'active' if @current_page["Organizations::Applications::OverviewController#show"]}"}
+        %li{:class => "#{'active' if @current_page["OverviewController#show"]}"}
           = link_to organization_application_overview_path(@current_organization, @current_application) do
             %i.fa.fa-dashboard
             %span Overview
-          %li{:class => "#{'active' if @current_page["Organizations::Applications::TracesController"]}"}
+          %li{:class => "#{'active' if @current_page["TracesController"]}"}
             = link_to organization_application_traces_path(@current_organization, @current_application) do
               %i.fa.fa-arrows-h
               %span Traces
-          %li{:class => "#{'active' if @current_page["Organizations::Applications::DatabaseController"]}"}
+          %li{:class => "#{'active' if @current_page["DatabaseController"]}"}
             = link_to organization_application_database_index_path(@current_organization, @current_application) do
               %i.fa.fa-database
               %span Database
           %li.header Events
-          %li{:class => "#{'active' if @current_page["Organizations::Applications::ErrorsController"] || @current_page["Organizations::Applications::ErrorInstancesController"]}"}
+          %li{:class => "#{'active' if @current_page["ErrorsController"] || @current_page["ErrorInstancesController"]}"}
             = link_to organization_application_errors_path(@current_organization, @current_application) do
               %i.fa.fa-exclamation-triangle
               %span Errors
-          %li{:class => "#{'active' if @current_page["Organizations::Applications::DeploymentsController"]}"}
+          %li{:class => "#{'active' if @current_page["DeploymentsController"]}"}
             = link_to organization_application_deployments_path(@current_organization, @current_application) do
               %i.fa.fa-rocket
               %span Deployments

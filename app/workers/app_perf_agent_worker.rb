@@ -4,6 +4,7 @@ class AppPerfAgentWorker < ActiveJob::Base
   attr_accessor :license_key,
                 :name,
                 :host,
+                :hostname,
                 :data,
                 :user,
                 :organization,
@@ -11,12 +12,12 @@ class AppPerfAgentWorker < ActiveJob::Base
                 :protocol_version
 
   def perform(params, body)
-    AppPerfRpm.without_tracing do
+    #AppPerfRpm.without_tracing do
       json = decompress_params(body)
 
       self.license_key      = params.fetch("license_key") { nil }
       self.protocol_version = params.fetch("protocol_version") { nil }
-      self.host             = json.fetch("host")
+      self.hostname         = json.fetch("host")
       self.name             = json.fetch("name") { nil }
 
       if self.license_key.nil? ||
@@ -42,7 +43,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       end
 
       if organization
-        self.host = organization.hosts.where(:name => host).first_or_create
+        self.host = organization.hosts.where(:name => hostname).first_or_create
 
         if protocol_version.to_i.eql?(2)
           errors, remaining_data = data.partition {|d| d[0] == "error" }
@@ -61,7 +62,7 @@ class AppPerfAgentWorker < ActiveJob::Base
           end
         end
       end
-    end
+    #end
   end
 
   private
@@ -201,7 +202,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       action = _opts.fetch("action") { nil }
       query = _opts.fetch("query") { nil }
       adapter = _opts.fetch("adapter") { nil }
-      span_type = _opts.fetch("type") { "web" }
       _backtrace = _opts.delete("backtrace")
 
       timestamp = Time.at(_start)
@@ -227,12 +227,11 @@ class AppPerfAgentWorker < ActiveJob::Base
         span[:grouping_id] = database_call.uuid.to_s
         span[:grouping_type] = "DatabaseCall"
       end
-      span[:span_type] = span_type
       span[:host_id] = host.id
       span[:layer_id] = layer.id
       span[:timestamp] = timestamp
       span[:duration] = _duration
-      span[:trace_key] = _trace_key
+      span[:trace_id] = _trace_key
       span[:uuid] = SecureRandom.uuid.to_s
       span[:payload] = _opts
       span[:organization_id] = organization.id
@@ -249,7 +248,7 @@ class AppPerfAgentWorker < ActiveJob::Base
     end
 
     all_events = []
-    spans.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
+    spans.select {|s| s[:trace_id] }.group_by {|s| s[:trace_id] }.each_pair do |trace_key, events|
       trace = traces.find {|t| t.trace_key == trace_key }
       next if trace.nil?
       timestamp = events.map {|e| e[:timestamp] }.min
@@ -263,15 +262,14 @@ class AppPerfAgentWorker < ActiveJob::Base
         e[:payload]["domain"] ||= domain
         e[:payload]["controller"] ||= controller
         e[:payload]["action"] ||= action
-        e[:trace_id] = trace.id
+        e[:trace_id] = trace.trace_key
         e[:organization_id] = organization.id
       }
 
       existing_spans = trace.spans.all
       new_spans = events.map {|s| application.spans.new(s) }
       all_spans = existing_spans + new_spans
-      root_event = trace.arrange_spans(all_spans)
-      set_exclusive_durations(root_event)
+      all_spans.each {|s| s.exclusive_duration = get_exclusive_duration(s, all_spans) }
 
       all_spans.select {|s| s.id.present? }.each(&:save)
 
@@ -284,14 +282,20 @@ class AppPerfAgentWorker < ActiveJob::Base
     DatabaseCall.import(database_calls)
   end
 
-  def set_exclusive_durations(root)
-    children = if root.children
-      root.children.map {|c| set_exclusive_durations(c) }
-    else
-      []
-    end
-    root.exclusive_duration ||= root.duration - children.inject(0.0) { |sum, child| sum + child.duration }
-    root
+  def get_exclusive_duration(span, spans)
+    children_data = span_children_data(span, spans)
+    children_data.size > 0 ? children_duration(children_data) : span.duration
+  end
+
+  def span_children_data(span, spans)
+    spans
+      .select {|s| span.parent_of?(s) }
+  end
+
+  def children_duration(children)
+    children
+      .map {|span| span.duration.to_f / 1000 }
+      .inject(0) {|sum, x| sum + x }
   end
 
   def generate_trace_id(seed = nil)
@@ -341,18 +345,24 @@ class AppPerfAgentWorker < ActiveJob::Base
   def process_metric_data(data)
     metric_data = []
     data.select {|d| d.first.eql?("metric") }.each do |datum|
-      _, timestamp, key, value, tags = datum
+      _, timestamp, tags = *datum
+      key = tags.delete("name")
+      value = tags.delete("value")
 
-      metric = organization.metrics.where(
-        :application_id => application.try(:id),
-        :name => key,
-      ).first_or_create
+      if key && value
+        metric = organization.metrics.where(
+          :metrics => {
+            :application_id => application.try(:id),
+            :name => key
+          }
+        ).first_or_create
 
-      metric_data << metric.metric_data.new do |metric_datum|
-        metric_datum.host = host
-        metric_datum.value = value
-        metric_datum.tags = tags || {}
-        metric_datum.timestamp = Time.at(timestamp)
+        metric_data << metric.metric_data.new do |metric_datum|
+          metric_datum.host = host
+          metric_datum.value = value
+          metric_datum.tags = tags || {}
+          metric_datum.timestamp = Time.at(timestamp)
+        end
       end
     end
     MetricDatum.import(metric_data)

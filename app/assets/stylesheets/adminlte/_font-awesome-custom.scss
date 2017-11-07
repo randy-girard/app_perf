@@ -1,0 +1,33 @@
+/*!
+ *  Font Awesome 4.6.3 by @davegandy - http://fontawesome.io - @fontawesome
+ *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
+ */
+
+@import "../../bower_components/font-awesome/scss/variables";
+@import "../../bower_components/font-awesome/scss/mixins";
+@import "../../bower_components/font-awesome/scss/path";
+
+.#{$fa-css-prefix} {
+  display: inline-block;
+  font-family: FontAwesome !important; // shortening font declaration
+  font-size: inherit; // can't have font-size inherit on line above, so need to override
+  text-rendering: auto; // optimizelegibility throws things off #1094
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.#{$fa-css-prefix} {
+  font: normal normal normal #{$fa-font-size-base}/#{$fa-line-height-base} FontAwesome;
+}
+
+@import "../../bower_components/font-awesome/scss/larger";
+@import "../../bower_components/font-awesome/scss/fixed-width";
+@import "../../bower_components/font-awesome/scss/list";
+@import "../../bower_components/font-awesome/scss/bordered-pulled";
+@import "../../bower_components/font-awesome/scss/animated";
+@import "../../bower_components/font-awesome/scss/rotated-flipped";
+@import "../../bower_components/font-awesome/scss/stacked";
+
+
+@import "../../bower_components/font-awesome/scss/icons";
+@import "../../bower_components/font-awesome/scss/screen-reader";

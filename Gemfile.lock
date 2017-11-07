@@ -30,8 +30,8 @@ GEM
       activemodel (= 4.2.5.2)
       activesupport (= 4.2.5.2)
       arel (~> 6.0)
-    activerecord-import (0.13.0)
-      activerecord (>= 3.0)
+    activerecord-import (0.20.2)
+      activerecord (>= 3.2)
     activesupport (4.2.5.2)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -43,9 +43,12 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    app_perf_rpm (0.0.5)
-      oj (= 3.3.2)
+    app_perf_rpm (0.0.6)
+      oj
+      opentracing (= 0.3.1)
     arel (6.0.4)
+    autoprefixer-rails (7.1.1.2)
+      execjs
     babel-source (5.8.35)
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
@@ -53,6 +56,9 @@ GEM
     bcrypt (3.1.11)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    bootstrap-sass (3.3.6)
+      autoprefixer-rails (>= 5.2.1)
+      sass (>= 3.3.4)
     builder (3.2.3)
     byebug (8.2.4)
     calculate-all (0.2.0)
@@ -89,8 +95,9 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.0.1)
+    concurrent-ruby (1.0.5)
     connection_pool (2.2.0)
+    crass (1.0.2)
     debug_inspector (0.0.2)
     devise (4.2.0)
       bcrypt (~> 3.0)
@@ -116,6 +123,7 @@ GEM
       railties (>= 3.0.0)
     faker (1.7.1)
       i18n (~> 0.5)
+    ffi (1.9.18)
     font-awesome-rails (4.6.1.0)
       railties (>= 3.2, < 5.1)
     foreman (0.78.0)
@@ -132,7 +140,8 @@ GEM
       tilt
     highcharts-rails (4.2.5)
       railties (>= 3.1)
-    i18n (0.8.6)
+    i18n (0.9.1)
+      concurrent-ruby (~> 1.0)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
@@ -144,7 +153,8 @@ GEM
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    loofah (2.0.3)
+    loofah (2.1.1)
+      crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
@@ -152,26 +162,29 @@ GEM
     mime-types (3.0)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0221)
-    mini_portile2 (2.2.0)
+    mini_portile2 (2.3.0)
     minitest (5.10.3)
     multi_json (1.11.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (3.2.0)
-    nokogiri (1.8.0)
-      mini_portile2 (~> 2.2.0)
-    oj (3.3.2)
+    nokogiri (1.8.1)
+      mini_portile2 (~> 2.3.0)
+    oj (3.3.9)
+    opentracing (0.3.1)
     orm_adapter (0.5.0)
+    passenger (5.1.4)
+      rack
+      rake (>= 0.8.1)
     pg (0.18.4)
-    progressive_render (0.3.0)
-      coffee-rails
-      jquery-rails
-      nokogiri
-      rails (>= 4.1)
-      railties
-      sass
-      sass-rails
-      uglifier
+    pg_array_parser (0.0.9)
+    pg_histogram (0.3)
+      activerecord (>= 4.0)
+      pg (>= 0.1)
+    postgres_ext (3.0.0)
+      activerecord (>= 4.0.0)
+      arel (>= 4.0.1)
+      pg_array_parser (~> 0.0.9)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -206,7 +219,7 @@ GEM
       activesupport (= 4.2.5.2)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (12.0.0)
+    rake (12.2.1)
     rdoc (4.2.2)
       json (~> 1.4)
     react-rails (2.2.1)
@@ -235,13 +248,24 @@ GEM
       rspec-mocks (~> 3.4.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
-    sass (3.4.22)
-    sass-rails (5.0.4)
-      railties (>= 4.0.0, < 5.0)
+    sass (3.4.25)
+    sass-rails (5.0.6)
+      railties (>= 4.0.0, < 6)
       sass (~> 3.1)
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    sassc (1.11.4)
+      bundler
+      ffi (~> 1.9.6)
+      sass (>= 3.3.0)
+    sassc-rails (1.3.0)
+      railties (>= 4.0.0)
+      sass
+      sassc (~> 1.9)
+      sprockets (> 2.11)
+      sprockets-rails
+      tilt
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
@@ -260,14 +284,14 @@ GEM
       tilt (>= 1.3, < 3)
     slop (3.6.0)
     spring (1.7.1)
-    sprockets (3.6.0)
+    sprockets (3.7.1)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
-    sprockets-es6 (0.9.0)
+    sprockets-es6 (0.9.2)
       babel-source (>= 5.8.11)
       babel-transpiler
       sprockets (>= 3.0.0)
-    sprockets-rails (3.0.4)
+    sprockets-rails (3.2.1)
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
@@ -279,8 +303,8 @@ GEM
       concurrent-ruby (~> 1.0.0)
     thor (0.19.4)
     thread_safe (0.3.6)
-    tilt (2.0.2)
-    tzinfo (1.2.3)
+    tilt (2.0.8)
+    tzinfo (1.2.4)
       thread_safe (~> 0.1)
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
@@ -303,6 +327,7 @@ DEPENDENCIES
   activeuuid
   app_perf_rpm
   bcrypt (~> 3.1.7)
+  bootstrap-sass
   byebug
   calculate-all
   capistrano (~> 3.4)
@@ -328,14 +353,16 @@ DEPENDENCIES
   jquery-rails
   kaminari
   oj
+  passenger
   pg
-  progressive_render
+  pg_histogram
+  postgres_ext
   pry
-  puma
   rails (= 4.2.5.2)
   react-rails
   rspec-rails
-  sass-rails (~> 5.0)
+  sass-rails
+  sassc-rails
   sdoc (~> 0.4.0)
   sidekiq
   simplecov
@@ -348,4 +375,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.14.6
+   1.15.3

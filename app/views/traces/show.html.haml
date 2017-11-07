@@ -3,29 +3,30 @@
   - @layer_names.each do |layer_name|
     - color = "#{Digest::MD5.hexdigest(layer_name)[0..5]}"
     = ".app-perf-color-#{layer_name} { background-color: ##{color}; border-color: ##{darken_hex(color)}; }"
+  = ".span-error { border-color: darkred !important; border: 2px; }"
 
 %section.content-header
   %h1
     Trace Details
   %ol.breadcrumb
     %li= link_to "Traces", organization_application_traces_path(@current_organization, @current_application)
-    %li.active= @trace.root_span.payload[:url]
+    %li.active= @trace.root_span.tag("http.url")
 %section.content
   .row
     .col-lg-12.connectedSortable
       .box
         .box-header
           %h3.box-title
-            Transaction Sample #{@trace.duration.to_f}
+            Transaction Span #{@trace.duration.to_f}
         .box-body
           #visualization{:data => { :span_id => @span ? @span.id : nil }}
           :javascript
             function setSelection(span_id) {
               if(span_id) {
-                $("#sample").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/spans/" + span_id);
+                $("#span").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/spans/" + span_id);
               }
               else {
-                $("#sample").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/traces/#{@trace.trace_key}/database");
+                $("#span").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/traces/#{@trace.trace_key}/database");
               }
             }
             groups = []
@@ -44,8 +45,6 @@
               order: function(a, b) {
                 return a.id - b.id;
               },
-              //min: #{@trace.timestamp.to_f * 1000},
-              //max: #{@trace.timestamp.to_f * 1000 + @trace.duration * 1000},
               margin: {
                   item: {
                       horizontal: -1
@@ -90,4 +89,4 @@
                 setSelection(span_id);
               }
             });
-      #sample= render "database"
+      #span= render "database"

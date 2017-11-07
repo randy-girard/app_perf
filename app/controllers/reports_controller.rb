@@ -12,6 +12,8 @@ class ReportsController < ApplicationController
         DatabaseReporter.new(@current_application, params, view_context)
       when "database_samples"
         DatabaseSampleReporter.new(@current_application, params, view_context)
+      when "percentiles"
+        PercentileReporter.new(@current_application, params, view_context)
       end
 
     respond_to do |format|

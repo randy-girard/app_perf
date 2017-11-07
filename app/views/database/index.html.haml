@@ -35,12 +35,14 @@
         .box-body
           %table.table.table-condensed
             %tr
+              %th{:width => "150"} Layer
               %th Statement
               %th.text-center{:width => "200"} Duration (ms)
-              %th{:width => "150"}
+              %th{:width => "200"}
             - @database_calls.each do |database_call|
               %tr
-                %td.ellipsis= link_to database_call.statement, organization_application_trace_path(@current_organization, database_call.application, database_call.database_span.trace_key, :sample_id => database_call.database_span.id)
+                %td.ellipsis= link_to database_call.span.layer.name, organization_application_database_index_path(@current_organization, database_call.application, :_layer => database_call.span.layer_id)
+                %td.ellipsis= link_to database_call.statement, organization_application_trace_path(@current_organization, database_call.application, database_call.span.trace_id, :span_id => database_call.span.id)
                 %td.text-center
                   = number_with_precision(database_call.duration, :precision => 2)
                 %td.text-center

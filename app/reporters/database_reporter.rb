@@ -9,11 +9,13 @@ class DatabaseReporter < Reporter
 
     data = application
       .database_calls
-      .joins(:database_type)
+      .joins(:database_type, :span)
       .group("database_types.name")
       .group_by_period(*report_params("database_calls.timestamp"))
-      .sum("database_calls.duration")
 
+    data = data.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
+    data = data.sum("database_calls.duration")
+    
     hash = []
     layers = {}
     labels = []

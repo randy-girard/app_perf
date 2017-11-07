@@ -16,9 +16,13 @@
             %tr
               %th{:width => "100"}
               %th Message
+              %th Trace
               %th{:width => "200"} Errored At
             - @error_instances.each do |error_instance|
               %tr
                 %td= link_to 'View Error', organization_application_error_instance_path(@current_organization, @current_application, @error_message, error_instance)
                 %td= error_instance.message
+                %td
+                  - if error_instance.span
+                    = link_to error_instance.span.tag("url"), organization_application_trace_path(@current_organization, @current_application, :id => error_instance.span.trace_id, :span_id => error_instance.span.id)
                 %td= error_instance.created_at
