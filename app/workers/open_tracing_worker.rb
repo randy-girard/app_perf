@@ -65,7 +65,7 @@ class OpenTracingWorker < ActiveJob::Base
   def decompress_params(body)
     compressed_body = Base64.decode64(body)
     data = Zlib::Inflate.inflate(compressed_body)
-    JSON.load(data)
+    MessagePack.unpack(data)
   end
 
   def load_layers(data)

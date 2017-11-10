@@ -47,7 +47,7 @@ gem "activerecord-import"
 gem "app_perf_rpm"
 gem 'faker'
 gem "activeuuid"
-gem "oj"
+gem "msgpack"
 gem "haml"
 gem "devise"
 gem "devise_invitable"
