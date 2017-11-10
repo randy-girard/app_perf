@@ -345,9 +345,7 @@ class AppPerfAgentWorker < ActiveJob::Base
   def process_metric_data(data)
     metric_data = []
     data.select {|d| d.first.eql?("metric") }.each do |datum|
-      _, timestamp, tags = *datum
-      key = tags.delete("name")
-      value = tags.delete("value")
+      _, timestamp, key, value, tags = *datum
 
       if key && value
         metric = organization.metrics.where(
