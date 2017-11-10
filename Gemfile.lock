@@ -43,8 +43,8 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    app_perf_rpm (0.0.6)
-      oj
+    app_perf_rpm (0.0.7)
+      msgpack
       opentracing (= 0.3.1)
     arel (6.0.4)
     autoprefixer-rails (7.1.1.2)
@@ -164,13 +164,13 @@ GEM
     mime-types-data (3.2016.0221)
     mini_portile2 (2.3.0)
     minitest (5.10.3)
+    msgpack (1.1.0)
     multi_json (1.11.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (3.2.0)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
-    oj (3.3.9)
     opentracing (0.3.1)
     orm_adapter (0.5.0)
     passenger (5.1.4)
@@ -352,7 +352,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   kaminari
-  oj
+  msgpack
   passenger
   pg
   pg_histogram

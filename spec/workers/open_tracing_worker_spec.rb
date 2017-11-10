@@ -16,24 +16,25 @@ describe OpenTracingWorker do
       }
 
       expect { OpenTracingWorker.perform_now(params, body) }
-        .to change { Backtrace.count }.by(7)
-        .and change { Span.count }.by(7)
-        .and change { LogEntry.count }.by(14)
-        .and change { Trace.count }.by(2)
+        .to change { Backtrace.count }.by(4)
+        .and change { Span.count }.by(6)
+        .and change { LogEntry.count }.by(8)
+        .and change { Trace.count }.by(1)
+
+      #Span.all.each do |s|
+      #  puts [s.uuid, s.source.length, s.backtrace.backtrace.length, s.duration, s.exclusive_duration].inspect
+      #end
 
       data = [
-        ["6445831bae7fcafe", 2, 500, 5138.04697990417, 11.208057403559906],
-        ["5be9cc485d202d0", 2, 4716, 5126.83892250061, 11.83009147643861],
-        ["7dc84d604a73ad78", 316, 8985, 10.3209018707275, 10.3209018707275],
-        ["762f86b1c423dce2", 809, 9096, 12.437105178833, 12.437105178833],
-        ["31e8c10792c9ce0b", 828, 9095, 11.9228363037109, 11.9228363037109],
-        ["a5f32654a51d6ffa", 623, 9068, 5080.3279876709, 5080.3279876709],
-        ["67a169f8dc7c355d", 2, 500, 2.39777565002441, 2.39777565002441]
+        ["e5170f65ba1c8510", 1, 1, 9.22608375549316, 9.22608375549316],
+        ["f5130aa4f5927a", 2, 2, 9.68074798583984, 9.68074798583984],
+        ["f31eab7afb85ed3d", 2, 2, 18.9278125762939, 18.9278125762939],
+        ["506548acd9ea836e", 2, 2, 5008.93211364746, 5008.93211364746]
       ]
       data.each_with_index do |datum, index|
         span = Span.find_by_uuid(datum[0])
-        expect(span.source.to_s.length).to eq(datum[1])
-        expect(span.backtrace.backtrace.to_s.length).to eq(datum[2])
+        expect(span.source.length).to eq(datum[1])
+        expect(span.backtrace.backtrace.length).to eq(datum[2])
         expect(span.duration).to eq(datum[3])
         expect(span.exclusive_duration).to eq(datum[4])
       end
@@ -51,17 +52,15 @@ describe OpenTracingWorker do
       }
 
       expect { OpenTracingWorker.perform_now(params, body) }
-        .to change { Backtrace.count }.by(17)
+        .to change { Backtrace.count }.by(3)
         .and change { Span.count }.by(17)
-        .and change { LogEntry.count }.by(35)
+        .and change { LogEntry.count }.by(7)
         .and change { Trace.count }.by(1)
         .and change { ErrorMessage.count }.by(1)
         .and change { ErrorDatum.count }.by(1)
 
       span = Span.all.find {|span| span.tag("error") == true }
-      expect(span.source.to_s.length).to eq(2)
-      expect(span.backtrace.backtrace.to_s.length).to eq(4716)
-      expect(span.duration).to eq(45.8791255950928)
+      expect(span.duration).to eq(45.9530353546143)
       expect(span.error).to eq(ErrorDatum.last)
     end
   end

@@ -4,6 +4,6 @@
       %div<
         Extracted source (around line ##{source_extract["line_number"]} of #{source_extract["file"]}):
       = preserve do
-        - source_extract["code"].each do |line, source|
-          %div{:class => "line #{"active" if source.first.to_i == source_extract["line_number"].to_i}"}<
-            = "#{(source.first.to_s + ":").ljust(8)} #{source.last}"
+        - source_extract["code"].each do |line_number, source|
+          %div{:class => "line #{"active" if line_number.to_i == source_extract["line_number"].to_i}"}<
+            = "#{(line_number.to_s + ":").ljust(8)} #{source}"

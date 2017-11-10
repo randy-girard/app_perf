@@ -18,7 +18,7 @@ describe AppPerfAgentWorker do
         "protocol_version" => 2
       }
 
-      body = Oj.dump({
+      body = MessagePack.pack({
         "name" => "App Name",
         "host" => "localhost",
         "data" => [
@@ -82,7 +82,7 @@ describe AppPerfAgentWorker do
         "protocol_version" => 2
       }
 
-      body = Oj.dump({
+      body = MessagePack.pack({
         "name" => "App Name",
         "host" => "localhost",
         "data" => [
@@ -124,7 +124,7 @@ describe AppPerfAgentWorker do
         "license_key" => organization.license_key,
         "protocol_version" => 2
       }
-      body = Oj.dump({
+      body = MessagePack.pack({
         "name" => "App Name",
         "host" => "localhost",
         "data" => [
