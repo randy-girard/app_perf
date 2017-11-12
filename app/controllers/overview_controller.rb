@@ -7,9 +7,9 @@ class OverviewController < ApplicationController
   }
 
   ORDERS = {
-    "Freq" => "COUNT(DISTINCT trace_id) DESC",
-    "Avg" => "(SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC",
-    "FreqAvg" => "(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(DISTINCT trace_id)) DESC"
+    "Freq" => "COUNT(DISTINCT traces.id) DESC",
+    "Avg" => "(SUM(traces.duration) / COUNT(DISTINCT traces.id)) DESC",
+    "FreqAvg" => "(COUNT(DISTINCT traces.id) * SUM(traces.duration) / COUNT(DISTINCT traces.id)) DESC"
   }
 
   before_filter :set_traces, :only => [:urls, :layers, :database_calls, :traces, :controllers, :hosts, :percentiles, :distributions]
@@ -62,9 +62,6 @@ class OverviewController < ApplicationController
       "Avg" => "(SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC",
       "FreqAvg" => "(COUNT(DISTINCT spans.id) * SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC"
     }
-
-
-    #.from("trace_cte")
 
     @layers = @current_application
       .layers
