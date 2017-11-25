@@ -15,7 +15,6 @@ ActiveRecord::Schema.define(version: 20171106015034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "timescaledb"
   enable_extension "uuid-ossp"
 
   create_table "applications", force: :cascade do |t|
@@ -169,7 +168,6 @@ ActiveRecord::Schema.define(version: 20171106015034) do
 
   create_table "metrics", force: :cascade do |t|
     t.integer  "application_id"
-    t.integer  "host_id"
     t.string   "name"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
@@ -177,26 +175,7 @@ ActiveRecord::Schema.define(version: 20171106015034) do
   end
 
   add_index "metrics", ["application_id"], name: "index_metrics_on_application_id", using: :btree
-  add_index "metrics", ["host_id"], name: "index_metrics_on_host_id", using: :btree
   add_index "metrics", ["organization_id"], name: "index_metrics_on_organization_id", using: :btree
-
-  create_table "new_traces", id: false, force: :cascade do |t|
-    t.integer  "id",              default: "nextval('traces_id_seq'::regclass)", null: false
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.string   "trace_key"
-    t.datetime "timestamp",                                                      null: false
-    t.float    "duration"
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
-    t.integer  "organization_id"
-  end
-
-  add_index "new_traces", ["application_id"], name: "new_traces_application_id_idx", using: :btree
-  add_index "new_traces", ["host_id"], name: "new_traces_host_id_idx", using: :btree
-  add_index "new_traces", ["organization_id"], name: "new_traces_organization_id_idx", using: :btree
-  add_index "new_traces", ["timestamp", "trace_key", "application_id"], name: "new_traces_trace_key_application_id_idx", using: :btree
-  add_index "new_traces", ["timestamp"], name: "new_traces_timestamp_idx", using: :btree
 
   create_table "organization_users", force: :cascade do |t|
     t.integer  "organization_id"
@@ -261,32 +240,6 @@ ActiveRecord::Schema.define(version: 20171106015034) do
   add_index "traces", ["timestamp"], name: "index_traces_on_timestamp", using: :btree
   add_index "traces", ["trace_key", "application_id"], name: "index_traces_on_trace_key_and_application_id", unique: true, using: :btree
 
-  create_table "ts_spans", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
-    t.integer  "application_id"
-    t.integer  "host_id"
-    t.integer  "layer_id"
-    t.string   "trace_id"
-    t.string   "name"
-    t.datetime "timestamp"
-    t.float    "duration"
-    t.float    "exclusive_duration"
-    t.string   "uuid"
-    t.jsonb    "payload"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
-    t.integer  "organization_id"
-    t.string   "parent_id"
-    t.string   "operation_name"
-  end
-
-  add_index "ts_spans", ["application_id"], name: "new_spans_application_id_idx", using: :btree
-  add_index "ts_spans", ["host_id"], name: "new_spans_host_id_idx", using: :btree
-  add_index "ts_spans", ["layer_id"], name: "new_spans_layer_id_idx", using: :btree
-  add_index "ts_spans", ["organization_id"], name: "new_spans_organization_id_idx", using: :btree
-  add_index "ts_spans", ["payload"], name: "new_spans_payload_idx", using: :gin
-  add_index "ts_spans", ["timestamp"], name: "new_spans_timestamp_idx", using: :btree
-  add_index "ts_spans", ["trace_id"], name: "new_spans_trace_id_idx", using: :btree
-
   create_table "users", force: :cascade do |t|
     t.string   "email"
     t.string   "license_key"
@@ -333,7 +286,6 @@ ActiveRecord::Schema.define(version: 20171106015034) do
   add_foreign_key "metric_data", "hosts"
   add_foreign_key "metric_data", "metrics"
   add_foreign_key "metrics", "applications"
-  add_foreign_key "metrics", "hosts"
   add_foreign_key "organization_users", "organizations"
   add_foreign_key "organization_users", "users"
   add_foreign_key "organizations", "users"

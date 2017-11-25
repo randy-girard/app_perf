@@ -43,6 +43,9 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
+    app_perf_agent (0.0.6)
+      msgpack
+      vmstat (= 2.3.0)
     app_perf_rpm (0.0.7)
       msgpack
       opentracing (= 0.3.1)
@@ -311,6 +314,7 @@ GEM
     uuidtools (2.1.5)
     vanilla-ujs (1.3.0)
       railties (>= 4.2.0)
+    vmstat (2.3.0)
     warden (1.2.7)
       rack (>= 1.0)
     web-console (2.3.0)
@@ -325,6 +329,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   activeuuid
+  app_perf_agent
   app_perf_rpm
   bcrypt (~> 3.1.7)
   bootstrap-sass
@@ -375,4 +380,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.15.3
+   1.16.0

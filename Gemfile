@@ -45,6 +45,7 @@ gem "sidekiq"
 gem "sucker_punch"
 gem "activerecord-import"
 gem "app_perf_rpm"
+gem "app_perf_agent"
 gem 'faker'
 gem "activeuuid"
 gem "msgpack"

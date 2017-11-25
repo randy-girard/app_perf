@@ -1,4 +1,5 @@
 class OrganizationsController < ApplicationController
+  skip_before_action :authorize_current_organization!
   before_action :set_organization, only: [:show, :edit, :update, :destroy]
 
   # GET /organizations

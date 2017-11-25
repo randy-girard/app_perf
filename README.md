@@ -12,7 +12,7 @@
 This is a application monitoring app. I am trying to build an open source, easy to setup, performance monitoring tool.
 
 
-### Setup
+### Setup (Localhost)
 
 Setup should be striaghtforward and easy. We use foreman to manage processes. Begin by running the setup script:
 
@@ -24,6 +24,15 @@ This should create and setup the database and any other needed services/apps. Th
 
 ```
 bundle exec foreman start
+```
+
+### Setup (Docker)
+
+AppPerf supports using Docker and Docker Compose. Just run the following and you should be good to go:
+
+```
+docker-compose build
+docker-compose up
 ```
 
 Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediatetly!
