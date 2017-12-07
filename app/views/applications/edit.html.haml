@@ -32,7 +32,7 @@
                 require 'app_perf_rpm'
 
                 AppPerfRpm.configure do |rpm|
-                  rpm.name = "#{@application.name}"
+                  rpm.application_name = "#{@application.name}"
                   rpm.license_key = "#{@application.license_key}"
                 end
 
