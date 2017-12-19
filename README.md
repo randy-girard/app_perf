@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/randy-girard/app_perf.svg?branch=master)](https://travis-ci.org/randy-girard/app_perf)
 
+Join Slack using this link: https://join.slack.com/t/app-perf/shared_invite/enQtMjg4ODkyOTM1NDQzLTg1MmU5MTlmMmE3MDhjZDBkMDYzNDQyNTIxMjU4OWI2ZjUwOWM2OGYyZjU3YTMyZTNhMTMzMGZhYjFlZTlkMzQ
+
 **More images are at the bottom.**
 
 ![Overview](/doc/overview.png?raw=true "Overview")
