@@ -10,6 +10,8 @@ WORKDIR /app
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --binstubs
 
+RUN gem install app_perf_agent
+
 COPY . .
 COPY .env.docker ./.env.development
 COPY supervisord.conf /etc/supervisord/conf.d/supervisord.conf
