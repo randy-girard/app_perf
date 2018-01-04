@@ -91,7 +91,7 @@ class OverviewController < ApplicationController
     @database_calls = @current_application
       .database_calls
       .with(:trace_cte => @_traces)
-      .select("layers.id AS layer_id, layers.name AS layer_name, database_calls.statement, MAX(database_calls.id) AS id, COUNT(*) AS freq, SUM(database_calls.duration) / COUNT(*) AS average")
+      .select("layers.id AS layer_id, layers.name AS layer_name, database_calls.statement, MAX(database_calls.id::varchar) AS id, COUNT(*) AS freq, SUM(database_calls.duration) / COUNT(*) AS average")
       .joins(:span => :layer)
       .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
       .where("statement IS NOT NULL")
