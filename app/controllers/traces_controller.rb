@@ -22,10 +22,8 @@ class TracesController < ApplicationController
 
     @database_calls = @current_application
       .database_calls
-      .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
       .joins(:span)
       .where(:spans => { :id => @trace.spans.select(:id) })
-      .group("database_calls.statement")
 
     group_index = 0
     item_index = 0
@@ -67,12 +65,12 @@ class TracesController < ApplicationController
       .where(:trace_key => params[:id])
       .first
     @spans = @trace.spans
+
     @database_calls = @current_application
       .database_calls
-      .select("database_calls.statement AS query, COUNT(database_calls.*) AS count, AVG(database_calls.duration) as avg_duration, SUM(database_calls.duration) AS total_duration")
       .joins(:span)
-      .where(:spans => { :id => @spans })
-      .group("database_calls.statement")
+      .where(:spans => { :id => @trace.spans.select(:id) })
+      
     render :layout => false
   end
 end

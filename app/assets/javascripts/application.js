@@ -32,4 +32,28 @@ $(function() {
       format: 'YYYY-MM-DD h:mm A'
     }
   });
+
+  $(document).on("mouseover", ".db-statement", function(e) {
+    var statements = $(this).find('.db-statements');
+
+    if(timeline) {
+      var span_ids = statements.find(".db-statement-span").map(function(){
+        return $(this).data('span-id');
+      }).get();
+      timeline.setSelection(span_ids);
+    }
+  });
+
+  $(document).on("mouseout", ".db-statement", function(e) {
+    timeline.setSelection([]);
+  })
+
+  $(document).on("click", ".statement-link", function(e) {
+    e.preventDefault();
+    var self = $(this);
+    var statements = self.closest(".db-statement").find('.db-statements');
+
+    self.find(".rotate").toggleClass('down');
+    statements.slideToggle( 100 );
+  });
 });

@@ -5,6 +5,9 @@
       Span Detail
       (#{number_with_precision(@span.duration, :precision => 2)}ms,
       #{number_with_precision(@span.exclusive_duration, :precision => 2)}ms exclusive)
+    .box-tools.pull-right
+      = button_tag :class => "btn btn-box-tool close-span-detail" do
+        %i.fa.fa-times
   .box-body
     .nav-tabs-custom
       %ul.nav.nav-tabs

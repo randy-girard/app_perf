@@ -8,13 +8,25 @@
         %th.text-center Count
         %th.text-center Avg
         %th.text-center Total
-      - @database_calls.sort_by(&:total_duration).reverse.each do |database_call|
-        %tr
-          %td.ellipsis= database_call.query
-          %td.text-center{:width => "100"}= database_call.count
+      - @database_calls.group_by(&:statement).each_pair do |statement, database_calls|
+        %tr.db-statement
+          %td
+            %div
+              = link_to "#expand", :class => "statement-link" do
+                %i.fa.fa-caret-right.rotate
+                = statement
+            %div.db-statements{ :style => "display: none; padding-left: 10px;" }
+              - database_calls.each do |database_call|
+                %div
+                  = number_with_precision(database_call.duration, :precision => 2)
+                  ms
+                  = link_to database_call.statement, "#statement", :class => "db-statement-span", :data => { :span_id => database_call.span.id.to_s }
+
+          %td.text-center{:width => "100"}= database_calls.size
           %td.text-center{:width => "100"}
-            = number_with_precision(database_call.avg_duration, :precision => 2)
+            = number_with_precision(database_calls.map(&:duration).sum / database_calls.size, :precision => 2)
             ms
           %td.text-center{:width => "100"}
-            = number_with_precision(database_call.total_duration, :precision => 2)
-            ms
+            %div
+              = number_with_precision(database_calls.map(&:duration).sum, :precision => 2)
+              ms

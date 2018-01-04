@@ -89,4 +89,17 @@
                 setSelection(span_id);
               }
             });
+            $(document).on("click", ".db-statement-span", function(e) {
+              e.preventDefault();
+              var span_id = $(this).data("span-id");
+              if(span_id) {
+                timeline.setSelection([span_id]);
+                setSelection(span_id);
+              }
+            });
+            $(document).on("click", ".close-span-detail", function(e) {
+              e.preventDefault();
+              timeline.setSelection([]);
+              setSelection();
+            });
       #span= render "database"
