@@ -23,7 +23,9 @@ services:
     depends_on:
       - 'postgres'
       - 'redis'
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - '5000:5000'
     volumes:
@@ -32,20 +34,6 @@ services:
       - '.env.docker'
     links:
       - 'postgres'
-
-  sidekiq:
-    depends_on:
-      - 'postgres'
-      - 'redis'
-    build: .
-    command: bundle exec sidekiq --verbose
-    volumes:
-      - '.:/app'
-    env_file:
-      - '.env.docker'
-    links:
-      - 'postgres'
-      - 'redis'
 
   agent:
     depends_on:
