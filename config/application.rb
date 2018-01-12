@@ -13,11 +13,7 @@ module AppPerf
     # -- all .rb files in that directory are automatically loaded.
     config.autoload_paths << Rails.root.join('app/workers')
 
-    if ENV["USE_SUCKER_PUNCH"] == "1"
-      config.active_job.queue_adapter = :sucker_punch
-    else
-      config.active_job.queue_adapter = :sidekiq
-    end
+    config.active_job.queue_adapter = :sidekiq
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
@@ -27,12 +23,12 @@ module AppPerf
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
+    # API
+    config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
+    config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
+
+
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
-
-    logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = config.log_formatter
-    config.log_tags  = [:subdomain, :uuid]
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 end

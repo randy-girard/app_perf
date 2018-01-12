@@ -42,7 +42,6 @@ gem "font-awesome-rails"
 gem "highcharts-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
-gem "sucker_punch"
 gem "activerecord-import"
 gem "app_perf_rpm"
 gem "app_perf_agent"
@@ -54,6 +53,9 @@ gem "devise"
 gem "devise_invitable"
 gem "react-rails"
 gem 'vanilla-ujs'
+gem 'oj'
+gem 'roda'
+gem 'pluck_to_hash'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

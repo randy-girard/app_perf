@@ -1,20 +1,4 @@
 class DurationReporter < Reporter
-
-  def render
-    view_context.area_chart(report_data, report_options)
-  end
-
-  def post_render
-
-    js = <<-EOF
-      $("#duration_chart").on('selection', function(event, min, max) {
-        event.preventDefault();
-        window.location = "/applications/1/transactions?custom=1&st=" + min + "&se=" + max
-      });
-    EOF
-    view_context.javascript_tag { view_context.raw(js) }
-  end
-
   def report_data
     time_range, period = Reporter.time_range(params)
 
@@ -24,8 +8,14 @@ class DurationReporter < Reporter
       .joins("LEFT JOIN traces ON spans.trace_id = traces.trace_key")
       .joins("LEFT JOIN database_calls ON database_calls.span_id = spans.uuid")
 
-    relation = relation.where("spans.payload->>'peer.address' = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("spans.payload->>'http.url' = ?", params[:_url]) if params[:_url]
+    if params[:_domain]
+      domains = relation.where("spans.payload->>'peer.address' = ?", params[:_domain])
+      relation = relation.where(:traces => { :trace_key => domains.select(:trace_id) })
+    end
+    if params[:_url]
+      urls = relation.where("spans.payload->>'http.url' = ?", params[:_url])
+      relation = relation.where(:traces => { :trace_key => urls.select(:trace_id) })
+    end
     if params[:_controller]
       controllers = relation.where("split_part(spans.operation_name, '#', 1) = ?", params[:_controller])
       relation = relation.where(:traces => { :trace_key => controllers.select(:trace_id) })
@@ -59,55 +49,6 @@ class DurationReporter < Reporter
       }) rescue nil
     end
 
-    deployments = application
-      .deployments
-      .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
-
-    {
-      :data => hash,
-      :annotations => deployments.map {|deployment|
-        {
-          :value => deployment.start_time.to_i * 1000,
-          :color => '#FF0000',
-          :width => 2
-        }
-      }
-    }
-  end
-
-  private
-
-  def report_colors
-    ["#b51fa4", "#A5FFFF", "#5374b0", "#EECC45", "#4E4318"]
-  end
-
-  def report_options
-    {
-      :id => "duration_chart",
-      :height => "100%",
-      :library => {
-        :chart => {
-          :zoomType => "x"
-        },
-        :plotOptions => {
-          :area => {
-            :stacking => "normal"
-          }
-        },
-        :colors => report_colors,
-        :legend => {
-          :position => "bottom"
-        },
-        :animation => false,
-        :xAxis => {
-          :plotLines => [],
-          :type => 'datetime',
-          :dateTimeLabelFormats => {
-            :hour => '%I %p',
-            :minute => '%I:%M %p'
-          }
-        }
-      }
-    }
+    hash
   end
 end

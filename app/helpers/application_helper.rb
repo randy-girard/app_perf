@@ -1,7 +1,19 @@
 module ApplicationHelper
   def dynamic_report_url(options = {}, base_params = {})
     params = metric_params(options, base_params)
-    url_for(params)
+
+    url = params.delete(:url)
+    if url
+      params.delete(:controller)
+      params.delete(:action)
+
+      uri = URI(url)
+      query = Rack::Utils.parse_query(uri.query)
+      uri.query = Rack::Utils.build_query(query.merge(params))
+      uri.to_s
+    else
+      url_for(params)
+    end
   end
 
   def metric_params(options = {}, base_params = {})
@@ -9,6 +21,7 @@ module ApplicationHelper
 
     controller  = base_params[:controller] || params[:controller]
     action      = base_params[:action]     || params[:action]
+    url         = base_params[:url]        || params[:url]
     _host       = options[:host]           || params[:_host]
     _domain     = options[:domain]         || params[:_domain]
     _url        = options[:url]            || params[:_url]

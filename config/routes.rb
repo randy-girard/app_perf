@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount API::Base, at: "/api"
+
   devise_for :users,
     :skip => [:registrations],
     :controllers => { :invitations => 'user/invitations' }
@@ -21,18 +23,7 @@ Rails.application.routes.draw do
       end
     end
     resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do
-      resource :overview, :controller => "overview", :only => [:show, :urls, :layers, :database_calls, :traces, :controllers, :hosts, :percentiles, :distributions] do
-        member do
-          get :urls
-          get :layers
-          get :database_calls
-          get :hosts
-          get :controllers
-          get :traces
-          get :percentiles
-          get :distributions
-        end
-      end
+      resource :overview, :controller => "overview", :only => [:show]
 
       resources :errors, :only => [:index, :show] do
         resources :instances, :controller => "error_instances", :only => [:index, :show]
@@ -48,7 +39,7 @@ Rails.application.routes.draw do
       resources :database, :controller => "database", :only => [:index]
       resources :deployments, :only => [:index, :new, :create]
 
-      resources :reports, :only => [:index, :show, :new, :error, :profile] do
+      resources :reports, :only => [:new, :error, :profile] do
         collection do
           get :error
           get :profile
@@ -57,8 +48,5 @@ Rails.application.routes.draw do
     end
   end
 
-  post "/api/listener/:protocol_version/:license_key" => "agent_listener#create"
-
   root :to => "dashboard#show"
-
 end

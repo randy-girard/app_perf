@@ -15,45 +15,59 @@ class PercentileReporter < Reporter
 
     # relation = relation.where("spans.span_type = ?", "web") if params[:_layer].nil?
 
-    relation = relation.where("spans.payload->>'domain' = ?", params[:_domain]) if params[:_domain]
-    relation = relation.where("spans.payload->>'url' = ?", params[:_url]) if params[:_url]
-    relation = relation.where("spans.payload->>'controller' = ?", params[:_controller]) if params[:_controller]
-    relation = relation.where("spans.payload->>'action' = ?", params[:_action]) if params[:_action]
+    if params[:_domain]
+      domains = relation.where("spans.payload->>'peer.address' = ?", params[:_domain])
+      relation = relation.where(:traces => { :trace_key => domains.select(:trace_id) })
+    end
+    if params[:_url]
+      urls = relation.where("spans.payload->>'http.url' = ?", params[:_url])
+      relation = relation.where(:traces => { :trace_key => urls.select(:trace_id) })
+    end
+    if params[:_controller]
+      controllers = relation.where("split_part(spans.operation_name, '#', 1) = ?", params[:_controller])
+      relation = relation.where(:traces => { :trace_key => controllers.select(:trace_id) })
+    end
+    if params[:_action]
+      actions = relation.where("split_part(spans.operation_name, '#', 2) = ?", params[:_action])
+      relation = relation.where(:traces => { :trace_key => actions.select(:trace_id) })
+    end
     relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]
     relation = relation.where("database_calls.statement = (SELECT statement FROM database_calls WHERE id = ?)", params[:_sql]) if params[:_sql]
 
     data = relation
       .group_by_period(*report_params)
+      .calculate_all(
+        :perc_50 => "percentile_disc(0.50) within group (order by #{table}.duration)",
+        :perc_75 => "percentile_disc(0.75) within group (order by #{table}.duration)",
+        :perc_90 => "percentile_disc(0.90) within group (order by #{table}.duration)",
+        :perc_95 => "percentile_disc(0.95) within group (order by #{table}.duration)",
+        :perc_99 => "percentile_disc(0.99) within group (order by #{table}.duration)"
+      )
 
-    @perc_50 = data.calculate_all("percentile_disc(0.50) within group (order by #{table}.duration)")
-    @perc_75 = data.calculate_all("percentile_disc(0.75) within group (order by #{table}.duration)")
-    @perc_90 = data.calculate_all("percentile_disc(0.90) within group (order by #{table}.duration)")
-    @perc_95 = data.calculate_all("percentile_disc(0.95) within group (order by #{table}.duration)")
-    @perc_99 = data.calculate_all("percentile_disc(0.99) within group (order by #{table}.duration)")
-
-    hash = [
-      {"name" => "50th Percentile", :data => @perc_50 },
-      {"name" => "75th Percentile", :data => @perc_75 },
-      {"name" => "90th Percentile", :data => @perc_90 },
-      {"name" => "95th Percentile", :data => @perc_95 },
-      {"name" => "99th Percentile", :data => @perc_99 }
-    ]
-
-
-    deployments = application
-      .deployments
-      .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
-
-    {
-      :data => hash,
-      :annotations => deployments.map {|deployment|
-        {
-          :value => deployment.start_time.to_i * 1000,
-          :color => '#FF0000',
-          :width => 2
-        }
-      }
+    latencies = {
+      :perc_50 => {},
+      :perc_75 => {},
+      :perc_90 => {},
+      :perc_95 => {},
+      :perc_99 => {}
     }
+
+    data.each_pair do |timestamp, percentiles|
+      latencies[:perc_50][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_50] : percentiles
+      latencies[:perc_75][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_75] : percentiles
+      latencies[:perc_90][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_90] : percentiles
+      latencies[:perc_95][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_95] : percentiles
+      latencies[:perc_99][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_99] : percentiles
+    end
+
+
+    [
+      {:name => "50th Percentile", :data => latencies[:perc_50] },
+      {:name => "75th Percentile", :data => latencies[:perc_75] },
+      {:name => "90th Percentile", :data => latencies[:perc_90] },
+      {:name => "95th Percentile", :data => latencies[:perc_95] },
+      {:name => "99th Percentile", :data => latencies[:perc_99] }
+    ]
   end
 end

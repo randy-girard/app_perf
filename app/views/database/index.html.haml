@@ -26,8 +26,12 @@
           = react_component("AreaChart", { :refresh => 15,
                                            :legend => "bottom",
                                            :curve => true,
-                                           :library => { :chart => { :zoomType => "x" }, xAxis: { type: 'datetime', labels: { format: '{value:%I:%M %p}' } }, yAxis: { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :controller => "reports", :action => "show", :application_id => @current_application, :id => "database" }) })
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         xAxis: { type: 'datetime', labels: { format: '{value:%I:%M %p}' } },
+                                                         yAxis: { labels: { format: '{value}ms' }} },
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/database",
+                                                                             :organization_id => @current_organization.id,
+                                                                             :application_id => @current_application.id }) })
     .col-lg-12.connectedSortable
       .box
         .box-header
@@ -48,3 +52,5 @@
                 %td.text-center
                   = time_ago_in_words(database_call.timestamp)
                   ago
+    .col-lg-12
+      = paginate @database_calls

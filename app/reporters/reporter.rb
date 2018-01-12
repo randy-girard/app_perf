@@ -10,21 +10,11 @@ class Reporter
     { :label => "7d", :past => 7 * 60 * 24, :period => "hour" }
   ]
 
-  def initialize(application, params, view_context)
+  def initialize(application, params)
     params[:period] ||= "minute"
 
     self.application = application
     self.params = params
-    self.view_context = view_context
-  end
-
-  def render
-  end
-
-  def pre_render
-  end
-
-  def post_render
   end
 
   def report_data
@@ -32,19 +22,6 @@ class Reporter
   end
 
   private
-
-  def parse(items)
-    items.map do |item|
-      [
-        item.first.to_i * 1000,
-        item.last
-      ]
-    end
-  end
-
-  def report_colors
-    []
-  end
 
   def report_params(timestamp = "spans.timestamp")
     options = { }
@@ -95,5 +72,5 @@ class Reporter
     return time_ago, period
   end
 
-  attr_accessor :application, :params, :view_context
+  attr_accessor :application, :params
 end

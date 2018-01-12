@@ -12,6 +12,8 @@ class OpenTracingWorker < ActiveJob::Base
                 :application,
                 :protocol_version
 
+  alias_attribute :jid, :job_id
+
   def perform(params, body)
     #AppPerfRpm.without_tracing do
       license_key      = params.fetch("license_key") { nil }

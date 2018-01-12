@@ -3,12 +3,11 @@ class MetricReporter < Reporter
 
   attr_accessor :host
 
-  def initialize(host, params, view_context)
+  def initialize(host, params)
     params[:period] ||= "minute"
 
     self.host = host
     self.params = params
-    self.view_context = view_context
   end
 
   def report_data
