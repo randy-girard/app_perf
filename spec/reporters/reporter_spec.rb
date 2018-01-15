@@ -4,36 +4,20 @@ require 'spec_helper'
 
 describe Reporter do
 
-  # TODO: auto-generated
   describe '#new' do
     it 'works' do
       application = double('application')
       params = {}
-      view_context = double('view_context')
-      result = Reporter.new(application, params, view_context)
+      result = Reporter.new(application, params)
       expect(result).not_to be_nil
     end
   end
 
-  # TODO: auto-generated
-  describe '#render' do
-    it 'returns nil' do
-      application = double('application')
-      params = {}
-      view_context = double('view_context')
-      reporter = Reporter.new(application, params, view_context)
-      result = reporter.render
-      expect(result).to be_nil
-    end
-  end
-
-  # TODO: auto-generated
   describe '#report_data' do
     it 'works' do
       application = double('application')
       params = {}
-      view_context = double('view_context')
-      reporter = Reporter.new(application, params, view_context)
+      reporter = Reporter.new(application, params)
       result = reporter.report_data
       expect(result).not_to be_nil
     end
