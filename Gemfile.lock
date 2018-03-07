@@ -46,9 +46,9 @@ GEM
     app_perf_agent (0.0.6)
       msgpack
       vmstat (= 2.3.0)
-    app_perf_rpm (0.2.3)
+    app_perf_rpm (0.2.4)
       msgpack
-      opentracing (= 0.3.1)
+      opentracing
     arel (6.0.4)
     autoprefixer-rails (7.1.1.2)
       execjs
@@ -173,7 +173,7 @@ GEM
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
     oj (3.3.10)
-    opentracing (0.3.1)
+    opentracing (0.3.2)
     orm_adapter (0.5.0)
     passenger (5.1.4)
       rack
