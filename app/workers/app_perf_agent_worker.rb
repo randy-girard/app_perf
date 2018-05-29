@@ -344,16 +344,20 @@ class AppPerfAgentWorker < ActiveJob::Base
 
   def process_metric_data(data)
     metric_data = []
+
+    organization_metrics = organization.metrics.where(
+      :metrics => { :application_id => application.try(:id) }
+    )
+
     data.select {|d| d.first.eql?("metric") }.each do |datum|
       _, timestamp, key, value, tags = *datum
 
       if key && value
-        metric = organization.metrics.where(
-          :metrics => {
+        metric = organization_metrics.find {|metric| metric.name == key } ||
+          organization.metrics.new(
             :application_id => application.try(:id),
             :name => key
-          }
-        ).first_or_create
+          )
 
         metric_data << metric.metric_data.new do |metric_datum|
           metric_datum.host = host
