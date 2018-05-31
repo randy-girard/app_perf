@@ -8,8 +8,10 @@
 user = User.create(
   :name => "User Example",
   :email => "user@example.com",
-  :password => "password"
+  :password => "password",
+  :license_key => "30b5805c-25d8-4fcd-875e-4fd9be32993e"
 )
-application = Application.create(
-  :name => "App Perf"
+application = organization.applications.create(
+  :name => "App Perf",
+  :license_key => ENV["APP_PERF_LICENSE_KEY"]
 )
