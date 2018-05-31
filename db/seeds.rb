@@ -10,10 +10,6 @@ user = User.create(
   :email => "user@example.com",
   :password => "password"
 )
-organization = user.organizations.create(
-  :name => "Organization #1",
-  :license_key => ENV["APP_PERF_LICENSE_KEY"]
-)
-application = organization.applications.create(
+application = Application.create(
   :name => "App Perf"
 )
