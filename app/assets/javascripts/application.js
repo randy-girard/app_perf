@@ -12,7 +12,6 @@
 //
 //= require jquery
 //= require vanilla-ujs
-//= require jQueryUI/jquery-ui
 //= require axios
 //= require pace/pace
 //= require bootstrap-sprockets
