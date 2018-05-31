@@ -24,7 +24,7 @@
                 %th Count
               - @errors.each do |error|
                 %tr
-                  %td= link_to 'View Error', organization_application_error_instances_path(@current_organization, @current_application, error)
+                  %td= link_to 'View Error', dynamic_url(@current_application, :error_instances, error_id: error)
                   %td
                     = error.error_class
                     %br/

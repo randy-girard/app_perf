@@ -9,10 +9,9 @@ describe ReportsController, :type => :controller do
   describe 'GET new' do
     it 'works' do
       expect(Application).to receive(:select).with("pg_sleep(5)") { [1] }
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
 
-      get :new, :organization_id => organization, :application_id => application
+      get :new, :application_id => application
       expect(response.status).to eq(200)
     end
   end
@@ -20,11 +19,10 @@ describe ReportsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET error' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
 
       expect {
-        get :error, :organization_id => organization, :application_id => application
+        get :error, :application_id => application
       }.to raise_error(RuntimeError)
     end
   end

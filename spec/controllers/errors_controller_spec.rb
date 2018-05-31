@@ -8,11 +8,10 @@ describe ErrorsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET index' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
       create(:error_message, :application => application)
 
-      get :index, :organization_id => organization, :application_id => application
+      get :index, :application_id => application
       expect(response.status).to eq(200)
     end
   end
@@ -20,12 +19,11 @@ describe ErrorsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET show' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
       error_datum = create(:error_datum, :application => application)
 
 
-      get :show, :organization_id => organization, :application_id => application, :id => error_datum
+      get :show, :application_id => application, :id => error_datum
       expect(response.status).to eq(200)
     end
   end

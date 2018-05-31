@@ -8,10 +8,9 @@ describe DatabaseController, :type => :controller do
   # TODO: auto-generated
   describe 'GET index' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
 
-      get :index, :organization_id => organization, :application_id => application
+      get :index, :application_id => application
       expect(response.status).to eq(200)
     end
   end

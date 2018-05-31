@@ -8,10 +8,9 @@ describe OverviewController, :type => :controller do
   # TODO: auto-generated
   describe 'GET show' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
 
-      get :show, :organization_id => organization, :application_id => application
+      get :show, :application_id => application
       expect(response.status).to eq(200)
     end
   end

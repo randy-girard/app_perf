@@ -1,6 +1,5 @@
 class Application < ActiveRecord::Base
   belongs_to :user
-  belongs_to :organization
   has_many :metrics, :dependent => :delete_all
   has_many :metric_data
   has_many :database_calls, :dependent => :delete_all
@@ -14,7 +13,7 @@ class Application < ActiveRecord::Base
   has_many :events, :dependent => :delete_all
   has_many :deployments
 
-  validates :name, :uniqueness => { :scope => :organization_id }
+  validates :name, presence: true
 
   before_validation do |record|
     record.license_key ||= SecureRandom.uuid

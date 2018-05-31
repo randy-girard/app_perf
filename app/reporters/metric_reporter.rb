@@ -36,9 +36,7 @@ class MetricReporter < Reporter
       hash.push({ :name => label , :data => data, :id => "ID-#{label}" }) rescue nil
     end
 
-    deployments = @host
-      .organization
-      .deployments
+    deployments = Deployment
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => time_range.first, :end => time_range.last)
 
     {

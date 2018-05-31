@@ -11,7 +11,7 @@
         .box-header
           %h3.box-title Deployments
           .box-tools
-            = link_to new_organization_application_deployment_path(@current_organization, @current_application), :class => "btn btn-primary" do
+            = link_to dynamic_url(@current_application, :deployment, action: :new), :class => "btn btn-primary" do
               %i.fa.fa-plus
               New Deployment
         .box-body

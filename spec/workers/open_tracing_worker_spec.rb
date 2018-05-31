@@ -5,13 +5,12 @@ describe OpenTracingWorker do
 
   describe '#perform' do
     it "should process traces" do
-      organization = create(:organization, :license_key => "1")
-      application = create(:application, :organization => organization)
+      application = create(:application, :license_key => "1")
 
       body = eval(File.read(Rails.root.join("spec", "factories", "open_tracing_trace.json")))
 
       params = {
-        "license_key" => organization.license_key,
+        "license_key" => application.license_key,
         "protocol_version" => "3"
       }
 
@@ -41,13 +40,12 @@ describe OpenTracingWorker do
     end
 
     it "should process log entry as error" do
-      organization = create(:organization, :license_key => "1")
-      application = create(:application, :organization => organization)
+      application = create(:application, :license_key => "1")
 
       body = eval(File.read(Rails.root.join("spec", "factories", "open_tracing_error.json")))
 
       params = {
-        "license_key" => organization.license_key,
+        "license_key" => application.license_key,
         "protocol_version" => "3"
       }
 

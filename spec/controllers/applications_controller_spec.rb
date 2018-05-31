@@ -8,9 +8,7 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET index' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-
-      get :index, :organization_id => organization
+      get :index
       expect(response.status).to eq(200)
     end
   end
@@ -18,8 +16,7 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET new' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      get :new, :organization_id => organization
+      get :new
       expect(response.status).to eq(200)
     end
   end
@@ -27,9 +24,8 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET edit' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
-      get :edit, :organization_id => organization, :id => application
+      application = create(:application)
+      get :edit, :id => application
       expect(response.status).to eq(200)
     end
   end
@@ -37,22 +33,20 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'PUT update' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
-      put :update, :organization_id => organization, :id => application, :application => { :name => "Test" }
+      application = create(:application)
+      put :update, :id => application, :application => { :name => "Test" }
       expect(response.status).to eq(302)
-      expect(response).to redirect_to(edit_organization_application_path(organization, application))
+      expect(response).to redirect_to(edit_application_path(application))
     end
   end
 
   # TODO: auto-generated
   describe 'DELETE destroy' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
-      delete :destroy, :organization_id => organization, :id => application
+      application = create(:application)
+      delete :destroy, :id => application
       expect(response.status).to eq(302)
-      expect(response).to redirect_to(organization_applications_path(organization))
+      expect(response).to redirect_to(applications_path)
     end
   end
 

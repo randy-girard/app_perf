@@ -4,21 +4,21 @@ class ApplicationsController < ApplicationController
   # GET /applications
   # GET /applications.json
   def index
-    @applications = @current_organization.applications
+    @applications = @application_scope
   end
 
   # GET /applications/new
   def new
-    @application = @current_organization.applications.new
+    @application = @application_scope.new
     @root_uri = URI.parse(root_url)
   end
 
   def create
-    @application = @current_organization.applications.new(application_params)
+    @application = @application_scope.new(application_params)
 
     respond_to do |format|
       if @application.save
-        format.html { redirect_to edit_organization_application_url(@current_organization, @application), notice: 'Application was successfully created.' }
+        format.html { redirect_to dynamic_url(@application, action: :edit), notice: 'Application was successfully created.' }
         format.json { render :show, status: :ok, location: @application }
       else
         format.html { render :new }
@@ -36,7 +36,7 @@ class ApplicationsController < ApplicationController
   def update
     respond_to do |format|
       if @application.update(application_params)
-        format.html { redirect_to edit_organization_application_url(@current_organization, @application), notice: 'Application was successfully updated.' }
+        format.html { redirect_to dynamic_url(@application, action: :edit), notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @application }
       else
         format.html { render :edit }
@@ -50,7 +50,7 @@ class ApplicationsController < ApplicationController
   def destroy
     @application.destroy
     respond_to do |format|
-      format.html { redirect_to organization_applications_url(@current_organization), notice: 'Application was successfully destroyed.' }
+      format.html { redirect_to dynamic_url(:applications), notice: 'Application was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -58,7 +58,7 @@ class ApplicationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_application
-      @application = @current_organization.applications.find(params[:id])
+      @application = @application_scope.find(params[:id])
       @current_application = @application
     end
 

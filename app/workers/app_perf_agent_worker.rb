@@ -7,7 +7,6 @@ class AppPerfAgentWorker < ActiveJob::Base
                 :hostname,
                 :data,
                 :user,
-                :organization,
                 :application,
                 :protocol_version
 
@@ -27,39 +26,26 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       self.data = Array(json.fetch("data"))
 
-      # Can we find a user by the license?
-      self.organization = Organization.where(:license_key => license_key).first
+      self.application = Application.where(:license_key => license_key).first_or_initialize
+      self.application.name = name
+      self.application.save
 
-      if organization
-        if name.present?
-          self.application = organization.applications.where(:name => name).first_or_initialize
-          application.save
+      self.host = Host.where(:name => hostname).first_or_create
+
+      if protocol_version.to_i.eql?(2)
+        errors, remaining_data = data.partition {|d| d[0] == "error" }
+        metrics, spans = Array(remaining_data).partition {|d| d[0] == "metric" }
+
+        if metrics.present?
+          process_metric_data(metrics)
         end
-        # We couldn't find a user, so lets find an application
-      elsif self.application = Application.where(:license_key => license_key).first
-        self.organization = application.organization
-      else
-        return
-      end
 
-      if organization
-        self.host = organization.hosts.where(:name => hostname).first_or_create
+        if errors.present? && application.present?
+          process_error_data(errors)
+        end
 
-        if protocol_version.to_i.eql?(2)
-          errors, remaining_data = data.partition {|d| d[0] == "error" }
-          metrics, spans = Array(remaining_data).partition {|d| d[0] == "metric" }
-
-          if metrics.present?
-            process_metric_data(metrics)
-          end
-
-          if errors.present? && application.present?
-            process_error_data(errors)
-          end
-
-          if spans.present? && application.present?
-            process_version_2(spans)
-          end
+        if spans.present? && application.present?
+          process_version_2(spans)
         end
       end
     #end
@@ -104,7 +90,6 @@ class AppPerfAgentWorker < ActiveJob::Base
     layer_names = data.map {|d| d[0] }.compact.uniq
     new_layers = (layer_names - existing_layers.map(&:name)).map {|l|
       layer = application.layers.where(:name => l).first_or_initialize
-      layer.organization = organization
       layer.save
       layer
     }
@@ -121,7 +106,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       database_type = application.database_types.where(
         :name => adapter
       ).first_or_initialize
-      database_type.organization = organization
       database_type.save
       database_type
     }
@@ -153,7 +137,6 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       trace.host = host
       trace.trace_key = trace_key
-      trace.organization = organization
 
       # Set timestamp if never set, or incoming timestamp is earlier than
       # the oldest recorded already.
@@ -211,7 +194,6 @@ class AppPerfAgentWorker < ActiveJob::Base
         database_type = database_types.find {|dt| dt.name == adapter }
         database_call = application.database_calls.new(
           :uuid => SecureRandom.uuid.to_s,
-          :organization_id => organization.id,
           :database_type_id => database_type.id,
           :host_id => host.id,
           :layer_id => layer.id,
@@ -234,7 +216,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       span[:trace_id] = _trace_key
       span[:uuid] = SecureRandom.uuid.to_s
       span[:payload] = _opts
-      span[:organization_id] = organization.id
 
       if _backtrace
         backtrace = Backtrace.new
@@ -263,7 +244,6 @@ class AppPerfAgentWorker < ActiveJob::Base
         e[:payload]["controller"] ||= controller
         e[:payload]["action"] ||= action
         e[:trace_id] = trace.trace_key
-        e[:organization_id] = organization.id
       }
 
       existing_spans = trace.spans.all
@@ -322,7 +302,6 @@ class AppPerfAgentWorker < ActiveJob::Base
       message, backtrace, fingerprint = generate_fingerprint(data["message"], data["backtrace"])
 
       error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
-      error_message.organization = organization
       error_message.error_class ||= data["error_class"]
       error_message.error_message ||= message
       error_message.last_error_at = Time.now
@@ -330,7 +309,6 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       error_data << application.error_data.new do |error_datum|
         error_datum.host = host
-        error_datum.organization = organization
         error_datum.error_message = error_message
         error_datum.transaction_id = trace_key
         error_datum.message = message
@@ -343,23 +321,16 @@ class AppPerfAgentWorker < ActiveJob::Base
   end
 
   def process_metric_data(data)
+    metrics = {}
     metric_data = []
-
-    organization_metrics = organization.metrics.where(
-      :metrics => { :application_id => application.try(:id) }
-    )
 
     data.select {|d| d.first.eql?("metric") }.each do |datum|
       _, timestamp, key, value, tags = *datum
 
       if key && value
-        metric = organization_metrics.find {|metric| metric.name == key } ||
-          organization.metrics.new(
-            :application_id => application.try(:id),
-            :name => key
-          )
+        metrics[key] ||= Metric.where(name: key, application_id: application.try(:id)).first_or_create
 
-        metric_data << metric.metric_data.new do |metric_datum|
+        metric_data << metrics[key].metric_data.new do |metric_datum|
           metric_datum.host = host
           metric_datum.value = value
           metric_datum.tags = tags || {}

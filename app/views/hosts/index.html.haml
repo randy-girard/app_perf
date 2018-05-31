@@ -18,7 +18,7 @@
               %th CPU Usage
             - @hosts.each do |host|
               %tr
-                %td= link_to host.name, organization_host_path(@current_organization, host)
+                %td= link_to host.name, dynamic_url(host)
                 %td
                   - if last_metric_activity = host.last_metric_activity
                     = time_ago_in_words(last_metric_activity)

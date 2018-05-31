@@ -3,7 +3,7 @@
   %h1
     Deployments
   %ol.breadcrumb
-    %li= link_to "Deployments", organization_application_deployments_path(@current_organization, @current_application)
+    %li= link_to "Deployments", dynamic_url(@current_application, :deployments)
     %li.active New Deployment
 %section.content
   .row

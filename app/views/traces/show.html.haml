@@ -9,7 +9,7 @@
   %h1
     Trace Details
   %ol.breadcrumb
-    %li= link_to "Traces", organization_application_traces_path(@current_organization, @current_application)
+    %li= link_to "Traces", dynamic_url(@current_application, :traces)
     %li.active= @trace.root_span.tag("http.url")
 %section.content
   .row
@@ -23,10 +23,10 @@
           :javascript
             function setSelection(span_id) {
               if(span_id) {
-                $("#span").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/spans/" + span_id);
+                $("#span").load("/applications/#{@current_application.id}/#{@span_url_root}/spans/" + span_id);
               }
               else {
-                $("#span").load("/organizations/#{@current_organization.id}/applications/#{@current_application.id}/traces/#{@trace.trace_key}/database");
+                $("#span").load("/applications/#{@current_application.id}/#{@span_url_root}/traces/#{@trace.trace_key}/database");
               }
             }
             groups = []

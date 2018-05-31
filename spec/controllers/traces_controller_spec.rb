@@ -8,10 +8,9 @@ describe TracesController, :type => :controller do
   # TODO: auto-generated
   describe 'GET index' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
+      application = create(:application)
 
-      get :index, :organization_id => organization, :application_id => application
+      get :index, :application_id => application
       expect(response.status).to eq(200)
     end
   end
@@ -19,11 +18,10 @@ describe TracesController, :type => :controller do
   # TODO: auto-generated
   describe 'GET show' do
     it 'works' do
-      organization = create(:organization, :user => subject.current_user)
-      application = create(:application, :organization => organization)
-      trace = create(:trace, :organization => organization, :application => application)
+      application = create(:application)
+      trace = create(:trace, :application => application)
 
-      get :show, :organization_id => organization, :application_id => application, :id => trace.trace_key
+      get :show, :application_id => application, :id => trace.trace_key
 
       expect(response.status).to eq(200)
     end

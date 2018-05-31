@@ -11,10 +11,9 @@ describe AppPerfAgentWorker do
 
     it "process trace" do
       user = User.create(:email => "user@example.com", :password => "password")
-      organization = create(:organization, :user => user)
 
       params = {
-        "license_key" => organization.license_key,
+        "license_key" => user.license_key,
         "protocol_version" => 2
       }
 
@@ -75,10 +74,9 @@ describe AppPerfAgentWorker do
 
     it 'works' do
       user = User.create(:email => "user@example.com", :password => "password")
-      organization = create(:organization, :user => user)
 
       params = {
-        "license_key" => organization.license_key,
+        "license_key" => user.license_key,
         "protocol_version" => 2
       }
 
@@ -116,12 +114,11 @@ describe AppPerfAgentWorker do
 
     it 'works with existing application' do
       user = User.create(:email => "user@example.com", :password => "password")
-      organization = create(:organization, :user => user)
-      application = create(:application, :organization => organization, :user => user, :name => "App Name")
+      application = create(:application, :name => "App Name")
       application.traces.create(:trace_key => "b07994fb2ece323877895abf7634479f6dfbac42")
 
       params = {
-        "license_key" => organization.license_key,
+        "license_key" => application.license_key,
         "protocol_version" => 2
       }
       body = MessagePack.pack({

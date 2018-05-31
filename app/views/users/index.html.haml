@@ -11,7 +11,7 @@
         .box-header
           %h3.box-title Users
           .box-tools
-            = link_to new_organization_user_path(@organization), :class => "btn btn-primary" do
+            = link_to dynamic_url(:user, action: :new), :class => "btn btn-primary" do
               %i.fa.fa-plus
               New User
         .box-body
@@ -25,5 +25,5 @@
               %tr
                 %td= user.name
                 %td= user.email
-                %td= link_to 'Edit', edit_user_registration_path, :class => "btn btn-default" if user == current_user
-                %td= link_to 'Destroy', [@organization, user], method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger"
+                %td= link_to 'Edit', dynamic_url(:user_registration, action: :edit), :class => "btn btn-default" if user == current_user
+                %td= link_to 'Destroy', dynamic_url(user), method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger"

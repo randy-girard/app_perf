@@ -8,7 +8,6 @@ class OpenTracingWorker < ActiveJob::Base
                 :host,
                 :data,
                 :user,
-                :organization,
                 :application,
                 :protocol_version
 
@@ -30,38 +29,26 @@ class OpenTracingWorker < ActiveJob::Base
       name     = json.fetch("name") { nil }
       data     = Array(json.fetch("data"))
 
-      set_organization(license_key, name)
+      set_application(license_key, name)
 
-      if organization
-        if data.present? && application.present?
-          set_host(hostname)
-          layers = load_layers(data)
-          process_data(layers, data)
-        end
+      if data.present? && application.present?
+        set_host(hostname)
+        layers = load_layers(data)
+        process_data(layers, data)
       end
     #end
   end
 
   private
 
-  def set_organization(license_key, name)
-    self.organization = Organization.where(:license_key => license_key).first
-
-    if organization
-      if name.present?
-        self.application = organization.applications.where(:name => name).first_or_initialize
-        application.save
-      end
-      # We couldn't find a user, so lets find an application
-    elsif self.application = Application.where(:license_key => license_key).first
-      self.organization = application.organization
-    else
-      return
-    end
+  def set_application(license_key, name)
+    self.application = Application.where(:license_key => license_key).first_or_initialize
+    self.application.name = name
+    self.application.save
   end
 
   def set_host(hostname)
-    self.host = organization.hosts.where(:name => hostname).first_or_create
+    self.host = Host.where(name: hostname).first_or_create
   end
 
   def decompress_params(body)
@@ -76,7 +63,6 @@ class OpenTracingWorker < ActiveJob::Base
       .uniq
       .map {|layer|
         layer = application.layers.where(:name => layer).first_or_initialize
-        layer.organization = organization
         layer.save
         layer
       }
@@ -121,7 +107,6 @@ class OpenTracingWorker < ActiveJob::Base
     data.map {|datum|
       span = Span.new
       # span.id = SecureRandom.uuid.to_s
-      span.organization_id = organization.id
       span.application_id = application.id
       span.host_id = host.id
       span.uuid = datum["id"]
@@ -144,7 +129,7 @@ class OpenTracingWorker < ActiveJob::Base
         log_entry = LogEntry.new
         log_entry.span_id = datum["id"]
         log_entry.trace_id = datum["traceId"]
-        log_entry.event = log_data["event"]
+        log_entry.event = log_data["event"] || log_data["fields"]["event"]
         log_entry.timestamp = Time.at(log_data["timestamp"].to_f)
         log_entry.fields = log_data["fields"]
         log_entry
@@ -170,7 +155,6 @@ class OpenTracingWorker < ActiveJob::Base
         message, backtrace, fingerprint = generate_fingerprint(message, backtrace)
 
         error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
-        error_message.organization = organization
         error_message.error_class ||= error_class
         error_message.error_message ||= message
         error_message.last_error_at = Time.now
@@ -179,7 +163,6 @@ class OpenTracingWorker < ActiveJob::Base
         error_datum = application.error_data.new
         error_datum.host = host
         error_datum.span_id = log_entry.span_id
-        error_datum.organization = organization
         error_datum.error_message = error_message
         error_datum.transaction_id = log_entry.trace_id
         error_datum.message = message
@@ -198,10 +181,8 @@ class OpenTracingWorker < ActiveJob::Base
       .map {|adapter|
         database_type = DatabaseType.where(
           :name => adapter,
-          :application_id => application.id,
-          :organization_id => organization.id
+          :application_id => application.id
         ).first_or_initialize
-        database_type.organization_id = organization.id
         database_type.application_id = application.id
         database_type.save
         database_type
@@ -216,7 +197,6 @@ class OpenTracingWorker < ActiveJob::Base
         database_type = database_types.find {|dt| dt.name == span.tag("db.vendor") }
         database_call = DatabaseCall.new
         database_call.database_type_id = database_type.id
-        database_call.organization_id = organization.id
         database_call.application_id = application.id
         database_call.span_id = span.uuid
         database_call.host_id = host.id
@@ -233,7 +213,6 @@ class OpenTracingWorker < ActiveJob::Base
       .select(&:is_root?)
       .map {|span|
         trace = Trace.new
-        trace.organization_id = organization.id
         trace.application_id = application.id
         trace.host_id = host.id
         trace.trace_key = span.trace_id

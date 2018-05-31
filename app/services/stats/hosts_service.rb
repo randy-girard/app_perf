@@ -1,7 +1,6 @@
 class Stats::HostsService < Stats::BaseService
   def call
-    organization
-      .hosts
+    Host
       .with(:trace_cte => traces)
       .joins(:spans => :trace)
       .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")

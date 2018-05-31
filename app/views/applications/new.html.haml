@@ -3,7 +3,7 @@
   %h1
     Applications
   %ol.breadcrumb
-    %li= link_to "Applications", organization_applications_path(@current_organization)
+    %li= link_to "Applications", dynamic_url(:applications)
     %li.active New Application
 %section.content
   .row
@@ -32,6 +32,6 @@
                   require 'app_perf_rpm'
 
                   AppPerfRpm.configure do |rpm|
-                    rpm.license_key = "#{@current_organization.license_key}"
+                    rpm.license_key = "#{@current_scope.license_key}"
                     rpm.application_name = "Application Name"
                   end

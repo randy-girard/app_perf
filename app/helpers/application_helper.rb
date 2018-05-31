@@ -84,7 +84,7 @@ module ApplicationHelper
     base_params.merge!("Action"     => _action)     if _action
 
     if _host
-      host = @current_organization.hosts.find(_host)
+      host = Host.find(_host)
       base_params.merge!("Host" => host.name)
     end
 

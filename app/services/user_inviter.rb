@@ -1,14 +1,12 @@
-class UserOrganizationInviter
-  def initialize(email, organization, current_user = nil)
+class UserInviter
+  def initialize(email, current_user = nil)
     self.email = email
-    self.organization = organization
     self.current_user = current_user
   end
 
   def execute
     ActiveRecord::Base.transaction do
       create_user if user.nil?
-      add_user_to_organization
       invite_user
     end
     user
@@ -16,7 +14,7 @@ class UserOrganizationInviter
 
   private
 
-  attr_accessor :email, :organization, :current_user
+  attr_accessor :email, :current_user
 
   def user
     @user ||= User.find_by_email(email)
@@ -27,14 +25,6 @@ class UserOrganizationInviter
     @user.password = SecureRandom.hex
     @user.save
     @user
-  end
-
-  def organization
-    @organization ||= Organization.find(organization_id)
-  end
-
-  def add_user_to_organization
-    user.organizations << organization
   end
 
   def invite_user

@@ -3,8 +3,8 @@
   %h1
     Error Backtrace
   %ol.breadcrumb
-    %li= link_to "Errors", organization_application_errors_path(@current_organization, @current_application)
-    %li= link_to @error_message.error_class, organization_application_error_instances_path(@current_organization, @current_application, @error_message)
+    %li= link_to "Errors", dynamic_url(@current_application, :errors)
+    %li= link_to @error_message.error_class, dynamic_url(@current_application, :error_instances, error_id: @error_message)
 %section.content
   .row
     .col-lg-12.connectedSortable

@@ -3,7 +3,7 @@
   %h1
     Applications
   %ol.breadcrumb
-    %li= link_to "Applications", organization_applications_path(@current_organization)
+    %li= link_to "Applications", dynamic_url(:applications)
     %li.active Edit Application
 %section.content
   .row
@@ -14,28 +14,43 @@
 
         = render 'form'
 
-      .box
-        .box-body
-          %p
-            Add the following gem to your project:
-          %p
-          %div
-            %pre.text-wrap
-              :preserve
-                # Gemfile
-                gem "app_perf_rpm"
-          %p
-            Copy and paste the contents below into your application setup or initializer:
-          %div
-            %pre.text-wrap
-              :preserve
-                require 'app_perf_rpm'
+      .nav-tabs-custom
+        %ul.nav.nav-tabs
+          %li.active= link_to "Ruby APM", "#ruby-apm", :data => { :toggle => "tab" }
+          %li= link_to "System Agent", "#system-agent", :data => { :toggle => "tab" }
+        %div.tab-content
+          %div#ruby-apm.tab-pane.active
+            %p
+              Add the following gem to your project:
+            %p
+            %div
+              %pre.text-wrap
+                :preserve
+                  # Gemfile
+                  gem "app_perf_rpm"
+            %p
+              Copy and paste the contents below into your organization setup or initializer:
+            %div
+              %pre.text-wrap
+                :preserve
+                  require 'app_perf_rpm'
 
-                AppPerfRpm.configure do |rpm|
-                  rpm.application_name = "#{@application.name}"
-                  rpm.license_key = "#{@application.license_key}"
-                end
+                  AppPerfRpm.configure do |rpm|
+                    rpm.application_name = "#{@application.name}"
+                    rpm.license_key = "#{@application.license_key}"
+                  end
+          %div#system-agent.tab-pane
+            %p
+              Install the App Perf Agent:
+            %div
+              %pre.text-wrap
+                gem install app_perf_agent
+            %p
+              Run the following command (Please note this is uses your personal license key):
+            %div
+              %pre.text-wrap
+                app_perf_agent --license #{current_user.license_key} --host #{ENV["HOST"]}
 
       %hr
 
-      = link_to 'Delete Application', [@current_organization, @application], method: :delete, data: { confirm: 'Deleting this Application will remove all existing metrics and they will not be able to be recovered. Are you sure?' }, :class => "btn btn-danger"
+      = link_to 'Delete Application', dynamic_url(@application), method: :delete, data: { confirm: 'Deleting this Application will remove all existing metrics and they will not be able to be recovered. Are you sure?' }, :class => "btn btn-danger"

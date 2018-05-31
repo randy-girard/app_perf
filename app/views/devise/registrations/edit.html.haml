@@ -34,4 +34,8 @@
                 %p.help-block
                   We need your current password to confirm your changes.
 
+              .form-group
+                = f.label :license_key
+                = f.text_field :license_key, :class => "form-control", disabled: true, readonly: true
+
               = f.submit "Update", :class => "btn btn-primary"

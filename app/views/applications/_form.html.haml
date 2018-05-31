@@ -1,4 +1,4 @@
-= form_for([@current_organization, @application]) do |f|
+= form_for(form_route(@application)) do |f|
   .box-body
     - if @application.errors.any?
       #error_explanation

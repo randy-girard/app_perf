@@ -3,7 +3,7 @@
   %h1
     Traces
   %ol.breadcrumb
-    %li= link_to 'Overview', organization_application_overview_path(@current_organization, @current_application)
+    %li= link_to 'Overview', dynamic_url(@current_application, :overview)
     %li.active Traces
 / Main content
 %section.content
@@ -23,7 +23,7 @@
             - @traces.each do |trace|
               %tr
                 %td.ellipsis
-                  = link_to (trace.root_span ? trace.root_span.tag("http.url") : trace.trace_key), organization_application_trace_path(@current_organization, @current_application, :id => trace.trace_key)
+                  = link_to (trace.root_span ? trace.root_span.tag("http.url") : trace.trace_key), dynamic_url(@current_application, :trace,  :id => trace.trace_key)
                 %td.text-center= number_with_precision(trace.duration, :precision => 2)
                 %td.text-center
                   = time_ago_in_words(trace.timestamp)

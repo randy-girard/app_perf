@@ -14,7 +14,6 @@ class Stats::BaseService
 
   def initialize(application, time_range, params)
     @application = application
-    @organization = application.organization
     @time_range = time_range
     @params = params
   end
@@ -22,7 +21,6 @@ class Stats::BaseService
   private
 
   attr_accessor :application,
-                :organization,
                 :time_range,
                 :params,
                 :traces

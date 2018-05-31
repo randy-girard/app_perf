@@ -1,6 +1,5 @@
 class MetricDataService
-  def initialize(organization, metric_name, params = {})
-    self.organization = organization
+  def initialize(metric_name, params = {})
     self.metric_name = metric_name
     self.params = params
 
@@ -26,8 +25,7 @@ class MetricDataService
 
   private
 
-  attr_accessor :organization,
-                :metric_name,
+  attr_accessor :metric_name,
                 :params,
                 :time_range,
                 :start_time,
@@ -54,17 +52,16 @@ class MetricDataService
   end
 
   def host
-    @host ||= organization.hosts.where(:id => params[:host_id]).first
+    @host ||= Host.find(params[:host_id])
   end
 
   def application
-    @application ||= organization.applications.where(:id => params[:application_id]).first
+    @application ||= Application.find_by_id(params[:application_id])
   end
 
   def metric_data
     @metric_data ||= MetricDatum
       .joins(:metric)
-      .where(:metrics => { :organization_id => organization })
       .where(:metrics => { :name => metric_names })
   end
 
@@ -88,7 +85,7 @@ class MetricDataService
     end
 
     data = data.group_by_period(period, "timestamp", options)
-    
+
     if params[:group] == "name"
       data.group("name")
     elsif params[:group].present?
@@ -174,8 +171,8 @@ class MetricDataService
 
   def annotations
     time_range, period = Reporter.time_range(params)
-    organization
-      .deployments
+
+    Deployment
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => start_time, :end => end_time)
       .map {|deployment|
         {

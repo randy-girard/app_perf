@@ -10,13 +10,12 @@ module API
         require_login!(r)
 
         @time_range, @period = Reporter.time_range(@params)
-        @current_organization = current_user.organizations.find(@params[:organization_id])
-        @current_application = @current_organization.applications.find(@params[:application_id])
+        @current_application = Application.find(@params[:application_id])
 
         r.on 'stats' do
           r.get 'average_duration' do
             data = DurationReporter.new(@current_application, @params).report_data
-            
+
             {
               :data => data,
               :annotations => annotations

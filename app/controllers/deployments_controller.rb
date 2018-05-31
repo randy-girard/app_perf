@@ -18,10 +18,9 @@ class DeploymentsController < ApplicationController
 
   def create
     @deployment = @current_application.deployments.new(deployment_params)
-    @deployment.organization = @current_organization
 
     if @deployment.save
-      redirect_to organization_application_deployments_path(@current_organization, @current_application)
+      redirect_to dynamic_url(@current_application, :deployments)
     else
       render "new"
     end

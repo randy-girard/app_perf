@@ -10,9 +10,9 @@
       .box
         .box-header
           %i.fa.fa-clock
-          %h3.box-title Organizations
+          %h3.box-title Applications
         .box-body
           %table.table.table-condensed
-            - @organizations.each do |organization|
+            - @applications.each do |application|
               %tr
-                %td= link_to organization.name, organization_applications_path(organization)
+                %td= link_to application.name, dynamic_url(application, :overview)

@@ -11,13 +11,16 @@ class TracesController < ApplicationController
 
   def show
     @database_call = params[:query]
-    @layer_names = @current_organization.layers.pluck(:name)
-    @trace = @current_organization
+
+    @trace = @current_application
       .traces
       .includes(:spans => :layer)
       .where(:trace_key => params[:id])
       .first
+
     @spans = @trace.spans.sort_by(&:timestamp)
+    @layer_ids = @spans.map(&:layer_id).uniq
+    @layer_names = Layer.where(id: @layer_ids).pluck(:name)
     @span = @spans.find {|s| s.id == params[:span_id] }
 
     @database_calls = @current_application
@@ -33,7 +36,7 @@ class TracesController < ApplicationController
 
       content = []
       if @current_application.name != application.name
-        content << view_context.link_to(application.name, organization_application_trace_path(@current_organization, application, @trace.trace_key))
+        content << view_context.link_to(application.name, dynamic_url(application, :trace, id: @trace.trace_key))
       end
       content << layer_name
 
@@ -70,7 +73,7 @@ class TracesController < ApplicationController
       .database_calls
       .joins(:span)
       .where(:spans => { :id => @trace.spans.select(:id) })
-      
+
     render :layout => false
   end
 end

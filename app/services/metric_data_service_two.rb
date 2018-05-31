@@ -1,6 +1,5 @@
 class MetricDataServiceTwo
-  def initialize(organization, metrics, params)
-    self.organization = organization
+  def initialize(metrics, params)
     self.metrics = metrics
     self.params = params
     self.group_values  = Array(params[:group].split(","))
@@ -24,8 +23,7 @@ class MetricDataServiceTwo
 
   private
 
-  attr_accessor :organization,
-                :metrics,
+  attr_accessor :metrics,
                 :params,
                 :headers,
                 :group_values,
@@ -43,7 +41,6 @@ class MetricDataServiceTwo
 
     data = MetricDatum
       .joins(:metric, :host)
-      .where(:metrics => { :organization_id => organization })
       .where(:metrics => { :name => metrics })
 
     data = host_filter(data)
@@ -61,11 +58,11 @@ class MetricDataServiceTwo
   end
 
   def host
-    @host ||= organization.hosts.where(:id => params[:host_id] || params[:_host]).first
+    @host ||= Host.where(:id => params[:host_id] || params[:_host]).first
   end
 
   def application
-    @application ||= organization.applications.where(:id => params[:application_id]).first
+    @application ||= Application.where(:id => params[:application_id]).first
   end
 
   def host_filter(data)
@@ -227,8 +224,7 @@ class MetricDataServiceTwo
 
   def annotations
     time_range, period = Reporter.time_range(params)
-    organization
-      .deployments
+    Deployment
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => start_time, :end => end_time)
       .map {|deployment|
         {

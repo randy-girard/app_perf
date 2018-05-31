@@ -1,5 +1,4 @@
 class Host < ActiveRecord::Base
-  belongs_to :organization
   belongs_to :application
 
   has_many :metric_data
@@ -8,7 +7,7 @@ class Host < ActiveRecord::Base
   has_many :error_data
   has_many :raw_data
 
-  validates :name, :uniqueness => { :scope => :organization_id }
+  validates :name, presence: true
 
   def last_metric_activity
     metric_data.maximum("metric_data.timestamp")

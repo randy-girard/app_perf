@@ -32,9 +32,7 @@
                                                          :xAxis => { :type => 'datetime',
                                                                      :labels => { format: '{value:%I:%M %p}' } },
                                                          :yAxis => { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/average_duration",
-                                                                             :organization_id => @current_organization.id,
-                                                                             :application_id => @current_application.id }) })
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/average_duration", :application_id => @current_application.id }) })
 
   .row
     %section.col-lg-6.connectedSortable
@@ -54,24 +52,15 @@
                                                          :xAxis => { :type => 'datetime',
                                                                      :labels => { format: '{value:%I:%M %p}' } },
                                                          :yAxis => { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency",
-                                                                             :organization_id => @current_organization.id,
-                                                                             :application_id => @current_application.id }) })
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency", :application_id => @current_application.id }) })
 
-      = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/controllers",
-                                                                                :organization_id => @current_organization.id,
-                                                                                :application_id => @current_application.id }))
+      = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/controllers", :application_id => @current_application.id }))
 
-      = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/urls",
-                                                                         :organization_id => @current_organization.id,
-                                                                         :application_id => @current_application.id }))
+      = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/urls", :application_id => @current_application.id }))
 
-      = react_component("HostDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/hosts",
-                                                                          :organization_id => @current_organization.id,
-                                                                          :application_id => @current_application.id }))
-      = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/database_calls",
-                                                                              :organization_id => @current_organization.id,
-                                                                              :application_id => @current_application.id }))
+      = react_component("HostDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/hosts", :application_id => @current_application.id }))
+
+      = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/database_calls", :application_id => @current_application.id }))
     %section.col-lg-6.connectedSortable
       .box
         .box-header
@@ -83,13 +72,8 @@
                                              :legend => false,
                                              :library => { :xAxis => { :labels => { :enabled => false } },
                                                            :plotOptions => { :series => { :color => "#337ab7" } } },
-                                             :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_distribution",
-                                                                               :organization_id => @current_organization.id,
-                                                                               :application_id => @current_application.id }) })
+                                             :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_distribution", :application_id => @current_application.id }) })
 
-      = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/layers",
-                                                                           :organization_id => @current_organization.id,
-                                                                           :application_id => @current_application.id }))
-      = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/traces",
-                                                                           :organization_id => @current_organization.id,
-                                                                           :application_id => @current_application.id }), :traces_url => organization_application_traces_path(@current_organization, @current_application))
+      = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/layers", :application_id => @current_application.id }))
+
+      = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/traces", :application_id => @current_application.id }), :traces_url => url_for(dynamic_url(@current_application, :traces)))
