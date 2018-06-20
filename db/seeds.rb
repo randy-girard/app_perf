@@ -5,13 +5,13 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-user = User.create(
+User.create(
   :name => "User Example",
   :email => "user@example.com",
   :password => "password",
   :license_key => "30b5805c-25d8-4fcd-875e-4fd9be32993e"
 )
-application = organization.applications.create(
+Application.create(
   :name => "App Perf",
   :license_key => ENV["APP_PERF_LICENSE_KEY"]
 )
