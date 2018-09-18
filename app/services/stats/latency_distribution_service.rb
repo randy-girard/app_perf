@@ -1,26 +1,39 @@
+require 'hdr_histogram'
+
 class Stats::LatencyDistributionService < Stats::BaseService
   def call
-    if params[:_layer].present?
-      @traces = traces
-        .select("spans.id, spans.exclusive_duration AS duration")
-        .where("spans.layer_id = ?", params[:_layer])
-    end
+    time_range, period = Reporter.time_range(params)
 
-    Trace
-      .with(:trace_cte => traces)
-      .from("trace_cte")
-      .joins("RIGHT JOIN generate_series(1, 100) g(n) ON width_bucket(trace_cte.duration, 0, (select max(duration) + 1 from trace_cte), 100) = g.n")
-      .group("g.n")
-      .order("g.n")
+    data = MetricDatum
+      .joins(:metric, :tags)
+      .where(metrics: { application_id: application })
+      .where(timestamp: time_range)
+      .calculate_all(
+        "hdr_c_distribution(hdr_group(hdr_histogram))"
+      )
+
+    return data.map {|distribution|
+      {
+        name: "p#{distribution[1]}",
+        data: { "#{distribution[0]} - #{distribution[1]}" => distribution[2] }
+      }
+    }
+
+
+    a = MetricDatum
+      .joins(", unnest_3d(histogram) AS s")
+      .where(:timestamp => time_range)
+      .where("histogram != '{}'")
+      .group("s.start")
+      .group("s.finish")
       .pluck_to_hash(
-        "g.n AS bucket",
-        "count(distinct trace_cte.id) AS count",
-        "min(trace_cte.duration) AS min_duration",
-        "max(trace_cte.duration) AS max_duration"
+        "s.start AS start",
+        "s.finish AS finish",
+        "AVG(s.count) AS count"
       ).map {|object|
         {
-          name: "p#{object[:bucket]}",
-          data: { "#{object[:bucket]}: in #{object[:min_duration].to_f.round(2)} to #{object[:max_duration].to_f.round(2)}ms" => object[:count] }
+          name: "p#{object[:finish]}",
+          data: { "#{object[:start]} - #{object[:finish]}" => object[:count] }
         }
       }
   end

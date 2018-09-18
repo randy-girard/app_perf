@@ -1,0 +1,11 @@
+Things to follow up on:
+
+1. Remove layers from spans table (and anywhere else)
+2. Clean up RPM
+3. Get tags working with spans
+4. Remove any puts
+5. Use unix timestamps for start/finish timestamps
+6. Move db statements from the tags table
+7. Figure out repeat sql statements in logs
+8. Add migration for unnest_3d method.
+9. Optimize tag loading in listener.

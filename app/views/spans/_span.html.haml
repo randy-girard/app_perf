@@ -2,9 +2,9 @@
   %td{:width => "20"}= link_to span.id, application_trace_path(@current_application, @trace.trace_key, :sample_id => span.id)
   %td{:width => "150"}= span.layer.name
   %td.ellipsis{:style => "padding-left: #{depth * 40}px;"}
-    - span.payload.each do |key, value|
-      = key
-      = value
+    - span.tags.each do |tag|
+      = tag.key
+      = tag.value
   %td{:width => "200"}
     .progress.progress-xs
       .progress-bar.progress-bar-danger{:style => "width: #{number_to_percentage(span.exclusive_duration.to_f / @trace.duration.to_f * 100.to_f, :precision => 2)}"}

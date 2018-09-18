@@ -1,0 +1,82 @@
+/ Content Header (Page header)
+%section.content-header
+  %h1
+    Overview
+  %ol.breadcrumb.breadcrumb-as-navigation
+    %li.active View Past:
+    - Reporter::PAST_OPTIONS.each do |option|
+      %li= link_to option[:label], dynamic_report_url(:past => option[:past])
+- if selected_filters.present?
+  %section.content-header
+    - selected_filters.each_pair do |key, value|
+      = link_to dynamic_report_url(:without => key), :class => "btn btn-info btn-sm", :title => value do
+        = key
+        \: #{truncate(value, :length => 40)}
+        %i.fa.fa-remove
+/ Main content
+
+%section.content
+  .row
+    %section.col-lg-12.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Worker Job Execution Time
+        .box-body
+          = react_component("AreaChart", { :refresh => 15,
+                                           :legend => true,
+                                           :curve => false,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} },
+                                           :data => api_v1_metrics_url("avg:app.worker.requests by {timestamp,component}") })
+
+  .row
+    %section.col-lg-6.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Latency
+        .box-body
+          = react_component("AreaChart", { :refresh => 15,
+                                           :legend => false,
+                                           :height => 200,
+                                           :curve => false,
+                                           :points => false,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }},
+                                                         :plotOptions => { :series => { :stacking => nil,
+                                                                                        :lineWidth => 1,
+                                                                                        :fillOpacity => 1.0 } } },
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency", :application_id => @current_application.id }) })
+
+      = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/controllers", :application_id => @current_application.id }))
+
+      = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/urls", :application_id => @current_application.id }))
+
+      = react_component("HostDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/hosts", :application_id => @current_application.id }))
+
+      = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/database_calls", :application_id => @current_application.id }))
+    %section.col-lg-6.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Latency Distribution
+        .box-body
+          = react_component("AreaChart", { :refresh => 15,
+                                           :height => 200,
+                                           :legend => false,
+                                           :library => { :xAxis => { :labels => { :enabled => false } },
+                                                         :plotOptions => { :series => { :color => "#337ab7" } } },
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_distribution", :application_id => @current_application.id }) })
+
+      = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/layers", :application_id => @current_application.id }))
+
+      = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/traces", :application_id => @current_application.id }), :traces_url => url_for(dynamic_url(@current_application, :traces)))

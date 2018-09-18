@@ -1,3 +1,10 @@
+PATH
+  remote: ../app_perf_rpm
+  specs:
+    app_perf_rpm (0.2.4)
+      msgpack
+      opentracing
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -30,7 +37,7 @@ GEM
       activemodel (= 4.2.7.1)
       activesupport (= 4.2.7.1)
       arel (~> 6.0)
-    activerecord-import (0.20.2)
+    activerecord-import (0.24.0)
       activerecord (>= 3.2)
     activesupport (4.2.7.1)
       i18n (~> 0.7)
@@ -46,9 +53,6 @@ GEM
     app_perf_agent (0.0.6)
       msgpack
       vmstat (= 2.3.0)
-    app_perf_rpm (0.2.4)
-      msgpack
-      opentracing
     arel (6.0.4)
     autoprefixer-rails (7.1.1.2)
       execjs
@@ -143,7 +147,7 @@ GEM
       tilt
     highcharts-rails (4.2.5)
       railties (>= 3.1)
-    i18n (0.9.1)
+    i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
@@ -164,7 +168,7 @@ GEM
     method_source (0.8.2)
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
-    minitest (5.11.1)
+    minitest (5.11.3)
     msgpack (1.2.4)
     multi_json (1.11.2)
     net-scp (1.2.1)
@@ -173,7 +177,7 @@ GEM
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     oj (3.3.10)
-    opentracing (0.3.2)
+    opentracing (0.4.1)
     orm_adapter (0.5.0)
     passenger (5.1.4)
       rack
@@ -309,7 +313,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    tzinfo (1.2.4)
+    tzinfo (1.2.5)
       thread_safe (~> 0.1)
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
@@ -332,7 +336,7 @@ DEPENDENCIES
   activerecord-import
   activeuuid
   app_perf_agent
-  app_perf_rpm
+  app_perf_rpm!
   bcrypt (~> 3.1.7)
   bootstrap-sass
   byebug

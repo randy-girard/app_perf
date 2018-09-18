@@ -36,6 +36,10 @@
             = link_to dynamic_url(@current_application, :overview) do
               %i.fa.fa-dashboard
               %span Overview
+          %li{:class => "#{'active' if @current_page["OverviewController#workers"]}"}
+            = link_to dynamic_url(:workers, @current_application, :overview) do
+              %i.fa.fa-gears
+              %span Workers
           %li{:class => "#{'active' if @current_page["TracesController"]}"}
             = link_to dynamic_url(@current_application, :traces) do
               %i.fa.fa-arrows-h

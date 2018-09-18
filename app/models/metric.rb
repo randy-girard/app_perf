@@ -2,8 +2,8 @@ require 'digest/sha1'
 
 class Metric < ActiveRecord::Base
   belongs_to :application
-  belongs_to :host
 
+  has_many :taggings, :dependent => :delete_all
   has_many :metric_data, :dependent => :delete_all
 
   def clean_name

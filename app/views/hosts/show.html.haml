@@ -3,16 +3,16 @@
   %h1
     = link_to "Hosts", dynamic_url(:hosts)
     >
-    = @host.name
+    = @host.value
 
   %ol.breadcrumb.breadcrumb-as-navigation
     %li.active View Past:
     - Reporter::PAST_OPTIONS.each do |option|
-      %li= link_to option[:label], dynamic_url(@host, _past: option[:past])
+      %li= link_to option[:label], dynamic_url(:host, id: @host, _past: option[:past])
   - if selected_filters.present?
     %section.content-header
       - selected_filters.each_pair do |key, value|
-        = link_to dynamic_url(@host, :without => key), :class => "btn btn-info btn-sm", :title => value do
+        = link_to dynamic_url(:host, id: @host, :without => key), :class => "btn btn-info btn-sm", :title => value do
           = key
           \: #{truncate(value, :length => 40)}
           %i.fa.fa-remove
@@ -21,20 +21,37 @@
   .row
     .col-lg-12
       .row
-        .col-lg-4
+        .col-lg-12
           .box
-            .box-header System Memory
+            .box-header PostgreSQL Database Size
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
+                                               :curve => false,
                                                :stacked => true,
                                                :library => { :chart => { :zoomType => "x" },
                                                              :xAxis => { :type => 'datetime',
                                                                          :labels => { :format => '{value:%I:%M %p}' } },
                                                              :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
                                                                            :shared => true } },
-                                               :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.memory.inactive_bytes,system.memory.active_bytes,system.memory.free_bytes,system.memory.wired_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
+                                               :data => "/api/v1/metrics?q=avg:system.db.stats{metric:size} by {timestamp,dbname}"} )
+
+
+      .row
+        .col-lg-4
+          .box
+            .box-header System Memory
+            .box-body
+              = react_component("AreaChart", { :refresh => 15,
+                                               :legend => "bottom",
+                                               :curve => false,
+                                               :stacked => true,
+                                               :library => { :chart => { :zoomType => "x" },
+                                                             :xAxis => { :type => 'datetime',
+                                                                         :labels => { :format => '{value:%I:%M %p}' } },
+                                                             :tooltip => { :pointFormafst => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
+                                                                           :shared => true } },
+                                               :data => "/api/v1/metrics?q=avg:system.memory.stats{host:#{@host.value}} by {timestamp,metric}"} )
 
         .col-lg-4
           .box
@@ -42,14 +59,14 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
+                                               :curve => false,
                                                :stacked => true,
                                                :library => { :chart => { :zoomType => "x" },
                                                              :xAxis => { :type => 'datetime',
                                                                          :labels => { :format => '{value:%I:%M %p}' } },
                                                              :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
                                                                            :shared => true } },
-                                               :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.network.in_bytes,system.network.out_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
+                                               :data => "/api/v1/metrics?q=avg:system.network.stats{host:#{@host.value}} by {timestamp,metric}"} )
 
         .col-lg-4
           .box
@@ -57,14 +74,14 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
+                                               :curve => false,
                                                :stacked => true,
                                                :library => { :chart => { :zoomType => "x" },
                                                              :xAxis => { :type => 'datetime',
                                                                          :labels => { :format => '{value:%I:%M %p}' } },
                                                              :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
                                                                            :shared => true } },
-                                               :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.disk.free_bytes,system.disk.used_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
+                                               :data => "/api/v1/metrics?q=avg:system.disk.stats{host:#{@host.value}} by {timestamp,metric}"} )
 
       .row
         .col-lg-6
@@ -73,7 +90,7 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
+                                               :curve => false,
                                                :points => false,
                                                :library => { :chart => { :zoomType => "x" },
                                                              :plotOptions => { :areaspline => { :stacking => 'percent' } },
@@ -81,7 +98,7 @@
                                                                            :shared => true },
                                                              :xAxis => { :type => 'datetime',
                                                                          :labels => { :format => '{value:%I:%M %p}' } } },
-                                               :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.cpu.nice,system.cpu.idle,system.cpu.user,system.cpu.system", :host_id => @host, :v => "1", :group => "name" }))) })
+                                               :data => "/api/v1/metrics?q=avg:system.cpu.stats{host:#{@host.value}} by {timestamp,metric}"} )
         .col-lg-6
           .box
             .box-header System Load (1, 5, 15 minute)
@@ -89,10 +106,10 @@
               = react_component("LineChart", { :refresh => 15,
                                                :legend => "bottom",
                                                :points => false,
-                                               :curve => true,
+                                               :curve => false,
                                                :library => { :chart => { :zoomType => "x" },
                                                              :xAxis => { :type => 'datetime',
                                                                          :labels => { :format => '{value:%I:%M %p}' } },
                                                              :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.2f}<br/>',
                                                                            :shared => true } },
-                                               :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.load.one_minute,system.load.five_minute,system.load.fifteen_minute", :host_id => @host, :v => "1", :group => "name" }))) })
+                                               :data => "/api/v1/metrics?q=avg:system.load.stats{host:#{@host.value}} by {timestamp,metric}"} )

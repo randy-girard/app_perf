@@ -15,6 +15,7 @@ class MetricDataService
     data = metric_data
     data = host_filter(data)
     data = application_filter(data)
+    data = data_filter(data)
     data = group(data)
     data = filter_time_range(data)
   end
@@ -52,7 +53,7 @@ class MetricDataService
   end
 
   def host
-    @host ||= Host.find(params[:host_id])
+    @host ||= Tag.find(params[:host_id]) if params[:host_id]
   end
 
   def application
@@ -61,17 +62,30 @@ class MetricDataService
 
   def metric_data
     @metric_data ||= MetricDatum
-      .joins(:metric)
+      .joins(:metric, :tags)
       .where(:metrics => { :name => metric_names })
   end
 
   def host_filter(data)
-    data = data.where(:metric_data => { :host_id => host }) if host
+    if host
+      data = data.where("tags.key = ?", 'host')
+      data = data.where("tags.value = ?", host.value)
+    end
     data
   end
 
   def application_filter(data)
     data = data.where(:metrics => { :application_id => application }) if application
+    data
+  end
+
+  def data_filter(data)
+    if params[:filter]
+      filter, value = params[:filter].to_s.split(":")
+      data = data.where("tags.key = ?", filter)
+      data = data.where("tags.value = ?", value)
+    end
+
     data
   end
 
@@ -89,8 +103,8 @@ class MetricDataService
     if params[:group] == "name"
       data.group("name")
     elsif params[:group].present?
-      sql = ActiveRecord::Base.send(:sanitize_sql_array, ["tags #>> ?", "{#{params[:group]}}"])
-      data = data.group(sql)
+      #sql = ActiveRecord::Base.send(:sanitize_sql_array, ["tags #>> ?", "{#{params[:group]}}"])
+      data = data.group("tags.value")
     else
       data
     end
@@ -111,17 +125,17 @@ class MetricDataService
   def aggregate(data)
     case params[:aggregate]
     when "sum"
-      data.sum("value")
+      data.sum("sum")
     when "max"
-      data.maximum("value")
+      data.maximum("sum")
     when "min"
-      data.minimum("value")
+      data.minimum("sum")
     else
       if by
         sql = ActiveRecord::Base.send(:sanitize_sql_array, ["CASE WHEN SUM((tags #>> :by)::int) = 0 THEN 0 ELSE SUM(value) / SUM((tags #>> :by)::int) END", :by => "{#{by}}"])
         data.calculate_all(sql)
       else
-        data.average("value")
+        data.average("sum")
       end
     end
   end

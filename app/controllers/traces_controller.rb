@@ -2,7 +2,7 @@ class TracesController < ApplicationController
   def index
     @traces = @current_application
       .traces
-      .includes(:root_span)
+      .includes(:root_span => :tags)
       .where("traces.duration IS NOT NULL")
       .where("traces.timestamp IS NOT NULL")
       .order("traces.timestamp DESC")
@@ -14,13 +14,11 @@ class TracesController < ApplicationController
 
     @trace = @current_application
       .traces
-      .includes(:spans => :layer)
+      .includes(:spans => :tags)
       .where(:trace_key => params[:id])
       .first
 
     @spans = @trace.spans.sort_by(&:timestamp)
-    @layer_ids = @spans.map(&:layer_id).uniq
-    @layer_names = Layer.where(id: @layer_ids).pluck(:name)
     @span = @spans.find {|s| s.id == params[:span_id] }
 
     @database_calls = @current_application
@@ -32,7 +30,8 @@ class TracesController < ApplicationController
     item_index = 0
     @groups = []
     @items = []
-    @spans.group_by {|s| [s.application, s.layer.name] }.each_pair do |(application, layer_name), spans|
+    @layer_names = @spans.map {|s| s.layer.value }
+    @spans.group_by {|s| [s.application, s.layer.value] }.each_pair do |(application, layer_name), spans|
 
       content = []
       if @current_application.name != application.name
@@ -64,7 +63,7 @@ class TracesController < ApplicationController
   def database
     @trace = @current_application
       .traces
-      .includes(:spans => :layer)
+      .includes(:spans)
       .where(:trace_key => params[:id])
       .first
     @spans = @trace.spans

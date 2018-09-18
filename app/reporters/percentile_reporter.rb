@@ -1,6 +1,38 @@
-class PercentileReporter < Reporter
+require 'gradient'
 
+class PercentileReporter < Reporter
   def report_data
+    time_range, period = Reporter.time_range(params)
+    percentiles = ["p99", "p95", "p90", "p75", "p50"]
+
+    data = MetricDatum
+      .joins(:metric)
+      .where("metrics.name = ?", "app.web.requests")
+      .group_by_period(*Reporter.report_params(params, "timestamp"))
+      .calculate_all(
+        p50: "hdr_c_valueAtQuantile(hdr_group(hdr_histogram), 50.0)",
+        p75: "hdr_c_valueAtQuantile(hdr_group(hdr_histogram), 75.0)",
+        p90: "hdr_c_valueAtQuantile(hdr_group(hdr_histogram), 90.0)",
+        p95: "hdr_c_valueAtQuantile(hdr_group(hdr_histogram), 95.0)",
+        p99: "hdr_c_valueAtQuantile(hdr_group(hdr_histogram), 99.0)"
+      )
+
+    latencies = {}
+    data.each do |timestamp, values|
+      percentiles.each do |percentile|
+        value = values == 0 ? 0 : (values[percentile.to_sym] || 0)
+        latencies[percentile] ||= {}
+        latencies[percentile][timestamp] = value
+      end
+    end
+
+    gradient = Gradient.new(colors: ["#d41121", "#0082c7"], steps: percentiles.size)
+    colors = gradient.hex
+
+    return percentiles.map.with_index {|percentile, index|
+      { name: percentile, data: latencies[percentile], color: colors[index] }
+    }
+
     time_range, period = Reporter.time_range(params)
 
     table = "traces"
@@ -44,30 +76,5 @@ class PercentileReporter < Reporter
         :perc_95 => "percentile_disc(0.95) within group (order by #{table}.duration)",
         :perc_99 => "percentile_disc(0.99) within group (order by #{table}.duration)"
       )
-
-    latencies = {
-      :perc_50 => {},
-      :perc_75 => {},
-      :perc_90 => {},
-      :perc_95 => {},
-      :perc_99 => {}
-    }
-
-    data.each_pair do |timestamp, percentiles|
-      latencies[:perc_50][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_50] : percentiles
-      latencies[:perc_75][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_75] : percentiles
-      latencies[:perc_90][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_90] : percentiles
-      latencies[:perc_95][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_95] : percentiles
-      latencies[:perc_99][timestamp] = percentiles.is_a?(Hash) ? percentiles[:perc_99] : percentiles
-    end
-
-
-    [
-      {:name => "50th Percentile", :data => latencies[:perc_50] },
-      {:name => "75th Percentile", :data => latencies[:perc_75] },
-      {:name => "90th Percentile", :data => latencies[:perc_90] },
-      {:name => "95th Percentile", :data => latencies[:perc_95] },
-      {:name => "99th Percentile", :data => latencies[:perc_99] }
-    ]
   end
 end

@@ -18,7 +18,11 @@ Rails.application.routes.draw do
   end
 
   resources :applications, :only => [:index, :new, :create, :edit, :update, :destroy] do
-    resource :overview, :controller => "overview", :only => [:show]
+    resource :overview, :controller => "overview", :only => [:show, :workers] do
+      collection do
+        get :workers
+      end
+    end
 
     resources :errors, :only => [:index, :show] do
       resources :instances, :controller => "error_instances", :only => [:index, :show]
@@ -34,10 +38,11 @@ Rails.application.routes.draw do
     resources :database, :controller => "database", :only => [:index]
     resources :deployments, :only => [:index, :new, :create]
 
-    resources :reports, :only => [:new, :error, :profile] do
+    resources :reports, :only => [:new, :error, :profile, :chart] do
       collection do
         get :error
         get :profile
+        get :chart
       end
     end
   end

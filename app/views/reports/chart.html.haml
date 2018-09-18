@@ -1,0 +1,35 @@
+%section.content
+  .row
+    %section.col-lg-12.connectedSortable
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Web Requests
+        .box-body
+          = react_component("AreaChart", { data: "/api/v1/metrics?q=avg:app.web.requests by {timestamp,component}",
+                                           curve: false,
+                                           legend: true,
+                                           stacked: true,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} } })
+
+    %section.col-lg-12
+      .box
+        .box-header
+          %i.fa.fa-clock
+          %h3.box-title Workers
+        .box-body
+          = react_component("AreaChart", { data: "/api/v1/metrics?q=avg:app.worker.requests by {timestamp,component}",
+                                           curve: false,
+                                           legend: true,
+                                           stacked: true,
+                                           :library => { :chart => { :zoomType => "x" },
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} } })

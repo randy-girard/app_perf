@@ -16,7 +16,7 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       self.license_key      = params.fetch("license_key") { nil }
       self.protocol_version = params.fetch("protocol_version") { nil }
-      self.hostname         = json.fetch("host")
+      self.hostname         = json.fetch("host") { nil }
       self.name             = json.fetch("name") { nil }
 
       if self.license_key.nil? ||
@@ -30,7 +30,9 @@ class AppPerfAgentWorker < ActiveJob::Base
       self.application.name = name
       self.application.save
 
-      self.host = Host.where(:name => hostname).first_or_create
+      if hostname
+        self.host = Host.where(:name => hostname).first_or_create
+      end
 
       if protocol_version.to_i.eql?(2)
         errors, remaining_data = data.partition {|d| d[0] == "error" }
@@ -322,20 +324,32 @@ class AppPerfAgentWorker < ActiveJob::Base
 
   def process_metric_data(data)
     metrics = {}
+    tags_cache = {}
+    hosts_cache = {}
     metric_data = []
 
     data.select {|d| d.first.eql?("metric") }.each do |datum|
       _, timestamp, key, value, tags = *datum
 
+      fingerprint = Digest::MD5.hexdigest(tags.sort.join("|"))
+
       if key && value
         metrics[key] ||= Metric.where(name: key, application_id: application.try(:id)).first_or_create
 
-        metric_data << metrics[key].metric_data.new do |metric_datum|
-          metric_datum.host = host
-          metric_datum.value = value
-          metric_datum.tags = tags || {}
-          metric_datum.timestamp = Time.at(timestamp)
+        if tags.present? && tags_cache[fingerprint] == nil
+          tags_cache[fingerprint] = MetricTag.where(fingerprint: fingerprint).first_or_initialize
+          tags_cache[fingerprint].metric = metrics[key]
+          tags_cache[fingerprint].tags = tags
+          tags_cache[fingerprint].save
         end
+
+        metric_datum = MetricDatum.new
+        metric_datum.metric = metrics[key]
+        metric_datum.metric_tag = tags_cache[fingerprint]
+        metric_datum.timestamp = Time.at(timestamp)
+        metric_datum.value = value
+
+        metric_data << metric_datum
       end
     end
     MetricDatum.import(metric_data)

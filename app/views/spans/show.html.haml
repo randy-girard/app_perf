@@ -1,7 +1,7 @@
 .box
   .box-header
     %h3.box-title
-      = @span.operation_name
+      = @span.layer.value
       Span Detail
       (#{number_with_precision(@span.duration, :precision => 2)}ms,
       #{number_with_precision(@span.exclusive_duration, :precision => 2)}ms exclusive)
@@ -25,13 +25,13 @@
       .tab-content
         #span-overview.tab-pane.active
           %table.table.table-striped.table-condensed
-            - @span.tags.sort_by {|k,v| k }.each do |key, value|
+            - @span.tags.sort_by(&:key).each do |tag|
               %tr
                 %td{:width => "200"}
                   %strong
-                    = key
+                    = tag.key
                 %td
-                  = value
+                  = tag.value
         - if @span.source.present?
           #span-source.tab-pane
             = render "shared/render_source", :source => @span.source

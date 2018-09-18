@@ -17,13 +17,15 @@
         .box-body
           %table.table.table-condensed
             %tr
-              %th URL
+              %th Type
+              %th Resource
               %th.text-center{:width => "200"} Duration (ms)
               %th.text-center{:width => "200"}
             - @traces.each do |trace|
               %tr
+                %td= trace.root_span.name
                 %td.ellipsis
-                  = link_to (trace.root_span ? trace.root_span.tag("http.url") : trace.trace_key), dynamic_url(@current_application, :trace,  :id => trace.trace_key)
+                  = link_to (trace.root_span ? trace.root_span.tag_value("url") : trace.trace_key), dynamic_url(@current_application, :trace,  :id => trace.trace_key)
                 %td.text-center= number_with_precision(trace.duration, :precision => 2)
                 %td.text-center
                   = time_ago_in_words(trace.timestamp)

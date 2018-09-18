@@ -1,42 +1,34 @@
 require 'securerandom'
 
-class OpenTracingWorker < ActiveJob::Base
+class SpansWorker < ActiveJob::Base
   queue_as :app_perf
 
   attr_accessor :license_key,
                 :name,
                 :host,
-                :data,
-                :user,
+                :hostname,
                 :application,
-                :protocol_version
+                :loaded_tags
 
   alias_attribute :jid, :job_id
 
-  def perform(params, body)
-    #AppPerfRpm.without_tracing do
-      license_key      = params.fetch("license_key") { nil }
-      protocol_version = params.fetch("protocol_version") { nil }
+  def perform(license_key, hostname, name, data)
+    self.name = name
+    self.license_key = license_key
+    self.hostname = hostname
 
-      if license_key.nil? ||
-         protocol_version.nil? ||
-         !protocol_version.to_i.eql?(3)
-        return
-      end
+    data = decompress_data(data)
 
-      json     = decompress_params(body)
-      hostname = json.fetch("host")
-      name     = json.fetch("name") { nil }
-      data     = Array(json.fetch("data"))
+    spans = data.fetch("data") { [] }
+    tags = data.fetch("tags") { [] }
 
-      set_application(license_key, name)
+    set_application(license_key, name)
 
-      if data.present? && application.present?
-        set_host(hostname)
-        layers = load_layers(data)
-        process_data(layers, data)
-      end
-    #end
+    if spans.present? && application.present?
+      set_host(hostname)
+      load_tags(tags)
+      process_data(spans, tags)
+    end
   end
 
   private
@@ -51,30 +43,25 @@ class OpenTracingWorker < ActiveJob::Base
     self.host = Host.where(name: hostname).first_or_create
   end
 
-  def decompress_params(body)
+  def load_tags(tags)
+    tag_ids = tags.map {|(k, v)| v }
+
+    self.loaded_tags = Tag.where(id: tag_ids).all
+  end
+
+  def decompress_data(body)
     compressed_body = Base64.decode64(body)
     data = Zlib::Inflate.inflate(compressed_body)
     MessagePack.unpack(data)
   end
 
-  def load_layers(data)
-    data
-      .map {|datum| datum["tags"]["component"] || datum["name"] }
-      .uniq
-      .map {|layer|
-        layer = application.layers.where(:name => layer).first_or_initialize
-        layer.save
-        layer
-      }
-  end
-
-  def process_data(layers, data)
+  def process_data(data, tags)
     data = set_exclusive_durations(data)
-    spans = build_spans(layers, data)
+    spans, taggings = build_spans(data, tags)
     log_entries = build_log_entries(data)
     backtraces = build_backtraces(log_entries)
     error_datum = build_errors(log_entries)
-    database_calls = build_database_calls(spans)
+    database_calls = build_database_calls(spans, taggings, tags)
     traces = build_traces(spans)
 
     Backtrace.import(backtraces)
@@ -83,6 +70,7 @@ class OpenTracingWorker < ActiveJob::Base
     ErrorDatum.import(error_datum)
     DatabaseCall.import(database_calls)
     Trace.import(traces)
+    Tagging.import(taggings)
   end
 
   def build_backtraces(log_entries)
@@ -103,10 +91,10 @@ class OpenTracingWorker < ActiveJob::Base
     backtraces
   end
 
-  def build_spans(layers, data)
-    data.map {|datum|
+  def build_spans(data, tags)
+    taggings = []
+    spans = data.map {|datum|
       span = Span.new
-      # span.id = SecureRandom.uuid.to_s
       span.application_id = application.id
       span.host_id = host.id
       span.uuid = datum["id"]
@@ -114,13 +102,33 @@ class OpenTracingWorker < ActiveJob::Base
       span.trace_id = datum["traceId"]
       span.parent_id = datum["parentId"]
       span.name = datum["name"]
-      span.layer_id = layers.find {|l| l.name == (datum["tags"]["component"] || datum["name"]) }.id
       span.timestamp = Time.at(datum["timestamp"].to_f)
       span.duration = datum["duration"].to_f
-      span.payload = datum["tags"]
+      span.payload = {}
+
+      _tags = datum["tags"]
+      if _tags.present?
+        _tags.each do |tag|
+          tag_id = tags[tag.to_i]
+          if tag_id
+            tagging = Tagging.new
+            tagging.tag_id = tag_id
+            tagging.uuid = span.uuid
+            taggings << tagging
+
+            loaded_tag = loaded_tags.find {|t| t.id == tag_id }
+            if loaded_tag
+              span.payload[loaded_tag.key] = loaded_tag.value
+            end
+          end
+        end
+      end
+
       span.exclusive_duration = datum["exclusiveDuration"].to_f
       span
     }
+
+    return spans, taggings
   end
 
   def build_log_entries(data)
@@ -174,13 +182,12 @@ class OpenTracingWorker < ActiveJob::Base
   end
 
   def get_database_types(spans)
-    spans
-      .select {|span| span.payload.has_key?("db.type") }
-      .map {|span| span.tag("db.vendor") }
+    loaded_tags
+      .select {|tag| tag.key == "db.vendor" }
       .uniq
-      .map {|adapter|
+      .map {|vendor|
         database_type = DatabaseType.where(
-          :name => adapter,
+          :name => vendor.value,
           :application_id => application.id
         ).first_or_initialize
         database_type.application_id = application.id
@@ -189,19 +196,18 @@ class OpenTracingWorker < ActiveJob::Base
       }
   end
 
-  def build_database_calls(spans)
+  def build_database_calls(spans, taggings, tags)
     database_types = get_database_types(spans)
     spans
-      .select {|span| span.payload.has_key?("db.type") }
+      .select {|span| span.payload["db.type"] }
       .map {|span|
-        database_type = database_types.find {|dt| dt.name == span.tag("db.vendor") }
+        database_type = database_types.find {|dt| dt.name == span.payload["db.vendor"] }
         database_call = DatabaseCall.new
         database_call.database_type_id = database_type.id
         database_call.application_id = application.id
         database_call.span_id = span.uuid
         database_call.host_id = host.id
-        database_call.layer_id = span.layer_id
-        database_call.statement = span.tag("db.statement")
+        database_call.statement = span.payload["db.statement"]
         database_call.timestamp = span.timestamp
         database_call.duration = span.duration
         database_call

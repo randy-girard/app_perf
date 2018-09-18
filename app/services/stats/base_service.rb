@@ -7,9 +7,9 @@ class Stats::BaseService
   }
 
   ORDERS = {
-    "Freq" => "COUNT(DISTINCT traces.id) DESC",
-    "Avg" => "(SUM(traces.duration) / COUNT(DISTINCT traces.id)) DESC",
-    "FreqAvg" => "(COUNT(DISTINCT traces.id) * SUM(traces.duration) / COUNT(DISTINCT traces.id)) DESC"
+    "Freq" => "SUM(count) DESC",
+    "Avg" => "SUM(sum) / SUM(count) DESC",
+    "FreqAvg" => "SUM(count) * SUM(sum) / SUM(count) DESC"
   }
 
   def initialize(application, time_range, params)

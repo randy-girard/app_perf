@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180531135158) do
+ActiveRecord::Schema.define(version: 20180706144913) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -138,26 +138,20 @@ ActiveRecord::Schema.define(version: 20180531135158) do
 
   add_index "log_entries", ["span_id"], name: "index_log_entries_on_span_id", using: :btree
 
-  create_table "metric_data", force: :cascade do |t|
-    t.integer  "host_id"
+  create_table "metric_data", id: false, force: :cascade do |t|
     t.integer  "metric_id"
-    t.datetime "timestamp"
-    t.float    "value"
-    t.jsonb    "tags",      default: {}
+    t.datetime "timestamp",              null: false
+    t.decimal  "value"
+    t.text     "histogram", default: [],              array: true
   end
 
-  add_index "metric_data", ["host_id"], name: "index_metric_data_on_host_id", using: :btree
   add_index "metric_data", ["metric_id"], name: "index_metric_data_on_metric_id", using: :btree
-  add_index "metric_data", ["tags"], name: "idx_metric_data_tags", using: :gin
+  add_index "metric_data", ["timestamp"], name: "metric_data_timestamp_idx", using: :btree
 
   create_table "metrics", force: :cascade do |t|
-    t.integer  "application_id"
-    t.string   "name"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.integer "application_id"
+    t.string  "name"
   end
-
-  add_index "metrics", ["application_id"], name: "index_metrics_on_application_id", using: :btree
 
   create_table "spans", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.integer  "application_id"
@@ -183,6 +177,23 @@ ActiveRecord::Schema.define(version: 20180531135158) do
   add_index "spans", ["payload"], name: "idx_spans_payload", using: :gin
   add_index "spans", ["timestamp"], name: "index_spans_on_timestamp", using: :btree
   add_index "spans", ["trace_id"], name: "index_spans_on_trace_id", using: :btree
+
+  create_table "taggings", force: :cascade do |t|
+    t.integer  "tag_id"
+    t.string   "uuid"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id", using: :btree
+  add_index "taggings", ["uuid"], name: "index_taggings_on_uuid", using: :btree
+
+  create_table "tags", force: :cascade do |t|
+    t.string   "key"
+    t.string   "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "traces", force: :cascade do |t|
     t.integer  "application_id"
@@ -242,9 +253,6 @@ ActiveRecord::Schema.define(version: 20180531135158) do
   add_foreign_key "error_messages", "applications"
   add_foreign_key "events", "applications"
   add_foreign_key "layers", "applications"
-  add_foreign_key "metric_data", "hosts"
-  add_foreign_key "metric_data", "metrics"
-  add_foreign_key "metrics", "applications"
   add_foreign_key "spans", "applications"
   add_foreign_key "spans", "hosts"
   add_foreign_key "spans", "layers"

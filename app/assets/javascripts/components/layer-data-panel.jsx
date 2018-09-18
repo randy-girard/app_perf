@@ -4,14 +4,14 @@ window.LayerDataPanel = React.createClass({
 
     return (
       data.map(function(datum) {
-        url = updateQueryStringParameter(baseURI, "_layer", datum.id);
+        url = updateQueryStringParameter(baseURI, "_layer", datum.name);
         return (
-          <tr key={`layer-${datum.id}`}>
-            <td className="ellipsis" key={`layer-${datum.id}-0`}>
+          <tr key={`layer-${datum.name}`}>
+            <td className="ellipsis" key={`layer-${datum.name}-0`}>
               <a href={url}>{datum.name}</a>
             </td>
-            <td width="100" key={`layer-${datum.id}-2`}>{datum.freq}</td>
-            <td width="100" key={`layer-${datum.id}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
+            <td width="100" key={`layer-${datum.name}-2`}>{datum.freq}</td>
+            <td width="100" key={`layer-${datum.name}-3`}>{parseFloat(datum.avg).toFixed(2)}</td>
           </tr>
         )
       })

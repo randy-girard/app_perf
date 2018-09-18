@@ -9,6 +9,9 @@ class ReportsController < ApplicationController
     raise 'Hello'
   end
 
+  def chart
+  end
+
   def profile
     @profile, @result = ::AppPerfRpm::Tracer.profile("test") do
       @profile = []

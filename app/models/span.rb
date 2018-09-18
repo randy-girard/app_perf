@@ -4,7 +4,6 @@ class Span < ActiveRecord::Base
   belongs_to :application
   belongs_to :host
   belongs_to :grouping, :primary_key => :uuid, :polymorphic => true
-  belongs_to :layer
   belongs_to :trace, :primary_key => :trace_key
 
   belongs_to :parent, :primary_key => :uuid, :class_name => "Span"
@@ -12,16 +11,19 @@ class Span < ActiveRecord::Base
 
   has_many :log_entries, :primary_key => :uuid
 
+  has_many :taggings, :primary_key => :uuid, :foreign_key => :uuid
+  has_many :tags, :through => :taggings
+
   has_one :database_call, :primary_key => :uuid
   has_one :backtrace, :as => :backtraceable, :primary_key => :uuid
   has_one :error, :primary_key => :uuid, :class_name => "ErrorDatum"
 
   delegate :name, :to => :layer, :prefix => true
 
-  serialize :payload, HashSerializer
+  attr_accessor :payload
 
-  def tags
-    payload
+  def layer
+    tags.where(key: "component").first || Tag.new(value: "")
   end
 
   def has_error?
@@ -29,11 +31,11 @@ class Span < ActiveRecord::Base
   end
 
   def tag(key)
-    if payload.is_a?(Hash)
-      payload[key.to_s]
-    else
-      nil
-    end
+    tags.find {|t| t.key == key } || Tag.new
+  end
+
+  def tag_value(key)
+    tag(key).value
   end
 
   def source

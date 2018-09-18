@@ -25,11 +25,14 @@
         .box-body
           = react_component("AreaChart", { :refresh => 15,
                                            :legend => "bottom",
-                                           :curve => true,
+                                           :curve => false,
                                            :library => { :chart => { :zoomType => "x" },
-                                                         xAxis: { type: 'datetime', labels: { format: '{value:%I:%M %p}' } },
-                                                         yAxis: { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/database", :application_id => @current_application.id }) })
+                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
+                                                                       :shared => true },
+                                                         :xAxis => { :type => 'datetime',
+                                                                     :labels => { format: '{value:%I:%M %p}' } },
+                                                         :yAxis => { labels: { format: '{value}ms' }} },
+                                           :data => api_v1_metrics_url("avg:app.worker.requests,app.web.requests{db.type:sql} by {timestamp,component}") })
     .col-lg-12.connectedSortable
       .box
         .box-header
@@ -43,7 +46,7 @@
               %th{:width => "200"}
             - @database_calls.each do |database_call|
               %tr
-                %td.ellipsis= link_to database_call.span.layer.name, dynamic_url(database_call.application, :database_index, :_layer => database_call.span.layer_id)
+                %td.ellipsis= link_to database_call.span.layer.value, dynamic_url(database_call.application, :database_index, :_layer => database_call.span.layer.value)
                 %td.ellipsis= link_to database_call.statement, dynamic_url(database_call.application, :trace, id: database_call.span.trace_id, :span_id => database_call.span.id)
                 %td.text-center
                   = number_with_precision(database_call.duration, :precision => 2)

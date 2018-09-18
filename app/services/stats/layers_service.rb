@@ -1,30 +1,34 @@
 class Stats::LayersService < Stats::BaseService
   def call
-    orders = {
-      "Freq" => "COUNT(DISTINCT spans.uuid) DESC",
-      "Avg" => "(SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC",
-      "FreqAvg" => "(COUNT(DISTINCT spans.id) * SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid)) DESC"
-    }
+    time_range, period = Reporter.time_range(params)
 
-    layers = application
-      .layers
-      .with(:trace_cte => traces)
-      .joins(:spans)
-      .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
-      .order(orders[params[:_order]] || orders["FreqAvg"])
-      .group("layers.id, layers.name")
+    cte = MetricDatum
+      .select("metric_data.sum")
+      .select("metric_data.count")
+      .select("jsonb_object_agg(tags.key, tags.value) AS tags")
+      .joins(:tags)
+      .where(timestamp: time_range)
+      .where("tags.key = ?", "component")
+      .group("metric_data.sum")
+      .group("metric_data.count")
+      .group("taggings.uuid")
+
+    relation = MetricDatum
+      .with(cte: cte)
+      .from("cte")
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
+      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .group("tags->>'component'")
 
     if params[:_layer].present?
-      layers = layers.where("spans.layer_id = ?", params[:_layer])
+      relation = relation.where("tags->>'component' = ?", params[:_layer])
     end
 
-    layers
+    return relation
       .pluck_to_hash(
-        "layers.id AS id",
-        "layers.name AS name",
-        "COUNT(DISTINCT spans.uuid) AS freq",
-        "SUM(spans.exclusive_duration) / COUNT(DISTINCT spans.uuid) AS avg"
+        "tags->>'component' AS name",
+        "SUM(count) AS freq",
+        "SUM(sum) / SUM(count) AS avg"
       )
   end
 end

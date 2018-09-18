@@ -21,16 +21,14 @@ class Reporter
     []
   end
 
-  private
-
-  def report_params(timestamp = "spans.timestamp")
+  def self.report_params(params, timestamp = "spans.timestamp")
     options = { }
     options[:permit] = %w[minute hour day]
     time_range, period = Reporter.time_range(params)
     if time_range
       options[:range] = time_range
     else
-      options[:last] = (params[:_last] || 60)
+      options[:last] = (params[:_last].presence || 30)
     end
 
     [
@@ -41,15 +39,15 @@ class Reporter
   end
 
   def self.time_range(params)
-    params.delete(:_past) if params[:_st] && params[:_se]
+    params.delete(:_past) if params[:_st].present? && params[:_se].present?
 
     if params[:_past]
       time_ago, @period = Reporter.parse_past_intervals(params)
       @start_time = (Time.now - time_ago).beginning_of_minute
       @end_time = Time.now.end_of_minute
     else
-      @start_time = (params[:_st] ? Time.at(params[:_st].to_i) : Time.now - 60.minutes).beginning_of_minute
-      @end_time = (params[:_se] ? Time.at(params[:_se].to_i) : Time.now).end_of_minute
+      @start_time = (params[:_st].present? ? Time.at(params[:_st].to_i) : Time.now - 30.minutes).beginning_of_minute
+      @end_time = (params[:_se].present? ? Time.at(params[:_se].to_i) : Time.now).end_of_minute
       @period = "minute"
     end
 
@@ -66,7 +64,7 @@ class Reporter
     if past_option
       time_ago, period = past.to_i.minutes, past_option[:period]
     else
-      time_ago, period = 60.minutes, "minute"
+      time_ago, period = 30.minutes, "minute"
     end
 
     return time_ago, period

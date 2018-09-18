@@ -1,4 +1,8 @@
 module ApplicationHelper
+  def api_v1_metrics_url(query = "")
+    "/api/v1/metrics?_st=#{params[:_st]}&_se=#{params[:_se]}&_past=#{params[:_past]}&q=#{query}"
+  end
+  
   def dynamic_report_url(options = {}, base_params = {})
     params = metric_params(options, base_params)
 
@@ -89,8 +93,7 @@ module ApplicationHelper
     end
 
     if _layer
-      layer = @current_application.layers.find(_layer)
-      base_params.merge!("Layer" => layer.name)
+      base_params.merge!("Layer" => _layer)
     end
 
     if _sql

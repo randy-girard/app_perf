@@ -25,14 +25,14 @@
         .box-body
           = react_component("AreaChart", { :refresh => 15,
                                            :legend => true,
-                                           :curve => true,
+                                           :curve => false,
                                            :library => { :chart => { :zoomType => "x" },
                                                          :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
                                                                        :shared => true },
                                                          :xAxis => { :type => 'datetime',
                                                                      :labels => { format: '{value:%I:%M %p}' } },
                                                          :yAxis => { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/average_duration", :application_id => @current_application.id }) })
+                                           :data => api_v1_metrics_url("avg:app.web.requests by {timestamp,component}") })
 
   .row
     %section.col-lg-6.connectedSortable
@@ -41,17 +41,20 @@
           %i.fa.fa-clock
           %h3.box-title Latency
         .box-body
-          = react_component("LineChart", { :refresh => 15,
+          = react_component("AreaChart", { :refresh => 15,
                                            :legend => false,
                                            :height => 200,
-                                           :curve => true,
+                                           :curve => false,
                                            :points => false,
                                            :library => { :chart => { :zoomType => "x" },
                                                          :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms<br/>',
                                                                        :shared => true },
                                                          :xAxis => { :type => 'datetime',
                                                                      :labels => { format: '{value:%I:%M %p}' } },
-                                                         :yAxis => { labels: { format: '{value}ms' }} },
+                                                         :yAxis => { labels: { format: '{value}ms' }},
+                                                         :plotOptions => { :series => { :stacking => nil,
+                                                                                        :lineWidth => 1,
+                                                                                        :fillOpacity => 1.0 } } },
                                            :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency", :application_id => @current_application.id }) })
 
       = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/controllers", :application_id => @current_application.id }))
@@ -68,11 +71,11 @@
           %h3.box-title Latency Distribution
         .box-body
           = react_component("ColumnChart", { :refresh => 15,
-                                             :height => 200,
-                                             :legend => false,
-                                             :library => { :xAxis => { :labels => { :enabled => false } },
-                                                           :plotOptions => { :series => { :color => "#337ab7" } } },
-                                             :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_distribution", :application_id => @current_application.id }) })
+                                           :height => 200,
+                                           :legend => false,
+                                           :library => { :xAxis => { :labels => { :enabled => false } },
+                                                         :plotOptions => { :series => { :color => "#337ab7" } } },
+                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_distribution", :application_id => @current_application.id }) })
 
       = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/layers", :application_id => @current_application.id }))
 
