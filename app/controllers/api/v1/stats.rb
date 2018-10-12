@@ -39,6 +39,14 @@ module API
             }
           end
 
+          r.get 'latency_bands' do
+            data = ::Stats::LatencyBandsService.new(@current_application, @time_range, @params).call
+
+            {
+              :data => data
+            }
+          end
+
           r.get 'hosts' do
             data = ::Stats::HostsService.new(@current_application, @time_range, @params).call
 

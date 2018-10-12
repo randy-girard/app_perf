@@ -4,7 +4,7 @@ class Trace < ActiveRecord::Base
 
   has_many :spans, :primary_key => :trace_key
   has_one  :root_span,
-    -> { where("spans.parent_id IS NULL") },
+    -> { where(parent_id: nil) },
     :primary_key => :trace_key,
     :class_name => "Span"
 

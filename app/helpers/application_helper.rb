@@ -34,6 +34,7 @@ module ApplicationHelper
     _past       = options[:past]           || params[:_past]
     _order      = options[:order]          || params[:_order]
     _limit      = options[:limit]          || params[:_limit]
+    _type       = options[:type]           || params[:_type]
 
     base_params.merge!(:_host       => _host)       if _host
     base_params.merge!(:_domain     => _domain)     if _domain
@@ -44,6 +45,7 @@ module ApplicationHelper
     base_params.merge!(:_sql        => _sql)        if _sql
     base_params.merge!(:_order      => _order)      if _order
     base_params.merge!(:_limit      => _limit)      if _limit
+    base_params.merge!(:_type       => _type)       if _type
     if _past
       base_params.merge!(:_past       => _past)
     elsif _st && _se
@@ -76,6 +78,7 @@ module ApplicationHelper
     _st         = params[:_st]
     _se         = params[:_se]
     _past       = params[:_past]
+    _type       = params[:_type]
 
     base_params = {}
     base_params.merge!("Domain"     => _domain)     if _domain
