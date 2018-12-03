@@ -156,7 +156,7 @@ GEM
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    loofah (2.2.2)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.0)
@@ -170,7 +170,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (3.2.0)
-    nokogiri (1.8.2)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     oj (3.3.10)
     opentracing (0.3.2)
@@ -195,7 +195,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     puma (2.15.3)
-    rack (1.6.10)
+    rack (1.6.11)
     rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
@@ -359,6 +359,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   kaminari
+  loofah (>= 2.2.3)
   msgpack
   oj
   passenger
@@ -367,6 +368,7 @@ DEPENDENCIES
   pluck_to_hash
   postgres_ext
   pry
+  rack (>= 1.6.11)
   rails (= 4.2.7.1)
   react-rails
   roda
@@ -384,4 +386,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
