@@ -43,9 +43,10 @@ GEM
       uuidtools
     airbrussh (1.0.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    app_perf_agent (0.0.6)
+    app_perf_agent (0.0.7)
       msgpack
-      vmstat (= 2.3.0)
+      pg
+      vmstat (= 2.3.1)
     app_perf_rpm (0.2.4)
       msgpack
       opentracing
@@ -165,7 +166,7 @@ GEM
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.1)
-    msgpack (1.2.4)
+    msgpack (1.2.6)
     multi_json (1.11.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -178,7 +179,7 @@ GEM
     passenger (5.1.4)
       rack
       rake (>= 0.8.1)
-    pg (0.18.4)
+    pg (1.1.4)
     pg_array_parser (0.0.9)
     pg_histogram (0.3)
       activerecord (>= 4.0)
@@ -316,7 +317,7 @@ GEM
     uuidtools (2.1.5)
     vanilla-ujs (1.3.0)
       railties (>= 4.2.0)
-    vmstat (2.3.0)
+    vmstat (2.3.1)
     warden (1.2.7)
       rack (>= 1.0)
     web-console (2.3.0)
