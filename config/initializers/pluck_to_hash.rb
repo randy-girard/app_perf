@@ -38,7 +38,14 @@ module PluckToHash
           [column_names, column_names]
         else
           [
-            keys,
+            keys.map do |k|
+              case k
+              when String
+                Arel.sql(k)
+              else
+                k
+              end
+            end,
             keys.map do |k|
               case k
               when String
