@@ -268,8 +268,8 @@ CREATE TABLE ar_internal_metadata (
 
 CREATE TABLE backtraces (
     id integer NOT NULL,
-    backtraceable_id character varying,
     backtraceable_type character varying,
+    backtraceable_id character varying,
     backtrace text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -591,7 +591,7 @@ CREATE TABLE metric_data (
     metric_id integer,
     "timestamp" timestamp without time zone,
     value double precision,
-    tags jsonb DEFAULT '{}'::jsonb
+    tags jsonb DEFAULT '"{}"'::jsonb
 );
 
 
@@ -665,11 +665,11 @@ CREATE TABLE spans (
     application_id integer,
     host_id integer,
     layer_id integer,
-    trace_key character varying,
     name character varying,
     "timestamp" timestamp without time zone,
     duration double precision,
     exclusive_duration double precision,
+    trace_key character varying,
     uuid character varying,
     payload jsonb,
     created_at timestamp without time zone NOT NULL,
@@ -741,8 +741,8 @@ CREATE TABLE users (
     invitation_sent_at timestamp without time zone,
     invitation_accepted_at timestamp without time zone,
     invitation_limit integer,
-    invited_by_id integer,
     invited_by_type character varying,
+    invited_by_id integer,
     invitations_count integer DEFAULT 0
 );
 
@@ -967,6 +967,14 @@ ALTER TABLE ONLY metric_data
 
 ALTER TABLE ONLY metrics
     ADD CONSTRAINT metrics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
@@ -1253,17 +1261,17 @@ CREATE INDEX index_users_on_invited_by_id ON users USING btree (invited_by_id);
 
 
 --
+-- Name: index_users_on_invited_by_type_and_invited_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_invited_by_type_and_invited_by_id ON users USING btree (invited_by_type, invited_by_id);
+
+
+--
 -- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
-
-
---
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --

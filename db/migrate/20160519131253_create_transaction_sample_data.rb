@@ -5,7 +5,7 @@ class CreateTransactionSampleData < ActiveRecord::Migration[5.0]
       t.references :host, index: true, foreign_key: true
       t.references :grouping, index: true, type: :string, polymorphic: true
       t.references :layer, index: true, foreign_key: true
-      t.string :trace_key, index: true
+      t.string :trace_id, index: true
       t.string :sample_type, :default => "web"
       t.string :name
       t.datetime :timestamp
