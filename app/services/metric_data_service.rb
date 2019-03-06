@@ -36,11 +36,12 @@ class MetricDataService
     data = to_relation
     data = aggregate(data)
     data = format_data(data)
+    return data
 
-    return {
-      :data => data,
-      :annotations => annotations
-    }
+    #return {
+    #  :data => data,
+    #  :annotations => annotations
+    #}
   end
 
   def to_json
@@ -78,6 +79,7 @@ class MetricDataService
   def group(data)
     options = {}
     options[:permit] = %w[minute hour day]
+
     if time_range
       options[:range] = time_range
     else
@@ -130,14 +132,16 @@ class MetricDataService
   def format_data(data)
     hash = []
     groups = {}
+
     data.each_pair do |group, event|
+      val = event != nil && scale != nil ? event / scale : 0
       if params[:group]
         timestamp, metric, group = *group
         groups[metric] ||= []
-        groups[metric] << [timestamp, event / scale]
+        groups[metric] << [timestamp, val]
       else
         groups[metric_names.join(" + ")] ||= []
-        groups[metric_names.join(" + ")] << [group, event / scale]
+        groups[metric_names.join(" + ")] << [group, val]
       end
     end
 

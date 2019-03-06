@@ -1,4 +1,4 @@
-class AddIndexToMetricTags < ActiveRecord::Migration
+class AddIndexToMetricTags < ActiveRecord::Migration[5.0]
   def up
     execute "CREATE INDEX idx_metric_data_tags ON metric_data USING GIN (tags jsonb_path_ops);"
   end

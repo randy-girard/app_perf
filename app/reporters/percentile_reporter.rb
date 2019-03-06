@@ -10,8 +10,8 @@ class PercentileReporter < Reporter
 
     relation = application
       .traces
-      .joins("LEFT JOIN spans ON traces.trace_key = spans.trace_id")
-      .joins("LEFT JOIN spans root_span ON  root_span.trace_id = traces.trace_key AND root_span.parent_id IS NULL")
+      .joins("LEFT JOIN spans ON traces.trace_key = spans.trace_key")
+      .joins("LEFT JOIN spans root_span ON  root_span.trace_key = traces.trace_key AND root_span.parent_id IS NULL")
       .joins("LEFT JOIN database_calls ON database_calls.span_id = spans.uuid")
 
     case params[:type]
@@ -27,19 +27,19 @@ class PercentileReporter < Reporter
 
     if params[:_domain]
       domains = relation.where("spans.payload->>'peer.address' = ?", params[:_domain])
-      relation = relation.where(:traces => { :trace_key => domains.select(:trace_id) })
+      relation = relation.where(:traces => { :trace_key => domains.select(:trace_key) })
     end
     if params[:_url]
       urls = relation.where("spans.payload->>'http.url' = ?", params[:_url])
-      relation = relation.where(:traces => { :trace_key => urls.select(:trace_id) })
+      relation = relation.where(:traces => { :trace_key => urls.select(:trace_key) })
     end
     if params[:_controller]
       controllers = relation.where("split_part(spans.operation_name, '#', 1) = ?", params[:_controller])
-      relation = relation.where(:traces => { :trace_key => controllers.select(:trace_id) })
+      relation = relation.where(:traces => { :trace_key => controllers.select(:trace_key) })
     end
     if params[:_action]
       actions = relation.where("split_part(spans.operation_name, '#', 2) = ?", params[:_action])
-      relation = relation.where(:traces => { :trace_key => actions.select(:trace_id) })
+      relation = relation.where(:traces => { :trace_key => actions.select(:trace_key) })
     end
     relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]

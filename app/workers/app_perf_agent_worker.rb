@@ -72,7 +72,7 @@ class AppPerfAgentWorker < ActiveJob::Base
           _opts = {}
         end
 
-        trace_key = generate_trace_id(_trace_key)
+        trace_key = generate_trace_key(_trace_key)
 
         begin
           [_layer, trace_key, _start.to_f, _duration.to_f, _opts]
@@ -213,7 +213,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       span[:layer_id] = layer.id
       span[:timestamp] = timestamp
       span[:duration] = _duration
-      span[:trace_id] = _trace_key
+      span[:trace_key] = _trace_key
       span[:uuid] = SecureRandom.uuid.to_s
       span[:payload] = _opts
 
@@ -229,7 +229,7 @@ class AppPerfAgentWorker < ActiveJob::Base
     end
 
     all_events = []
-    spans.select {|s| s[:trace_id] }.group_by {|s| s[:trace_id] }.each_pair do |trace_key, events|
+    spans.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
       trace = traces.find {|t| t.trace_key == trace_key }
       next if trace.nil?
       timestamp = events.map {|e| e[:timestamp] }.min
@@ -243,7 +243,7 @@ class AppPerfAgentWorker < ActiveJob::Base
         e[:payload]["domain"] ||= domain
         e[:payload]["controller"] ||= controller
         e[:payload]["action"] ||= action
-        e[:trace_id] = trace.trace_key
+        e[:trace_key] = trace.trace_key
       }
 
       existing_spans = trace.spans.all
@@ -278,7 +278,7 @@ class AppPerfAgentWorker < ActiveJob::Base
       .inject(0) {|sum, x| sum + x }
   end
 
-  def generate_trace_id(seed = nil)
+  def generate_trace_key(seed = nil)
     if seed.nil?
       Digest::SHA1.hexdigest([Time.now, rand].join)
     else

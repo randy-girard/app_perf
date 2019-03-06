@@ -10,19 +10,15 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require activestorage
 //= require jquery
-//= require vanilla-ujs
-//= require axios
-//= require pace/pace
 //= require bootstrap-sprockets
+//= require pace/pace
 //= require daterangepicker/moment
 //= require daterangepicker/daterangepicker
 //= require vis/vis
 //= require AdminLTE
 
-//= require utils
-//= require charts/charts
-//= require react.init
 $(function() {
   $(".singledatetime").daterangepicker({
     singleDatePicker: true,

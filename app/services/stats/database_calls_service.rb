@@ -3,14 +3,14 @@ class Stats::DatabaseCallsService < Stats::BaseService
     orders = {
       "Freq" => "COUNT(*) DESC",
       "Avg" => "(SUM(exclusive_duration) / COUNT(*)) DESC",
-      "FreqAvg" => "(COUNT(DISTINCT trace_id) * SUM(exclusive_duration) / COUNT(*)) DESC"
+      "FreqAvg" => "(COUNT(DISTINCT trace_key) * SUM(exclusive_duration) / COUNT(*)) DESC"
     }
 
     application
       .database_calls
       .with(:trace_cte => traces)
       .joins(:span => :layer)
-      .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
+      .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .where("statement IS NOT NULL")
       .group("layers.id, layers.name, database_calls.statement")
       .order(orders[params[:_order]] || orders["FreqAvg"])

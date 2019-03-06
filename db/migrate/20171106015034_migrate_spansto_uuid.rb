@@ -1,4 +1,4 @@
-class MigrateSpanstoUuid < ActiveRecord::Migration
+class MigrateSpanstoUuid < ActiveRecord::Migration[5.0]
   def change
     change_table :spans do |t|
       t.remove :id

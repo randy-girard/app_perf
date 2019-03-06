@@ -3,10 +3,10 @@ class Stats::ControllersService < Stats::BaseService
     application
       .spans
       .with(:trace_cte => traces)
-      .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
+      .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .where("length(split_part(spans.operation_name, '#', 1)) > 0")
       .where("length(split_part(spans.operation_name, '#', 2)) > 0")
-      .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
+      .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .joins(:trace)
       .group("split_part(spans.operation_name, '#', 1), split_part(spans.operation_name, '#', 2)")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])

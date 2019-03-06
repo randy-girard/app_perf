@@ -1,4 +1,4 @@
-class DatabaseCall < ActiveRecord::Base
+class DatabaseCall < ApplicationRecord
   belongs_to :application
   belongs_to :host
   belongs_to :database_type

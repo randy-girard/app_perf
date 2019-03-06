@@ -1,4 +1,4 @@
-class CreateErrorMessages < ActiveRecord::Migration
+class CreateErrorMessages < ActiveRecord::Migration[5.0]
   def change
     create_table :error_messages do |t|
       t.references :application, index: true, foreign_key: true

@@ -1,4 +1,4 @@
-class CreateHosts < ActiveRecord::Migration
+class CreateHosts < ActiveRecord::Migration[5.0]
   def change
     create_table :hosts do |t|
       t.references :application, index: true, foreign_key: true

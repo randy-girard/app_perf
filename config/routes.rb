@@ -47,11 +47,5 @@ Rails.application.routes.draw do
 
   mount API::Base, at: "/api"
 
-  if defined?(Enterprise)
-    mount Enterprise::Engine => "/"
-  elsif defined?(Hosted)
-    mount Hosted::Engine => "/"
-  end
-
   root :to => "dashboard#show"
 end

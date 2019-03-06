@@ -1,4 +1,4 @@
-class AddOrganizationToModels < ActiveRecord::Migration
+class AddOrganizationToModels < ActiveRecord::Migration[5.0]
   def change
     add_reference :applications, :organization, :index => true
     add_reference :hosts, :organization, :index => true

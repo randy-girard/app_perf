@@ -1,10 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 10.1
--- Dumped by pg_dump version 10.1
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -82,7 +75,7 @@ CREATE FUNCTION hist_sfunc(state histogram_result[], val double precision, min d
 
         -- Init the array with the correct number of 0's so the caller doesn't see NULLs
         IF state[0] IS NULL THEN
-          width := (max - min) / nbuckets;
+          width := (max - min) / (nbuckets - 1);
           FOR i IN SELECT * FROM generate_series(0, nbuckets - 1) LOOP
             state[i] := (0, i, floatrange(i * width, (i + 1) * width));
           END LOOP;
@@ -258,13 +251,25 @@ ALTER SEQUENCE applications_id_seq OWNED BY applications.id;
 
 
 --
+-- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE ar_internal_metadata (
+    key character varying NOT NULL,
+    value character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: backtraces; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE backtraces (
     id integer NOT NULL,
-    backtraceable_id character varying,
     backtraceable_type character varying,
+    backtraceable_id character varying,
     backtrace text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -586,7 +591,7 @@ CREATE TABLE metric_data (
     metric_id integer,
     "timestamp" timestamp without time zone,
     value double precision,
-    tags jsonb DEFAULT '{}'::jsonb
+    tags jsonb DEFAULT '"{}"'::jsonb
 );
 
 
@@ -660,7 +665,7 @@ CREATE TABLE spans (
     application_id integer,
     host_id integer,
     layer_id integer,
-    trace_id character varying,
+    trace_key character varying,
     name character varying,
     "timestamp" timestamp without time zone,
     duration double precision,
@@ -736,8 +741,8 @@ CREATE TABLE users (
     invitation_sent_at timestamp without time zone,
     invitation_accepted_at timestamp without time zone,
     invitation_limit integer,
-    invited_by_id integer,
     invited_by_type character varying,
+    invited_by_id integer,
     invitations_count integer DEFAULT 0
 );
 
@@ -869,6 +874,14 @@ ALTER TABLE ONLY applications
 
 
 --
+-- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY ar_internal_metadata
+    ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+
+--
 -- Name: backtraces backtraces_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -954,6 +967,14 @@ ALTER TABLE ONLY metric_data
 
 ALTER TABLE ONLY metrics
     ADD CONSTRAINT metrics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
@@ -1177,10 +1198,10 @@ CREATE INDEX index_spans_on_timestamp ON spans USING btree ("timestamp");
 
 
 --
--- Name: index_spans_on_trace_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_spans_on_trace_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_trace_id ON spans USING btree (trace_id);
+CREATE INDEX index_spans_on_trace_key ON spans USING btree (trace_key);
 
 
 --
@@ -1240,17 +1261,17 @@ CREATE INDEX index_users_on_invited_by_id ON users USING btree (invited_by_id);
 
 
 --
+-- Name: index_users_on_invited_by_type_and_invited_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_invited_by_type_and_invited_by_id ON users USING btree (invited_by_type, invited_by_id);
+
+
+--
 -- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
-
-
---
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --
@@ -1419,97 +1440,53 @@ ALTER TABLE ONLY database_calls
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20160428204600');
+INSERT INTO "schema_migrations" (version) VALUES
+('20160428204600'),
+('20160428204603'),
+('20160507124206'),
+('20160515180739'),
+('20160515182837'),
+('20160519121226'),
+('20160519121315'),
+('20160519131250'),
+('20160519131253'),
+('20160519131260'),
+('20160519134740'),
+('20161230191409'),
+('20161231022752'),
+('20170106142559'),
+('20170108135011'),
+('20170111003940'),
+('20170427234422'),
+('20170428004655'),
+('20170428145810'),
+('20170428155739'),
+('20170428180924'),
+('20170726010744'),
+('20170726123049'),
+('20170727161615'),
+('20170727172500'),
+('20170727175217'),
+('20170728002115'),
+('20170728002503'),
+('20170803133120'),
+('20170803194431'),
+('20170803194915'),
+('20170803200634'),
+('20170812161507'),
+('20170812162234'),
+('20170813124637'),
+('20171025163818'),
+('20171027003948'),
+('20171027010303'),
+('20171028020823'),
+('20171028131934'),
+('20171101185138'),
+('20171106004939'),
+('20171106015034'),
+('20180530143857'),
+('20180530175949'),
+('20180531135158'),
+('20181005151705');
 
-INSERT INTO schema_migrations (version) VALUES ('20160428204603');
-
-INSERT INTO schema_migrations (version) VALUES ('20160507124206');
-
-INSERT INTO schema_migrations (version) VALUES ('20160515180739');
-
-INSERT INTO schema_migrations (version) VALUES ('20160515182837');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519121226');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519121315');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519131250');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519131253');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519131260');
-
-INSERT INTO schema_migrations (version) VALUES ('20160519134740');
-
-INSERT INTO schema_migrations (version) VALUES ('20161230191409');
-
-INSERT INTO schema_migrations (version) VALUES ('20161231022752');
-
-INSERT INTO schema_migrations (version) VALUES ('20170106142559');
-
-INSERT INTO schema_migrations (version) VALUES ('20170108135011');
-
-INSERT INTO schema_migrations (version) VALUES ('20170111003940');
-
-INSERT INTO schema_migrations (version) VALUES ('20170427234422');
-
-INSERT INTO schema_migrations (version) VALUES ('20170428004655');
-
-INSERT INTO schema_migrations (version) VALUES ('20170428145810');
-
-INSERT INTO schema_migrations (version) VALUES ('20170428155739');
-
-INSERT INTO schema_migrations (version) VALUES ('20170428180924');
-
-INSERT INTO schema_migrations (version) VALUES ('20170726010744');
-
-INSERT INTO schema_migrations (version) VALUES ('20170726123049');
-
-INSERT INTO schema_migrations (version) VALUES ('20170727161615');
-
-INSERT INTO schema_migrations (version) VALUES ('20170727172500');
-
-INSERT INTO schema_migrations (version) VALUES ('20170727175217');
-
-INSERT INTO schema_migrations (version) VALUES ('20170728002115');
-
-INSERT INTO schema_migrations (version) VALUES ('20170728002503');
-
-INSERT INTO schema_migrations (version) VALUES ('20170803133120');
-
-INSERT INTO schema_migrations (version) VALUES ('20170803194431');
-
-INSERT INTO schema_migrations (version) VALUES ('20170803194915');
-
-INSERT INTO schema_migrations (version) VALUES ('20170803200634');
-
-INSERT INTO schema_migrations (version) VALUES ('20170812161507');
-
-INSERT INTO schema_migrations (version) VALUES ('20170812162234');
-
-INSERT INTO schema_migrations (version) VALUES ('20170813124637');
-
-INSERT INTO schema_migrations (version) VALUES ('20171025163818');
-
-INSERT INTO schema_migrations (version) VALUES ('20171027003948');
-
-INSERT INTO schema_migrations (version) VALUES ('20171027010303');
-
-INSERT INTO schema_migrations (version) VALUES ('20171028020823');
-
-INSERT INTO schema_migrations (version) VALUES ('20171028131934');
-
-INSERT INTO schema_migrations (version) VALUES ('20171101185138');
-
-INSERT INTO schema_migrations (version) VALUES ('20171106004939');
-
-INSERT INTO schema_migrations (version) VALUES ('20171106015034');
-
-INSERT INTO schema_migrations (version) VALUES ('20180530143857');
-
-INSERT INTO schema_migrations (version) VALUES ('20180530175949');
-
-INSERT INTO schema_migrations (version) VALUES ('20180531135158');
-
-INSERT INTO schema_migrations (version) VALUES ('20181005151705');
 

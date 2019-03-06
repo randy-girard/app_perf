@@ -41,6 +41,7 @@ module CalculateAllHashes
     # Groupdate::OrderHack instead of a string for the group_values which is not
     # accepted by ActiveRecord's pluck method.
     sql_snippets = group_values.map(&:to_s) + functions.values
+
     # Fix DEPRECATION WARNING:
     # Dangerous query method, will be disallowed in Rails 6.0
     # using Arel.sql() to silence the warning

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :analytic_event_datum do
 
   end

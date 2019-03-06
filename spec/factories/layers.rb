@@ -1,7 +1,7 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :layer do
-    application nil
-    name "MyString"
-    category "MyString"
+    application { nil }
+    name { "MyString" }
+    category { "MyString" }
   end
 end

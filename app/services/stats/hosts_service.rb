@@ -3,7 +3,7 @@ class Stats::HostsService < Stats::BaseService
     Host
       .with(:trace_cte => traces)
       .joins(:spans => :trace)
-      .where("spans.trace_id IN (SELECT trace_key FROM trace_cte)")
+      .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .where("hosts.name IS NOT NULL")
       .group("hosts.id, hosts.name")
       .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])

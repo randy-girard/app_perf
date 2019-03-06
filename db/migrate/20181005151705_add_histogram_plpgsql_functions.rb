@@ -1,4 +1,4 @@
-class AddHistogramPlpgsqlFunctions < ActiveRecord::Migration
+class AddHistogramPlpgsqlFunctions < ActiveRecord::Migration[5.0]
   def change
     execute <<-EOF
       DROP TYPE IF EXISTS floatrange CASCADE;

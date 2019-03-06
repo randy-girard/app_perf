@@ -1,4 +1,0 @@
-nginx: nginx -p `pwd` -c ./config/nginx/development.conf
-web: bundle exec passenger start -p 5001
-worker: bundle exec sidekiq
-data_service: node ./scripts/data_service.js log/nginx.app_perf.log

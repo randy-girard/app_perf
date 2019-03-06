@@ -27,13 +27,12 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
-                                               :stacked => true,
-                                               :library => { :chart => { :zoomType => "x" },
-                                                             :xAxis => { :type => 'datetime',
-                                                                         :labels => { :format => '{value:%I:%M %p}' } },
-                                                             :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
-                                                                           :shared => true } },
+                                               :points => false,
+                                               :curve => false,
+                                               :library => { spanGaps: true,
+                                                             tooltips: { mode: "index" },
+                                                             hover: { mode: "index" },
+                                                             scales: { yAxes: [{ stacked: true }]}},
                                                :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.memory.inactive_bytes,system.memory.active_bytes,system.memory.free_bytes,system.memory.wired_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
 
         .col-lg-4
@@ -42,13 +41,12 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
-                                               :stacked => true,
-                                               :library => { :chart => { :zoomType => "x" },
-                                                             :xAxis => { :type => 'datetime',
-                                                                         :labels => { :format => '{value:%I:%M %p}' } },
-                                                             :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
-                                                                           :shared => true } },
+                                               :points => false,
+                                               :curve => false,
+                                               :library => { spanGaps: true,
+                                                             tooltips: { mode: "index" },
+                                                             hover: { mode: "index" },
+                                                             scales: { yAxes: [{ stacked: true }]}},
                                                :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.network.in_bytes,system.network.out_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
 
         .col-lg-4
@@ -57,13 +55,12 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
-                                               :stacked => true,
-                                               :library => { :chart => { :zoomType => "x" },
-                                                             :xAxis => { :type => 'datetime',
-                                                                         :labels => { :format => '{value:%I:%M %p}' } },
-                                                             :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}b ({point.percentage:.0f}%)<br/>',
-                                                                           :shared => true } },
+                                               :points => false,
+                                               :curve => false,
+                                               :library => { spanGaps: true,
+                                                             tooltips: { mode: "index" },
+                                                             hover: { mode: "index" },
+                                                             scales: { yAxes: [{ stacked: true }]}},
                                                :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.disk.free_bytes,system.disk.used_bytes", :host_id => @host, :v => "1", :group => "name" }))) })
 
       .row
@@ -73,14 +70,12 @@
             .box-body
               = react_component("AreaChart", { :refresh => 15,
                                                :legend => "bottom",
-                                               :curve => true,
+                                               :curve => false,
                                                :points => false,
-                                               :library => { :chart => { :zoomType => "x" },
-                                                             :plotOptions => { :areaspline => { :stacking => 'percent' } },
-                                                             :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span> {point.percentage:.0f}%<br/>',
-                                                                           :shared => true },
-                                                             :xAxis => { :type => 'datetime',
-                                                                         :labels => { :format => '{value:%I:%M %p}' } } },
+                                               :library => { spanGaps: true,
+                                                             tooltips: { mode: "index" },
+                                                             hover: { mode: "index" },
+                                                             scales: { yAxes: [{ stacked: true }]}},
                                                :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.cpu.nice,system.cpu.idle,system.cpu.user,system.cpu.system", :host_id => @host, :v => "1", :group => "name" }))) })
         .col-lg-6
           .box
@@ -89,10 +84,9 @@
               = react_component("LineChart", { :refresh => 15,
                                                :legend => "bottom",
                                                :points => false,
-                                               :curve => true,
-                                               :library => { :chart => { :zoomType => "x" },
-                                                             :xAxis => { :type => 'datetime',
-                                                                         :labels => { :format => '{value:%I:%M %p}' } },
-                                                             :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.2f}<br/>',
-                                                                           :shared => true } },
+                                               :curve => false,
+                                               :library => { spanGaps: true,
+                                                             tooltips: { mode: "index" },
+                                                             hover: { mode: "index" },
+                                                             scales: { yAxes: [{ stacked: true }]}},
                                                :data => url_for(dynamic_url(:metric, metric_params({}, { :id => "system.load.one_minute,system.load.five_minute,system.load.fifteen_minute", :host_id => @host, :v => "1", :group => "name" }))) })

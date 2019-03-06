@@ -13,45 +13,42 @@
     / /.search form
     / sidebar menu: : style can be found in sidebar.less
     %ul.sidebar-menu
-      - if enterprise?
-        = render "enterprise/shared/sidebar"
-      - else
-        %li.header Administration
-        %li{:class => "#{'active' if @current_page["ApplicationsController"]}"}
-          = link_to dynamic_url(:applications) do
-            %i.fa.fa-cubes
-            %span Applications
-        %li{:class => "#{'active' if @current_page["UsersController"]}"}
-          = link_to dynamic_url(:users) do
-            %i.fa.fa-user
-            %span Users
-        %li.header Monitoring
-        %li{:class => "#{'active' if @current_page["HostsController"]}"}
-          = link_to dynamic_url(:hosts) do
-            %i.fa.fa-server
-            %span Hosts
-        - if @current_application
-          %li.header= @current_application.name
-          %li{:class => "#{'active' if @current_page["OverviewController#show"]}"}
-            = link_to dynamic_url(@current_application, :overview) do
-              %i.fa.fa-dashboard
-              %span Overview
-          %li{:class => "#{'active' if @current_page["TracesController"]}"}
-            = link_to dynamic_url(@current_application, :traces) do
-              %i.fa.fa-arrows-h
-              %span Traces
-          %li{:class => "#{'active' if @current_page["DatabaseController"]}"}
-            = link_to dynamic_url(@current_application, :database_index) do
-              %i.fa.fa-database
-              %span Database
-          %li.header Events
-          %li{:class => "#{'active' if @current_page["ErrorsController"] || @current_page["ErrorInstancesController"]}"}
-            = link_to dynamic_url(@current_application, :errors) do
-              %i.fa.fa-exclamation-triangle
-              %span Errors
-          %li{:class => "#{'active' if @current_page["DeploymentsController"]}"}
-            = link_to dynamic_url(@current_application, :deployments) do
-              %i.fa.fa-rocket
-              %span Deployments
+      %li.header Administration
+      %li{:class => "#{'active' if @current_page["ApplicationsController"]}"}
+        = link_to dynamic_url(:applications) do
+          %i.fa.fa-cubes
+          %span Applications
+      %li{:class => "#{'active' if @current_page["UsersController"]}"}
+        = link_to dynamic_url(:users) do
+          %i.fa.fa-user
+          %span Users
+      %li.header Monitoring
+      %li{:class => "#{'active' if @current_page["HostsController"]}"}
+        = link_to dynamic_url(:hosts) do
+          %i.fa.fa-server
+          %span Hosts
+      - if @current_application
+        %li.header= @current_application.name
+        %li{:class => "#{'active' if @current_page["OverviewController#show"]}"}
+          = link_to dynamic_url(@current_application, :overview) do
+            %i.fa.fa-dashboard
+            %span Overview
+        %li{:class => "#{'active' if @current_page["TracesController"]}"}
+          = link_to dynamic_url(@current_application, :traces) do
+            %i.fa.fa-arrows-h
+            %span Traces
+        %li{:class => "#{'active' if @current_page["DatabaseController"]}"}
+          = link_to dynamic_url(@current_application, :database_index) do
+            %i.fa.fa-database
+            %span Database
+        %li.header Events
+        %li{:class => "#{'active' if @current_page["ErrorsController"] || @current_page["ErrorInstancesController"]}"}
+          = link_to dynamic_url(@current_application, :errors) do
+            %i.fa.fa-exclamation-triangle
+            %span Errors
+        %li{:class => "#{'active' if @current_page["DeploymentsController"]}"}
+          = link_to dynamic_url(@current_application, :deployments) do
+            %i.fa.fa-rocket
+            %span Deployments
 
   / /.sidebar
