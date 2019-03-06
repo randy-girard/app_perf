@@ -11,7 +11,7 @@ class Stats::LayersService < Stats::BaseService
       .with(:trace_cte => traces)
       .joins(:spans)
       .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
-      .order(orders[params[:_order]] || orders["FreqAvg"])
+      .order(Arel.sql(orders[params[:_order]] || orders["FreqAvg"]))
       .group("layers.id, layers.name")
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
 

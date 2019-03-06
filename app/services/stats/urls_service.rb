@@ -7,7 +7,7 @@ class Stats::UrlsService < Stats::BaseService
       .where("spans.payload->>'peer.address' IS NOT NULL AND spans.payload->>'http.url' IS NOT NULL")
       .joins(:trace)
       .group("spans.payload->>'peer.address', spans.payload->>'http.url'")
-      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .order(Arel.sql(ORDERS[params[:_order]] || ORDERS["FreqAvg"]))
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
       .pluck_to_hash(
         "spans.payload->>'peer.address' AS domain",

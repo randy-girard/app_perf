@@ -6,7 +6,7 @@ class Stats::HostsService < Stats::BaseService
       .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .where("hosts.name IS NOT NULL")
       .group("hosts.id, hosts.name")
-      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .order(Arel.sql(ORDERS[params[:_order]] || ORDERS["FreqAvg"]))
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
       .pluck_to_hash(
         "hosts.id AS id",

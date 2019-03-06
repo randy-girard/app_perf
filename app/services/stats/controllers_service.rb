@@ -9,7 +9,7 @@ class Stats::ControllersService < Stats::BaseService
       .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .joins(:trace)
       .group("split_part(spans.operation_name, '#', 1), split_part(spans.operation_name, '#', 2)")
-      .order(ORDERS[params[:_order]] || ORDERS["FreqAvg"])
+      .order(Arel.sql(ORDERS[params[:_order]] || ORDERS["FreqAvg"]))
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
       .pluck_to_hash(
         "split_part(spans.operation_name, '#', 1) AS controller",

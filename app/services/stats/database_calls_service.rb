@@ -13,7 +13,7 @@ class Stats::DatabaseCallsService < Stats::BaseService
       .where("spans.trace_key IN (SELECT trace_key FROM trace_cte)")
       .where("statement IS NOT NULL")
       .group("layers.id, layers.name, database_calls.statement")
-      .order(orders[params[:_order]] || orders["FreqAvg"])
+      .order(Arel.sql(orders[params[:_order]] || orders["FreqAvg"]))
       .limit(LIMITS[params[:_limit]] || LIMITS["10"])
       .pluck_to_hash(
         "layers.id AS layer_id",
