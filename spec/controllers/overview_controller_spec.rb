@@ -10,7 +10,9 @@ describe OverviewController, :type => :controller do
     it 'works' do
       application = create(:application)
 
-      get :show, :application_id => application
+      get :show, :params => {
+        :application_id => application
+      }
       expect(response.status).to eq(200)
     end
   end

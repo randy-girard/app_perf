@@ -12,7 +12,10 @@ describe ErrorInstancesController, :type => :controller do
       error_message = create(:error_message, :application => application)
       create(:error_datum, :application => application, :error_message => error_message)
 
-      get :index, :application_id => application, :error_id => error_message
+      get :index, :params => {
+        :application_id => application,
+        :error_id => error_message
+      }
       expect(response.status).to eq(200)
     end
   end
@@ -23,7 +26,11 @@ describe ErrorInstancesController, :type => :controller do
       application = create(:application)
       error_message = create(:error_message, :application => application)
       error_datum = create(:error_datum, :application => application, :error_message => error_message)
-      get :show, :application_id => application, :error_id => error_message, :id => error_datum
+      get :show, :params => {
+        :application_id => application,
+        :error_id => error_message,
+        :id => error_datum
+      }
       expect(response.status).to eq(200)
     end
   end

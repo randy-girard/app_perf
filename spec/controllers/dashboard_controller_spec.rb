@@ -8,7 +8,7 @@ describe DashboardController, :type => :controller do
   # TODO: auto-generated
   describe 'GET show' do
     it 'works' do
-      get :show, {}, {}
+      get :show
       expect(response.status).to eq(200)
     end
   end
