@@ -1,10 +1,6 @@
 import React from "react"
 
 class DataPanelBody extends React.Component {
-  goToPage (e) {
-    this.props.router.push('/some/location');
-  }
-
   render () {
     return (
       <div className="box-body">

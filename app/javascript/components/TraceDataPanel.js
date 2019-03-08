@@ -10,6 +10,7 @@ class TraceDataPanel extends React.Component {
     var that = this;
     return (
       data.map(function(datum, index) {
+        console.log(props);
         var url = props.traces_url + "/" + datum.trace_key;
 
         return (
@@ -31,6 +32,7 @@ class TraceDataPanel extends React.Component {
                  showHeaderButtons={false}
                  title={this.props.title}
                  url={this.props.url}
+                 traces_url={this.props.traces_url}
                  callback={this.renderData} />
     )
   }
