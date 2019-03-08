@@ -16,19 +16,19 @@ module API
           r.get 'average_duration' do
             data = DurationReporter.new(@current_application, @params).report_data
 
-            #{
-            #  :data => data,
-            #  :annotations => annotations
-            #}
+            {
+              :data => data,
+              :annotations => annotations
+            }
           end
 
           r.get 'latency' do
             data = PercentileReporter.new(@current_application, @params).report_data
 
-            #{
-            #  :data => data,
-            #  :annotations => annotations
-            #}
+            {
+              :data => data,
+              :annotations => annotations
+            }
           end
 
           r.get 'latency_distribution' do
@@ -42,9 +42,10 @@ module API
           r.get 'latency_bands' do
             data = ::Stats::LatencyBandsService.new(@current_application, @time_range, @params).call
 
-            #{
-            #  :data => data
-            #}
+            {
+              :data => data,
+              :annotations => annotations
+            }
           end
 
           r.get 'hosts' do
@@ -90,10 +91,10 @@ module API
           r.get 'database' do
             data = DatabaseReporter.new(@current_application, @params).report_data
 
-            #{
-            #  :data => data,
-            #  :annotations => annotations
-            #}
+            {
+              :data => data,
+              :annotations => annotations
+            }
           end
 
           r.get 'database_calls' do

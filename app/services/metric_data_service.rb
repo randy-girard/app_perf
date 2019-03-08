@@ -36,12 +36,11 @@ class MetricDataService
     data = to_relation
     data = aggregate(data)
     data = format_data(data)
-    return data
 
-    #return {
-    #  :data => data,
-    #  :annotations => annotations
-    #}
+    return {
+      :data => data,
+      :annotations => annotations
+    }
   end
 
   def to_json
@@ -178,11 +177,21 @@ class MetricDataService
 
     Deployment
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => start_time, :end => end_time)
-      .map {|deployment|
+      .each_with_index
+      .map {|deployment, index|
         {
-          :value => deployment.start_time.to_i * 1000,
-          :color => '#FF0000',
-          :width => 2
+          type: 'line',
+          id: 'event-#{index}',
+          mode: 'vertical',
+          scaleID: 'x-axis-0',
+          value: deployment.start_time.to_i * 1_000,
+          borderColor: 'red',
+          borderWidth: 1,
+          label: {
+            enabled: true,
+            position: "center",
+            content: deployment.title
+          }
         }
       }
   end

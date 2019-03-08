@@ -31,7 +31,8 @@
                                          messages: { empty: "Waiting for data..." },
                                          library: { tooltips: { mode: "index" },
                                                     hover: { mode: "index" },
-                                                    scales: { yAxes: [{ stacked: true }]}},
+                                                    scales: { yAxes: [{ stacked: true }]},
+                                                    annotation: { annotations: [] }},
                                          data: dynamic_report_url({}, { url: "/api/v1/stats/average_duration",
                                                                         application_id: @current_application.id,
                                                                         type: "web" }))

@@ -1,4 +1,6 @@
 class ReportsController < ApplicationController
+  skip_before_action :authenticate_user!
+
   def new
     data = Application.select("pg_sleep(5)").first
 
@@ -7,6 +9,11 @@ class ReportsController < ApplicationController
 
   def error
     raise 'Hello'
+  end
+
+  def stress_test
+
+    render json: {}, status: :ok
   end
 
   def profile

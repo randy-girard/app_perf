@@ -15,8 +15,10 @@
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 
-import ReactChartkick, { AreaChart, LineChart } from 'react-chartkick';
+import ReactChartkick, { AreaChart, LineChart } from './react-chartkick.js';
 import Chart from 'chart.js';
+import 'chartjs-plugin-annotation';
+
 ReactChartkick.addAdapter(Chart);
 
 import WebpackerReact from 'webpacker-react';
