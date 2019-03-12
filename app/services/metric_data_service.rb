@@ -78,6 +78,7 @@ class MetricDataService
   def group(data)
     options = {}
     options[:permit] = %w[minute hour day]
+
     if time_range
       options[:range] = time_range
     else
@@ -130,14 +131,16 @@ class MetricDataService
   def format_data(data)
     hash = []
     groups = {}
+
     data.each_pair do |group, event|
+      val = event != nil && scale != nil ? event / scale : 0
       if params[:group]
         timestamp, metric, group = *group
         groups[metric] ||= []
-        groups[metric] << [timestamp, event / scale]
+        groups[metric] << [timestamp, val]
       else
         groups[metric_names.join(" + ")] ||= []
-        groups[metric_names.join(" + ")] << [group, event / scale]
+        groups[metric_names.join(" + ")] << [group, val]
       end
     end
 
@@ -174,11 +177,21 @@ class MetricDataService
 
     Deployment
       .where("start_time BETWEEN :start AND :end OR end_time BETWEEN :start AND :end", :start => start_time, :end => end_time)
-      .map {|deployment|
+      .each_with_index
+      .map {|deployment, index|
         {
-          :value => deployment.start_time.to_i * 1000,
-          :color => '#FF0000',
-          :width => 2
+          type: 'line',
+          id: 'event-#{index}',
+          mode: 'vertical',
+          scaleID: 'x-axis-0',
+          value: deployment.start_time.to_i * 1_000,
+          borderColor: 'red',
+          borderWidth: 1,
+          label: {
+            enabled: true,
+            position: "center",
+            content: deployment.title
+          }
         }
       }
   end

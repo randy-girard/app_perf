@@ -19,19 +19,19 @@ class WithFilterService
 
     if params[:_domain]
       domains = relation.where("spans.payload->>'peer.address' = ?", params[:_domain])
-      @relation = relation.where(:traces => { :trace_key => domains.select("spans.trace_id") })
+      @relation = relation.where(:traces => { :trace_key => domains.select("spans.trace_key") })
     end
     if params[:_url]
       urls = relation.where("spans.payload->>'http.url' = ?", params[:_url])
-      @relation = relation.where(:traces => { :trace_key => urls.select("spans.trace_id") })
+      @relation = relation.where(:traces => { :trace_key => urls.select("spans.trace_key") })
     end
     if params[:_controller]
       controllers = relation.where("split_part(spans.operation_name, '#', 1) = ?", params[:_controller])
-      @relation = relation.where(:traces => { :trace_key => controllers.select("spans.trace_id") })
+      @relation = relation.where(:traces => { :trace_key => controllers.select("spans.trace_key") })
     end
     if params[:_action]
       actions = relation.where("split_part(spans.operation_name, '#', 2) = ?", params[:_action])
-      @relation = relation.where(:traces => { :trace_key => actions.select("spans.trace_id") })
+      @relation = relation.where(:traces => { :trace_key => actions.select("spans.trace_key") })
     end
     @relation = relation.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
     @relation = relation.where("spans.host_id = ?", params[:_host]) if params[:_host]

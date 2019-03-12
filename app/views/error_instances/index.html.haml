@@ -24,5 +24,5 @@
                 %td= error_instance.message
                 %td
                   - if error_instance.span
-                    = link_to error_instance.span.tag("url"), dynamic_url(@current_application, :trace, :id => error_instance.span.trace_id, :span_id => error_instance.span.id)
+                    = link_to error_instance.span.tag("url"), dynamic_url(@current_application, :trace, :id => error_instance.span.trace_key, :span_id => error_instance.span.id)
                 %td= error_instance.created_at

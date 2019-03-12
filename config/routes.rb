@@ -34,10 +34,11 @@ Rails.application.routes.draw do
     resources :database, :controller => "database", :only => [:index]
     resources :deployments, :only => [:index, :new, :create]
 
-    resources :reports, :only => [:new, :error, :profile] do
+    resources :reports, :only => [:new, :error, :profile, :stress_test] do
       collection do
         get :error
         get :profile
+        get :stress_test
       end
     end
   end
@@ -46,12 +47,6 @@ Rails.application.routes.draw do
   mount Sidekiq::Web => '/sidekiq'
 
   mount API::Base, at: "/api"
-
-  if defined?(Enterprise)
-    mount Enterprise::Engine => "/"
-  elsif defined?(Hosted)
-    mount Hosted::Engine => "/"
-  end
 
   root :to => "dashboard#show"
 end

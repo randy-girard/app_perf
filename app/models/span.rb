@@ -1,11 +1,9 @@
-class Span < ActiveRecord::Base
-  include ActiveUUID::UUID
-
+class Span < ApplicationRecord
   belongs_to :application
   belongs_to :host
   belongs_to :grouping, :primary_key => :uuid, :polymorphic => true
   belongs_to :layer
-  belongs_to :trace, :primary_key => :trace_key
+  belongs_to :trace, :primary_key => :trace_key, :foreign_key => :trace_key
 
   belongs_to :parent, :primary_key => :uuid, :class_name => "Span"
   has_many :children, :primary_key => :uuid, :foreign_key => :parent_id, :class_name => "Span"
@@ -17,8 +15,6 @@ class Span < ActiveRecord::Base
   has_one :error, :primary_key => :uuid, :class_name => "ErrorDatum"
 
   delegate :name, :to => :layer, :prefix => true
-
-  serialize :payload, HashSerializer
 
   def tags
     payload
@@ -38,7 +34,11 @@ class Span < ActiveRecord::Base
 
   def source
     @log_entry ||= log_entries.where(:event => "source").first || LogEntry.new
-    @log_entry.fields.fetch("stack", nil) || @log_entry.fields.fetch(":stack", nil)
+    if @log_entry.fields
+      @log_entry.fields.fetch("stack", nil) || @log_entry.fields.fetch(":stack", nil)
+    else
+      nil
+    end
   end
 
   def is_root?

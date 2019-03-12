@@ -11,7 +11,9 @@ describe ReportsController, :type => :controller do
       expect(Application).to receive(:select).with("pg_sleep(5)") { [1] }
       application = create(:application)
 
-      get :new, :application_id => application
+      get :new, :params => {
+        :application_id => application
+      }
       expect(response.status).to eq(200)
     end
   end
@@ -22,7 +24,9 @@ describe ReportsController, :type => :controller do
       application = create(:application)
 
       expect {
-        get :error, :application_id => application
+        get :error, :params => {
+          :application_id => application
+        }
       }.to raise_error(RuntimeError)
     end
   end

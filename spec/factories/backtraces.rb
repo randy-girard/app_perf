@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :backtrace do
-    backtraceable nil
-    backtrace "MyText"
+    backtraceable { nil }
+    backtrace { "MyText" }
   end
 end

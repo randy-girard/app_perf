@@ -1,11 +1,12 @@
-class Trace < ActiveRecord::Base
+class Trace < ApplicationRecord
   belongs_to :application
   belongs_to :host
 
-  has_many :spans, :primary_key => :trace_key
+  has_many :spans, :primary_key => :trace_key, :foreign_key => :trace_key
   has_one  :root_span,
     -> { where(parent_id: nil) },
     :primary_key => :trace_key,
+    :foreign_key => :trace_key,
     :class_name => "Span"
 
   validates :trace_key, :uniqueness => { :scope => :application_id }

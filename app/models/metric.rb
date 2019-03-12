@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-class Metric < ActiveRecord::Base
+class Metric < ApplicationRecord
   belongs_to :application
   belongs_to :host
 

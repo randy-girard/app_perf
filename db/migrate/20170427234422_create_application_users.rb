@@ -1,4 +1,4 @@
-class CreateApplicationUsers < ActiveRecord::Migration
+class CreateApplicationUsers < ActiveRecord::Migration[5.0]
   def change
     create_table :application_users do |t|
       t.references :application, index: true, foreign_key: true

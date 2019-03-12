@@ -23,45 +23,62 @@
           %i.fa.fa-clock
           %h3.box-title Average Request Time
         .box-body
-          = react_component("AreaChart", { :refresh => 15,
-                                           :legend => true,
-                                           :curve => false,
-                                           :library => { :chart => { :zoomType => "x" },
-                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f}ms ({point.percentage:.0f}%)<br/>',
-                                                                       :shared => true },
-                                                         :xAxis => { :type => 'datetime',
-                                                                     :labels => { format: '{value:%I:%M %p}' } },
-                                                         :yAxis => { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/average_duration", :application_id => @current_application.id, :type => "web" }) })
+          = react_component("AreaChart", refresh: 15,
+                                         legend: "bottom",
+                                         curve: false,
+                                         points: false,
+                                         suffix: "ms",
+                                         messages: { empty: "Waiting for data..." },
+                                         library: { tooltips: { mode: "index" },
+                                                    hover: { mode: "index" },
+                                                    scales: { yAxes: [{ stacked: true }]},
+                                                    annotation: { annotations: [] },
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
+                                         data: dynamic_report_url({}, { url: "/api/v1/stats/average_duration",
+                                                                        application_id: @current_application.id,
+                                                                        type: "web" }))
 
       .box
         .box-header
           %i.fa.fa-clock
           %h3.box-title Latency
         .box-body
-          = react_component("AreaChart", { :refresh => 15,
-                                           :legend => false,
-                                           :curve => false,
-                                           :points => false,
-                                           :stack => false,
-                                           :library => { :chart => { :zoomType => "x" },
-                                                         :plotOptions => { :series => { :lineWidth => 0 } },
-                                                         :tooltip => { :pointFormat => '<span style="color:{series.color}">{series.name}</span>: {point.y:.0f} ({point.percentage:.0f}%)<br/>',
-                                                                       :shared => true },
-                                                         :xAxis => { :type => 'datetime',
-                                                                     :labels => { format: '{value:%I:%M %p}' } } },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/latency_bands", :application_id => @current_application.id, :type => "web" }) })
+          = react_component("AreaChart", refresh: 15,
+                                         legend: "bottom",
+                                         curve: false,
+                                         points: false,
+                                         messages: { empty: "Waiting for data..." },
+                                         library: { tooltips: { mode: "index" },
+                                                    hover: { mode: "index" },
+                                                    scales: { yAxes: [{ stacked: true }] },
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
+                                         data: dynamic_report_url({}, { url: "/api/v1/stats/latency_bands",
+                                                                        application_id: @current_application.id,
+                                                                        type: "web" }))
 
   .row
     %section.col-lg-6.connectedSortable
-      = react_component("ControllerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/controllers", :application_id => @current_application.id, :type => "web" }))
+      = react_component("ControllerDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/controllers",
+                                                                             application_id: @current_application.id,
+                                                                             type: "web" }))
 
-      = react_component("UrlDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/urls", :application_id => @current_application.id, :type => "web" }))
+      = react_component("UrlDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/urls",
+                                                                      application_id: @current_application.id,
+                                                                      type: "web" }))
 
-      = react_component("HostDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/hosts", :application_id => @current_application.id, :type => "web" }))
+      = react_component("HostDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/hosts",
+                                                                       application_id: @current_application.id,
+                                                                       type: "web" }))
 
-      = react_component("DatabaseDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/database_calls", :application_id => @current_application.id, :type => "web" }))
+      = react_component("DatabaseDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/database_calls",
+                                                                           application_id: @current_application.id,
+                                                                           type: "web" }))
     %section.col-lg-6.connectedSortable
-      = react_component("LayerDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/layers", :application_id => @current_application.id, :type => "web" }))
+      = react_component("LayerDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/layers",
+                                                                        application_id: @current_application.id,
+                                                                        type: "web" }))
 
-      = react_component("TraceDataPanel", :url => dynamic_report_url({}, { :url => "/api/v1/stats/traces", :application_id => @current_application.id, :type => "web" }), :traces_url => url_for(dynamic_url(@current_application, :traces)))
+      = react_component("TraceDataPanel", url: dynamic_report_url({}, { url: "/api/v1/stats/traces",
+                                                                        application_id: @current_application.id,
+                                                                        type: "web" }),
+                                          traces_url: url_for(dynamic_url(@current_application, :traces)))

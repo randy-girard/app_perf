@@ -1,4 +1,4 @@
-class CreateTraces < ActiveRecord::Migration
+class CreateTraces < ActiveRecord::Migration[5.0]
   def change
     create_table :traces do |t|
       t.references :application, index: true, foreign_key: true

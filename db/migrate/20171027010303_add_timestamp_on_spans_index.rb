@@ -1,4 +1,4 @@
-class AddTimestampOnSpansIndex < ActiveRecord::Migration
+class AddTimestampOnSpansIndex < ActiveRecord::Migration[5.0]
   def change
     add_index :spans, :timestamp
     add_index :traces, :timestamp

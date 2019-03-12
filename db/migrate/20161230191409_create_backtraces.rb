@@ -1,4 +1,4 @@
-class CreateBacktraces < ActiveRecord::Migration
+class CreateBacktraces < ActiveRecord::Migration[5.0]
   def change
     create_table :backtraces do |t|
       t.references :backtraceable, polymorphic: true, type: :string, index: true

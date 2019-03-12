@@ -3,24 +3,14 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  around_filter :use_time_zone
-  before_filter :authenticate_user!
+  around_action :use_time_zone
+  before_action :authenticate_user!
   before_action :set_current_application
   before_action :set_application_scope
   before_action :set_current_page
   before_action :set_time_range
 
   layout :set_layout
-
-  helper_method :enterprise?
-  def enterprise?
-    defined?(Enterprise)
-  end
-
-  helper_method :hosted?
-  def hosted?
-    defined?(Hosted)
-  end
 
   helper_method :dynamic_url
   def dynamic_url(*args, **params)

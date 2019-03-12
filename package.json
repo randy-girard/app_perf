@@ -1,0 +1,21 @@
+{
+  "name": "AppPerf",
+  "private": true,
+  "dependencies": {
+    "@babel/preset-react": "^7.0.0",
+    "@rails/webpacker": "^4.0.1",
+    "axios": "^0.18.0",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "chart.js": "^2.7.3",
+    "chartjs-plugin-annotation": "^0.5.7",
+    "chartjs-plugin-zoom": "chartjs/chartjs-plugin-zoom#master",
+    "moment": "^2.24.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "webpacker-react": "^0.3.2"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.2.1"
+  }
+}

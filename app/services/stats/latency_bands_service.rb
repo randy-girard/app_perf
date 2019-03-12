@@ -9,10 +9,10 @@ class Stats::LatencyBandsService < Stats::BaseService
     period, timestamp, options = report_params
 
     data = Trace
-      .with(trace_cte: traces.uniq)
+      .with(trace_cte: traces.distinct)
       .from("trace_cte")
       .group_by_period(period, timestamp, options)
-      .order("histogram_bucket(histogram(duration, 0, (SELECT max(duration) FROM trace_cte), 10)) DESC")
+      .order(Arel.sql("histogram_bucket(histogram(duration, 0, (SELECT max(duration) FROM trace_cte), 10)) DESC"))
       .calculate_all_hashes(
         count: "histogram_count(histogram(duration, 0, (SELECT max(duration) FROM trace_cte), 10))",
         range: "histogram_range(histogram(duration, 0, (SELECT max(duration) FROM trace_cte), 10))"

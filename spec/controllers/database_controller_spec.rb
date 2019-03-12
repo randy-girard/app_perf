@@ -10,7 +10,9 @@ describe DatabaseController, :type => :controller do
     it 'works' do
       application = create(:application)
 
-      get :index, :application_id => application
+      get :index, :params => {
+        :application_id => application
+      }
       expect(response.status).to eq(200)
     end
   end

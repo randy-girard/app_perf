@@ -43,7 +43,8 @@ module API
             data = ::Stats::LatencyBandsService.new(@current_application, @time_range, @params).call
 
             {
-              :data => data
+              :data => data,
+              :annotations => annotations
             }
           end
 

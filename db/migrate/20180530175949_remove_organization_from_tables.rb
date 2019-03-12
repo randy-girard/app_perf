@@ -1,4 +1,4 @@
-class RemoveOrganizationFromTables < ActiveRecord::Migration
+class RemoveOrganizationFromTables < ActiveRecord::Migration[5.0]
   def change
     tables = %w(
       applications

@@ -23,13 +23,16 @@
           %i.fa.fa-clock
           %h3.box-title Database Query Time
         .box-body
-          = react_component("AreaChart", { :refresh => 15,
-                                           :legend => "bottom",
-                                           :curve => true,
-                                           :library => { :chart => { :zoomType => "x" },
-                                                         xAxis: { type: 'datetime', labels: { format: '{value:%I:%M %p}' } },
-                                                         yAxis: { labels: { format: '{value}ms' }} },
-                                           :data => dynamic_report_url({}, { :url => "/api/v1/stats/database", :application_id => @current_application.id }) })
+          = react_component("AreaChart", refresh: 15,
+                                         legend: "bottom",
+                                         curve: false,
+                                         points: false,
+                                         suffix: "ms",
+                                         messages: { empty: "Waiting for data..." },
+                                         library: { scales: { xAxes: [{ type: "time", time: { unit: "minute" }}]},
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
+                                         data: dynamic_report_url({}, { url: "/api/v1/stats/database",
+                                                                        application_id: @current_application.id }))
     .col-lg-12.connectedSortable
       .box
         .box-header
@@ -42,13 +45,14 @@
               %th.text-center{:width => "200"} Duration (ms)
               %th{:width => "200"}
             - @database_calls.each do |database_call|
-              %tr
-                %td.ellipsis= link_to database_call.span.layer.name, dynamic_url(database_call.application, :database_index, :_layer => database_call.span.layer_id)
-                %td.ellipsis= link_to database_call.statement, dynamic_url(database_call.application, :trace, id: database_call.span.trace_id, :span_id => database_call.span.id)
-                %td.text-center
-                  = number_with_precision(database_call.duration, :precision => 2)
-                %td.text-center
-                  = time_ago_in_words(database_call.timestamp)
-                  ago
+              - if database_call.span
+                %tr
+                  %td.ellipsis= link_to database_call.span.layer.name, dynamic_url(database_call.application, :database_index, :_layer => database_call.span.layer_id)
+                  %td.ellipsis= link_to database_call.statement, dynamic_url(database_call.application, :trace, id: database_call.span.trace_key, :span_id => database_call.span.id)
+                  %td.text-center
+                    = number_with_precision(database_call.duration, :precision => 2)
+                  %td.text-center
+                    = time_ago_in_words(database_call.timestamp)
+                    ago
     .col-lg-12
       = paginate @database_calls

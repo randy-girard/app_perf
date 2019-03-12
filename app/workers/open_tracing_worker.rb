@@ -111,7 +111,7 @@ class OpenTracingWorker < ActiveJob::Base
       span.host_id = host.id
       span.uuid = datum["id"]
       span.operation_name = datum["name"]
-      span.trace_id = datum["traceId"]
+      span.trace_key = datum["traceId"]
       span.parent_id = datum["parentId"]
       span.name = datum["name"]
       span.layer_id = layers.find {|l| l.name == (datum["tags"]["component"] || datum["name"]) }.id
@@ -215,7 +215,7 @@ class OpenTracingWorker < ActiveJob::Base
         trace = Trace.new
         trace.application_id = application.id
         trace.host_id = host.id
-        trace.trace_key = span.trace_id
+        trace.trace_key = span.trace_key
         trace.timestamp = span.timestamp
         trace.duration = span.duration
         trace

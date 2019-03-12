@@ -1,7 +1,7 @@
-class Backtrace < ActiveRecord::Base
+class Backtrace < ApplicationRecord
   belongs_to :backtraceable, polymorphic: true
 
-  serialize :backtrace
+  serialize :backtrace, JSON
 
   def app_backtrace(lines = 10)
     @app_backtrace ||=

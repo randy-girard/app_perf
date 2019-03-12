@@ -1,4 +1,4 @@
-class FixUpMetrics < ActiveRecord::Migration
+class FixUpMetrics < ActiveRecord::Migration[5.0]
   def change
     remove_column :metrics, :unit, :string
     remove_column :metrics, :timestamp, :datetime
