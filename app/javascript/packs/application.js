@@ -16,8 +16,13 @@
 // const imagePath = (name) => images(name, true)
 
 import ReactChartkick, { AreaChart, LineChart } from './react-chartkick.js';
+
+import Chartkick from './chartkick.js';
+window.Chartkick = Chartkick;
+
 import Chart from 'chart.js';
 import 'chartjs-plugin-annotation';
+import './chartjs-plugin-zoom.js';
 
 ReactChartkick.addAdapter(Chart);
 
@@ -43,4 +48,24 @@ WebpackerReact.setup({
   LayerDataPanel,
   TraceDataPanel,
   UrlDataPanel
+});
+
+$(document).ready(function() {
+  Chartkick.eachChart(function(chart) {
+    if(typeof(chart.options.library.zoom) !== 'undefined') {
+      chart.options.library.zoom.onZoom = function(chart) {
+        console.log(chart);
+        var min = chart.chart.scales['x-axis-0'].min / 1000;
+        var max = chart.chart.scales['x-axis-0'].max / 1000;
+
+        var currentUrl = location.href;
+        currentUrl = Utils.updateQueryStringParameter(currentUrl, "_past", "");
+        currentUrl = Utils.updateQueryStringParameter(currentUrl, "_interval", "");
+        currentUrl = Utils.updateQueryStringParameter(currentUrl, "_st", min);
+        currentUrl = Utils.updateQueryStringParameter(currentUrl, "_se", max);
+
+        window.location = currentUrl;
+      }
+    }
+  });
 });

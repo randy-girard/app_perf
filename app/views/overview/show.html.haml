@@ -32,7 +32,8 @@
                                          library: { tooltips: { mode: "index" },
                                                     hover: { mode: "index" },
                                                     scales: { yAxes: [{ stacked: true }]},
-                                                    annotation: { annotations: [] }},
+                                                    annotation: { annotations: [] },
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
                                          data: dynamic_report_url({}, { url: "/api/v1/stats/average_duration",
                                                                         application_id: @current_application.id,
                                                                         type: "web" }))
@@ -49,7 +50,8 @@
                                          messages: { empty: "Waiting for data..." },
                                          library: { tooltips: { mode: "index" },
                                                     hover: { mode: "index" },
-                                                    scales: { yAxes: [{ stacked: true }] } },
+                                                    scales: { yAxes: [{ stacked: true }] },
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
                                          data: dynamic_report_url({}, { url: "/api/v1/stats/latency_bands",
                                                                         application_id: @current_application.id,
                                                                         type: "web" }))

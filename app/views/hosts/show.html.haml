@@ -33,6 +33,7 @@
                                                library: { spanGaps: true,
                                                           tooltips: { mode: "index" },
                                                           hover: { mode: "index" },
+                                                          zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" },
                                                           scales: { yAxes: [{ stacked: true }]}},
                                                data: url_for(dynamic_url(:metric, metric_params({}, { id: "system.memory.inactive_bytes,system.memory.active_bytes,system.memory.free_bytes,system.memory.wired_bytes", host_id: @host, v: "1", group: "name" }))) })
 
@@ -48,6 +49,7 @@
                                                library: { spanGaps: true,
                                                           tooltips: { mode: "index" },
                                                           hover: { mode: "index" },
+                                                          zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" },
                                                           scales: { yAxes: [{ stacked: true }]}},
                                                data: url_for(dynamic_url(:metric, metric_params({}, { id: "system.network.in_bytes,system.network.out_bytes", host_id: @host, v: "1", group: "name" }))) })
 
@@ -63,6 +65,7 @@
                                                library: { spanGaps: true,
                                                              tooltips: { mode: "index" },
                                                              hover: { mode: "index" },
+                                                             zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" },
                                                              scales: { yAxes: [{ stacked: true }]}},
                                                data: url_for(dynamic_url(:metric, metric_params({}, { id: "system.disk.free_bytes,system.disk.used_bytes", host_id: @host, v: "1", group: "name" }))) })
 
@@ -79,6 +82,7 @@
                                                library: { spanGaps: true,
                                                           tooltips: { mode: "index" },
                                                           hover: { mode: "index" },
+                                                          zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" },
                                                           scales: { yAxes: [{ stacked: true }]}},
                                                data: url_for(dynamic_url(:metric, metric_params({}, { id: "system.cpu.nice,system.cpu.idle,system.cpu.user,system.cpu.system", host_id: @host, v: "1", group: "name" }))) })
         .col-lg-6
@@ -93,5 +97,6 @@
                                                library: { spanGaps: true,
                                                           tooltips: { mode: "index" },
                                                           hover: { mode: "index" },
+                                                          zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" },
                                                           scales: { yAxes: [{ stacked: true }]}},
                                                data: url_for(dynamic_url(:metric, metric_params({}, { id: "system.load.one_minute,system.load.five_minute,system.load.fifteen_minute", host_id: @host, v: "1", group: "name" }))) })

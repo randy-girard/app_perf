@@ -10,7 +10,6 @@ class TraceDataPanel extends React.Component {
     var that = this;
     return (
       data.map(function(datum, index) {
-        console.log(props);
         var url = props.traces_url + "/" + datum.trace_key;
 
         return (

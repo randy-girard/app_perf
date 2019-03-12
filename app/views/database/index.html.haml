@@ -29,8 +29,8 @@
                                          points: false,
                                          suffix: "ms",
                                          messages: { empty: "Waiting for data..." },
-                                         library: { scales: { xAxes: [{ type: "time",
-                                                                        time: { unit: "minute" }}]}},
+                                         library: { scales: { xAxes: [{ type: "time", time: { unit: "minute" }}]},
+                                                    zoom: { enabled: true, drag: true, mode: 'x', onZoom: "onChartZoom()" } },
                                          data: dynamic_report_url({}, { url: "/api/v1/stats/database",
                                                                         application_id: @current_application.id }))
     .col-lg-12.connectedSortable
