@@ -9,7 +9,7 @@ class DatabaseReporter < Reporter
       .group_by_period(*report_params("database_calls.timestamp"))
 
     data = data.where("spans.layer_id = ?", params[:_layer]) if params[:_layer]
-    data = data.sum("database_calls.duration")
+    data = data.average("database_calls.duration")
 
     hash = []
     layers = {}
