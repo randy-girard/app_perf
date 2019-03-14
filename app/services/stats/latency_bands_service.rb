@@ -1,3 +1,5 @@
+require "gradient"
+
 class Stats::LatencyBandsService < Stats::BaseService
   def call
     if params[:_layer].present?
