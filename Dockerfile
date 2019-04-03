@@ -1,6 +1,6 @@
-FROM ruby:2.3-alpine
+FROM ruby:2.6.1-alpine
 
-RUN apk update && apk add build-base nodejs postgresql-dev sqlite-dev tzdata curl-dev 
+RUN apk update && apk add build-base nodejs postgresql-dev sqlite-dev tzdata curl-dev git
 
 RUN apk add --no-cache supervisor
 
@@ -17,7 +17,6 @@ COPY .env.docker ./.env.development
 COPY supervisord.conf /etc/supervisord/conf.d/supervisord.conf
 
 LABEL maintainer="Randy Girard <rgirard59@yahoo.com>"
-
 
 CMD cd /app &&\
     bundle exec rake assets:precompile &&\
