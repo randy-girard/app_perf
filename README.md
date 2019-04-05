@@ -39,6 +39,15 @@ docker-compose up
 
 Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediatetly!
 
+### Default Login
+
+AppPerf has a sample account allowing you to check out the application
+
+```
+username: user@example.com
+password: password
+```
+
 ### Using Other databases
 
 SQLite has some limitation with concurrency in this app, as well as various date functions used for reporting. If you would rather test against postgresql (Mysql to come), you can run the following command to create a local development database running on port 5443 (Must have postgresql installed):

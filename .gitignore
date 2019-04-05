@@ -45,4 +45,7 @@
 /node_modules
 /yarn-error.log
 yarn-debug.log*
-.yarn-integrity
+
+# Ignore supervisord files
+supervisord.log*
+supervisord.pid*
