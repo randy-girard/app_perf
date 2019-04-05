@@ -10,7 +10,6 @@
 /.project
 /.bundle
 /.DS_Store
-/*.lock
 /app_perf_ruby_agent.yml
 /config/database.yml
 /public/.DS_Store
