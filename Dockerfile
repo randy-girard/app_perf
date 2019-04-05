@@ -23,6 +23,7 @@ CMD cd /app &&\
     bundle exec rake assets:precompile &&\
     bundle exec rake db:create &&\
     bundle exec rake db:migrate &&\
+    bundle exec rake db:seed &&\
     /bin/sh -c "/usr/bin/supervisord -c /app/supervisord.conf"
 
 EXPOSE 5000
