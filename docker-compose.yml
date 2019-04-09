@@ -25,7 +25,7 @@ services:
       - 'redis'
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - '5000:5000'
     volumes:

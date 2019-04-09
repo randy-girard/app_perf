@@ -32,6 +32,9 @@ Dir.chdir APP_ROOT do
   system "rm -f log/*"
   system "rm -rf tmp/cache"
 
+  puts "== Create pids directory =="
+  system "mkdir -p tmp/pids"
+
   puts "== Setting up Database=="
   system "bundle exec rake db:drop"
   system "bundle exec rake db:create"
