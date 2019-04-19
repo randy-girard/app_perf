@@ -10,8 +10,8 @@
     .col-lg-12
       .nav-tabs-custom
         %ul.nav.nav-tabs
-          %li.active= link_to "Manually Create New Application", "#new-application", :data => { :toggle => "tab" }
-          %li= link_to "Automatically Create Application", "#auto-application", :data => { :toggle => "tab" }
+          %li.active= link_to "Manually Create New Application", "#new-application", data: { toggle: "tab" }
+          %li= link_to "Automatically Create Application", "#auto-application", data: { toggle: "tab" }
         %div.tab-content
           %div#new-application.tab-pane.active
             = render 'form'

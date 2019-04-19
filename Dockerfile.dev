@@ -21,10 +21,12 @@ ONBUILD ADD . $INSTALL_PATH
 
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
-RUN bundle install --jobs 20 --retry 5 --without development test --deployment --quiet && \
+RUN bundle install --jobs 20 --retry 5 --binstubs && \
       gem install app_perf_agent && yarn install
 
 COPY . .
+COPY .env.docker ./.env.development
+COPY supervisord.conf /etc/supervisord/conf.d/supervisord.conf
 
 # Available (and reused) args
 # Use --build-arg PORT=5000 to use another app default port
@@ -32,7 +34,12 @@ ARG PORT=5000
 EXPOSE $PORT
 
 # The default command that gets ran will be to start the puma server and webpack.
-CMD ["bundle", "exec", "rails", "s"]
+CMD cd /app &&\
+    bundle exec rake assets:precompile &&\
+    bundle exec rake db:create &&\
+    bundle exec rake db:migrate &&\
+    bundle exec rake db:seed &&\
+    /bin/sh -c "/usr/bin/supervisord -c /app/supervisord.conf"
 
 # Metadata
 LABEL org.label-schema.vendor="App Perf" \

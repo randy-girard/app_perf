@@ -1,4 +1,10 @@
 ---
-:concurrency: 5
+:verbose: true
+:concurrency: 15
+:pidfile: tmp/pids/sidekiq.pid
+production:
+  :concurrency: 10
+staging:
+  :concurrency: 10
 :queues:
   - app_perf

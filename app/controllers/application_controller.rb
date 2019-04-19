@@ -35,12 +35,12 @@ class ApplicationController < ActionController::Base
   def set_current_application
     @application_scope = Application
     if current_user
-      if params[:application_id]
-        @current_application ||= @application_scope.find_by_id(params[:application_id])
-      elsif session[:application_id]
-        @current_application ||= @application_scope.find_by_id(session[:application_id])
-      end
-      @current_scope = @current_application
+      @current_application ||= if params[:application_id]
+                                 @application_scope.find_by_id(params[:application_id])
+                               elsif session[:application_id]
+                                 @application_scope.find_by_id(session[:application_id])
+                               end
+      @current_scope = @current_application || current_user
     end
   end
 
