@@ -16,7 +16,7 @@ This is a application monitoring app. I am trying to build an open source, easy 
 
 ### Setup (Localhost)
 
-Setup should be striaghtforward and easy. We use foreman to manage processes. Begin by running the setup script:
+Setup should be straightforward and easy. We use foreman to manage processes. Begin by running the setup script:
 
 ```
 ./bin/setup
@@ -37,7 +37,7 @@ docker-compose build
 docker-compose up
 ```
 
-Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediatetly!
+Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediately!
 
 ### Default Login
 
