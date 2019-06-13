@@ -11,6 +11,7 @@ redis_url = redis_config[:url] || "redis://#{redis_config[:host]}:#{redis_config
 Sidekiq.configure_server do |config|
   config.redis = {
     url: redis_url,
+    namespace: "app_perf_#{Rails.env}",
     network_timeout: 5
   }
 end
@@ -18,6 +19,7 @@ end
 Sidekiq.configure_client do |config|
   config.redis = {
     url: redis_url,
+    namespace: "app_perf_#{Rails.env}",
     network_timeout: 5
   }
 end

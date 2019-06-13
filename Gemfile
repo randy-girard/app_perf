@@ -31,6 +31,7 @@ gem 'postgres_ext', github: 'cerebris/postgres_ext', branch: "rails-5"
 gem "font-awesome-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
+gem "redis-namespace"
 gem "activerecord-import"
 gem "app_perf_rpm"
 gem "app_perf_agent"

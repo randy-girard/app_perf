@@ -210,6 +210,8 @@ GEM
       ffi (~> 1.0)
     rdoc (6.1.1)
     redis (4.1.0)
+    redis-namespace (1.6.0)
+      redis (>= 3.0.4)
     responders (2.4.1)
       actionpack (>= 4.2.0, < 6.0)
       railties (>= 4.2.0, < 6.0)
@@ -344,6 +346,7 @@ DEPENDENCIES
   pry
   rack
   rails (= 5.2.2.1)
+  redis-namespace
   roda
   rspec-rails
   sass-rails
