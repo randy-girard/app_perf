@@ -13,6 +13,21 @@ Join Slack using this link: https://join.slack.com/t/app-perf/shared_invite/enQt
 
 This is a application monitoring app. I am trying to build an open source, easy to setup, performance monitoring tool.
 
+### Prerequisites
+
+Before you set up AppPerf, you need to make sure the following is installed and functional.
+
+- Yarn
+- Node
+- PostgreSQL
+
+If you are on Mac, you should be able to install them with the following commands:
+
+```
+brew install yarn
+brew install node
+brew install postgresql
+```
 
 ### Setup (Localhost)
 
