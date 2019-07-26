@@ -20,6 +20,7 @@ Before you set up AppPerf, you need to make sure the following is installed and 
 - Yarn
 - Node
 - PostgreSQL
+- Mailcatcher, or another smtp mail server (In Development, if you want to send emails)
 
 If you are on Mac, you should be able to install them with the following commands:
 
