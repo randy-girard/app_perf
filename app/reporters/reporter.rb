@@ -21,7 +21,9 @@ class Reporter
     []
   end
 
-  private
+  def self.report_params(params, timestamp = "spans.timestamp")
+    self.new(nil, params).report_params(timestamp)
+  end
 
   def report_params(timestamp = "spans.timestamp")
     options = { }
