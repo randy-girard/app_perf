@@ -1,8 +1,8 @@
-module API
+module Api
   module V1
     class Stats < Roda
-      include API::V1::Defaults
-      include API::V1::Authentication
+      include Api::V1::Defaults
+      include Api::V1::Authentication
 
       route do |r|
         @params = r.params.symbolize_keys

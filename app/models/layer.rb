@@ -1,5 +1,5 @@
 class Layer < ApplicationRecord
-  belongs_to :application
+  belongs_to :application, optional: true
 
   has_many :spans
 

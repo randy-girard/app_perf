@@ -46,7 +46,7 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
-  mount API::Base, at: "/api"
+  mount Api::Base, at: "/api"
 
   root :to => "dashboard#show"
 end

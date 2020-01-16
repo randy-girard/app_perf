@@ -1,8 +1,8 @@
 class ErrorDatum < ApplicationRecord
-  belongs_to :application
-  belongs_to :host
-  belongs_to :error_message
-  belongs_to :span, :primary_key => :uuid
+  belongs_to :application, optional: true
+  belongs_to :host, optional: true
+  belongs_to :error_message, optional: true
+  belongs_to :span, :primary_key => :uuid, optional: true
 
   serialize :source, JSON
   serialize :backtrace, JSON

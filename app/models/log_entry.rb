@@ -1,5 +1,5 @@
 class LogEntry < ApplicationRecord
-  belongs_to :span, :foreign_key => :uuid
+  belongs_to :span, :foreign_key => :uuid, optional: true
 
   attr_accessor :trace_id
 

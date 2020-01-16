@@ -1,4 +1,4 @@
-module API
+module Api
   module V1
     module Defaults
       extend ActiveSupport::Concern
@@ -8,7 +8,7 @@ module API
         plugin :all_verbs
         plugin :hooks
         plugin :sinatra_helpers
-        
+
         def annotations
           ::Stats::AnnotationsService.new(@current_application, @time_range, @params).call
         end

@@ -1,11 +1,10 @@
 class Span < ApplicationRecord
-  belongs_to :application
-  belongs_to :host
-  belongs_to :grouping, :primary_key => :uuid, :polymorphic => true
-  belongs_to :layer
-  belongs_to :trace, :primary_key => :trace_key, :foreign_key => :trace_key
+  belongs_to :application, optional: true
+  belongs_to :host, optional: true
+  belongs_to :layer, optional: true
+  belongs_to :trace, :primary_key => :trace_key, :foreign_key => :trace_key, optional: true
 
-  belongs_to :parent, :primary_key => :uuid, :class_name => "Span"
+  belongs_to :parent, :primary_key => :uuid, :class_name => "Span", optional: true
   has_many :children, :primary_key => :uuid, :foreign_key => :parent_id, :class_name => "Span"
 
   has_many :log_entries, :primary_key => :uuid
@@ -46,8 +45,7 @@ class Span < ApplicationRecord
   end
 
   def is_query?(uuid)
-    grouping_type.eql?("DatabaseCall") &&
-    grouping_id.to_s.eql?(uuid)
+    !!database_call
   end
 
   def end

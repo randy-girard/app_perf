@@ -3,11 +3,23 @@ SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
-SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
 
 --
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
@@ -23,11 +35,13 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
+SET search_path = public, pg_catalog;
+
 --
 -- Name: floatrange; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.floatrange AS RANGE (
+CREATE TYPE floatrange AS RANGE (
     subtype = double precision,
     subtype_diff = float8mi
 );
@@ -37,18 +51,18 @@ CREATE TYPE public.floatrange AS RANGE (
 -- Name: histogram_result; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.histogram_result AS (
+CREATE TYPE histogram_result AS (
 	count integer,
 	bucket integer,
-	range public.floatrange
+	range floatrange
 );
 
 
 --
--- Name: hist_sfunc(public.histogram_result[], double precision, double precision, double precision, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hist_sfunc(histogram_result[], double precision, double precision, double precision, integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.hist_sfunc(state public.histogram_result[], val double precision, min double precision, max double precision, nbuckets integer) RETURNS public.histogram_result[]
+CREATE FUNCTION hist_sfunc(state histogram_result[], val double precision, min double precision, max double precision, nbuckets integer) RETURNS histogram_result[]
     LANGUAGE plpgsql IMMUTABLE
     AS $$
       DECLARE
@@ -78,7 +92,7 @@ CREATE FUNCTION public.hist_sfunc(state public.histogram_result[], val double pr
 -- Name: histobar(double precision, double precision); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.histobar(v double precision, tick_size double precision) RETURNS text
+CREATE FUNCTION histobar(v double precision, tick_size double precision) RETURNS text
     LANGUAGE sql
     AS $$
       	SELECT repeat('=', (v * tick_size)::integer);
@@ -86,10 +100,10 @@ CREATE FUNCTION public.histobar(v double precision, tick_size double precision) 
 
 
 --
--- Name: histogram_bucket(public.histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: histogram_bucket(histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.histogram_bucket(h public.histogram_result[]) RETURNS SETOF integer
+CREATE FUNCTION histogram_bucket(h histogram_result[]) RETURNS SETOF integer
     LANGUAGE plpgsql
     AS $$
       DECLARE
@@ -107,10 +121,10 @@ CREATE FUNCTION public.histogram_bucket(h public.histogram_result[]) RETURNS SET
 
 
 --
--- Name: histogram_count(public.histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: histogram_count(histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.histogram_count(h public.histogram_result[]) RETURNS SETOF integer
+CREATE FUNCTION histogram_count(h histogram_result[]) RETURNS SETOF integer
     LANGUAGE plpgsql
     AS $$
       DECLARE
@@ -128,10 +142,10 @@ CREATE FUNCTION public.histogram_count(h public.histogram_result[]) RETURNS SETO
 
 
 --
--- Name: histogram_range(public.histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: histogram_range(histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.histogram_range(h public.histogram_result[]) RETURNS SETOF public.floatrange
+CREATE FUNCTION histogram_range(h histogram_result[]) RETURNS SETOF floatrange
     LANGUAGE plpgsql
     AS $$
       DECLARE
@@ -149,10 +163,10 @@ CREATE FUNCTION public.histogram_range(h public.histogram_result[]) RETURNS SETO
 
 
 --
--- Name: show_histogram(public.histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: show_histogram(histogram_result[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.show_histogram(h public.histogram_result[]) RETURNS TABLE(bucket integer, range public.floatrange, count integer, bar text, cumbar text, cumsum integer, cumpct numeric)
+CREATE FUNCTION show_histogram(h histogram_result[]) RETURNS TABLE(bucket integer, range floatrange, count integer, bar text, cumbar text, cumsum integer, cumpct numeric)
     LANGUAGE plpgsql
     AS $$
       DECLARE
@@ -192,9 +206,9 @@ CREATE FUNCTION public.show_histogram(h public.histogram_result[]) RETURNS TABLE
 -- Name: histogram(double precision, double precision, double precision, integer); Type: AGGREGATE; Schema: public; Owner: -
 --
 
-CREATE AGGREGATE public.histogram(double precision, double precision, double precision, integer) (
-    SFUNC = public.hist_sfunc,
-    STYPE = public.histogram_result[]
+CREATE AGGREGATE histogram(double precision, double precision, double precision, integer) (
+    SFUNC = hist_sfunc,
+    STYPE = histogram_result[]
 );
 
 
@@ -206,7 +220,7 @@ SET default_with_oids = false;
 -- Name: applications; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.applications (
+CREATE TABLE applications (
     id integer NOT NULL,
     user_id integer,
     name character varying,
@@ -220,7 +234,8 @@ CREATE TABLE public.applications (
 -- Name: applications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.applications_id_seq
+CREATE SEQUENCE applications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -232,18 +247,18 @@ CREATE SEQUENCE public.applications_id_seq
 -- Name: applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.applications_id_seq OWNED BY public.applications.id;
+ALTER SEQUENCE applications_id_seq OWNED BY applications.id;
 
 
 --
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.ar_internal_metadata (
+CREATE TABLE ar_internal_metadata (
     key character varying NOT NULL,
     value character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -251,7 +266,7 @@ CREATE TABLE public.ar_internal_metadata (
 -- Name: backtraces; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.backtraces (
+CREATE TABLE backtraces (
     id integer NOT NULL,
     backtraceable_type character varying,
     backtraceable_id character varying,
@@ -265,7 +280,8 @@ CREATE TABLE public.backtraces (
 -- Name: backtraces_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.backtraces_id_seq
+CREATE SEQUENCE backtraces_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -277,14 +293,14 @@ CREATE SEQUENCE public.backtraces_id_seq
 -- Name: backtraces_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.backtraces_id_seq OWNED BY public.backtraces.id;
+ALTER SEQUENCE backtraces_id_seq OWNED BY backtraces.id;
 
 
 --
 -- Name: database_calls; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.database_calls (
+CREATE TABLE database_calls (
     id integer NOT NULL,
     application_id integer,
     host_id integer,
@@ -303,7 +319,8 @@ CREATE TABLE public.database_calls (
 -- Name: database_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.database_calls_id_seq
+CREATE SEQUENCE database_calls_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -315,14 +332,14 @@ CREATE SEQUENCE public.database_calls_id_seq
 -- Name: database_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.database_calls_id_seq OWNED BY public.database_calls.id;
+ALTER SEQUENCE database_calls_id_seq OWNED BY database_calls.id;
 
 
 --
 -- Name: database_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.database_types (
+CREATE TABLE database_types (
     id integer NOT NULL,
     application_id integer,
     name character varying,
@@ -335,7 +352,8 @@ CREATE TABLE public.database_types (
 -- Name: database_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.database_types_id_seq
+CREATE SEQUENCE database_types_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -347,14 +365,14 @@ CREATE SEQUENCE public.database_types_id_seq
 -- Name: database_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.database_types_id_seq OWNED BY public.database_types.id;
+ALTER SEQUENCE database_types_id_seq OWNED BY database_types.id;
 
 
 --
 -- Name: error_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.error_data (
+CREATE TABLE error_data (
     id integer NOT NULL,
     application_id integer,
     host_id integer,
@@ -374,7 +392,8 @@ CREATE TABLE public.error_data (
 -- Name: error_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.error_data_id_seq
+CREATE SEQUENCE error_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -386,14 +405,14 @@ CREATE SEQUENCE public.error_data_id_seq
 -- Name: error_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.error_data_id_seq OWNED BY public.error_data.id;
+ALTER SEQUENCE error_data_id_seq OWNED BY error_data.id;
 
 
 --
 -- Name: error_messages; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.error_messages (
+CREATE TABLE error_messages (
     id integer NOT NULL,
     application_id integer,
     fingerprint character varying,
@@ -409,7 +428,8 @@ CREATE TABLE public.error_messages (
 -- Name: error_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.error_messages_id_seq
+CREATE SEQUENCE error_messages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -421,14 +441,14 @@ CREATE SEQUENCE public.error_messages_id_seq
 -- Name: error_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.error_messages_id_seq OWNED BY public.error_messages.id;
+ALTER SEQUENCE error_messages_id_seq OWNED BY error_messages.id;
 
 
 --
 -- Name: events; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.events (
+CREATE TABLE events (
     id integer NOT NULL,
     type character varying,
     application_id integer,
@@ -445,7 +465,8 @@ CREATE TABLE public.events (
 -- Name: events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.events_id_seq
+CREATE SEQUENCE events_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -457,14 +478,14 @@ CREATE SEQUENCE public.events_id_seq
 -- Name: events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.events_id_seq OWNED BY public.events.id;
+ALTER SEQUENCE events_id_seq OWNED BY events.id;
 
 
 --
 -- Name: hosts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hosts (
+CREATE TABLE hosts (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -476,7 +497,8 @@ CREATE TABLE public.hosts (
 -- Name: hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.hosts_id_seq
+CREATE SEQUENCE hosts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -488,14 +510,14 @@ CREATE SEQUENCE public.hosts_id_seq
 -- Name: hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.hosts_id_seq OWNED BY public.hosts.id;
+ALTER SEQUENCE hosts_id_seq OWNED BY hosts.id;
 
 
 --
 -- Name: layers; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.layers (
+CREATE TABLE layers (
     id integer NOT NULL,
     application_id integer,
     name character varying,
@@ -508,7 +530,8 @@ CREATE TABLE public.layers (
 -- Name: layers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.layers_id_seq
+CREATE SEQUENCE layers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -520,14 +543,14 @@ CREATE SEQUENCE public.layers_id_seq
 -- Name: layers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.layers_id_seq OWNED BY public.layers.id;
+ALTER SEQUENCE layers_id_seq OWNED BY layers.id;
 
 
 --
 -- Name: log_entries; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.log_entries (
+CREATE TABLE log_entries (
     id integer NOT NULL,
     span_id character varying,
     event character varying,
@@ -542,7 +565,8 @@ CREATE TABLE public.log_entries (
 -- Name: log_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.log_entries_id_seq
+CREATE SEQUENCE log_entries_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -554,14 +578,14 @@ CREATE SEQUENCE public.log_entries_id_seq
 -- Name: log_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.log_entries_id_seq OWNED BY public.log_entries.id;
+ALTER SEQUENCE log_entries_id_seq OWNED BY log_entries.id;
 
 
 --
 -- Name: metric_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.metric_data (
+CREATE TABLE metric_data (
     id integer NOT NULL,
     host_id integer,
     metric_id integer,
@@ -575,7 +599,8 @@ CREATE TABLE public.metric_data (
 -- Name: metric_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.metric_data_id_seq
+CREATE SEQUENCE metric_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -587,14 +612,14 @@ CREATE SEQUENCE public.metric_data_id_seq
 -- Name: metric_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.metric_data_id_seq OWNED BY public.metric_data.id;
+ALTER SEQUENCE metric_data_id_seq OWNED BY metric_data.id;
 
 
 --
 -- Name: metrics; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.metrics (
+CREATE TABLE metrics (
     id integer NOT NULL,
     application_id integer,
     name character varying,
@@ -607,7 +632,8 @@ CREATE TABLE public.metrics (
 -- Name: metrics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.metrics_id_seq
+CREATE SEQUENCE metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -619,14 +645,14 @@ CREATE SEQUENCE public.metrics_id_seq
 -- Name: metrics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.metrics_id_seq OWNED BY public.metrics.id;
+ALTER SEQUENCE metrics_id_seq OWNED BY metrics.id;
 
 
 --
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.schema_migrations (
+CREATE TABLE schema_migrations (
     version character varying NOT NULL
 );
 
@@ -635,7 +661,7 @@ CREATE TABLE public.schema_migrations (
 -- Name: spans; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.spans (
+CREATE TABLE spans (
     application_id integer,
     host_id integer,
     layer_id integer,
@@ -650,7 +676,7 @@ CREATE TABLE public.spans (
     updated_at timestamp without time zone NOT NULL,
     parent_id character varying,
     operation_name character varying,
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL
+    id uuid DEFAULT uuid_generate_v4() NOT NULL
 );
 
 
@@ -658,7 +684,7 @@ CREATE TABLE public.spans (
 -- Name: traces; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.traces (
+CREATE TABLE traces (
     id integer NOT NULL,
     application_id integer,
     host_id integer,
@@ -674,7 +700,8 @@ CREATE TABLE public.traces (
 -- Name: traces_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.traces_id_seq
+CREATE SEQUENCE traces_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -686,14 +713,14 @@ CREATE SEQUENCE public.traces_id_seq
 -- Name: traces_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.traces_id_seq OWNED BY public.traces.id;
+ALTER SEQUENCE traces_id_seq OWNED BY traces.id;
 
 
 --
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.users (
+CREATE TABLE users (
     id integer NOT NULL,
     email character varying,
     license_key character varying,
@@ -724,7 +751,8 @@ CREATE TABLE public.users (
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.users_id_seq
+CREATE SEQUENCE users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -736,112 +764,112 @@ CREATE SEQUENCE public.users_id_seq
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
 -- Name: applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.applications ALTER COLUMN id SET DEFAULT nextval('public.applications_id_seq'::regclass);
+ALTER TABLE ONLY applications ALTER COLUMN id SET DEFAULT nextval('applications_id_seq'::regclass);
 
 
 --
 -- Name: backtraces id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.backtraces ALTER COLUMN id SET DEFAULT nextval('public.backtraces_id_seq'::regclass);
+ALTER TABLE ONLY backtraces ALTER COLUMN id SET DEFAULT nextval('backtraces_id_seq'::regclass);
 
 
 --
 -- Name: database_calls id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls ALTER COLUMN id SET DEFAULT nextval('public.database_calls_id_seq'::regclass);
+ALTER TABLE ONLY database_calls ALTER COLUMN id SET DEFAULT nextval('database_calls_id_seq'::regclass);
 
 
 --
 -- Name: database_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_types ALTER COLUMN id SET DEFAULT nextval('public.database_types_id_seq'::regclass);
+ALTER TABLE ONLY database_types ALTER COLUMN id SET DEFAULT nextval('database_types_id_seq'::regclass);
 
 
 --
 -- Name: error_data id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_data ALTER COLUMN id SET DEFAULT nextval('public.error_data_id_seq'::regclass);
+ALTER TABLE ONLY error_data ALTER COLUMN id SET DEFAULT nextval('error_data_id_seq'::regclass);
 
 
 --
 -- Name: error_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_messages ALTER COLUMN id SET DEFAULT nextval('public.error_messages_id_seq'::regclass);
+ALTER TABLE ONLY error_messages ALTER COLUMN id SET DEFAULT nextval('error_messages_id_seq'::regclass);
 
 
 --
 -- Name: events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.events ALTER COLUMN id SET DEFAULT nextval('public.events_id_seq'::regclass);
+ALTER TABLE ONLY events ALTER COLUMN id SET DEFAULT nextval('events_id_seq'::regclass);
 
 
 --
 -- Name: hosts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.hosts ALTER COLUMN id SET DEFAULT nextval('public.hosts_id_seq'::regclass);
+ALTER TABLE ONLY hosts ALTER COLUMN id SET DEFAULT nextval('hosts_id_seq'::regclass);
 
 
 --
 -- Name: layers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.layers ALTER COLUMN id SET DEFAULT nextval('public.layers_id_seq'::regclass);
+ALTER TABLE ONLY layers ALTER COLUMN id SET DEFAULT nextval('layers_id_seq'::regclass);
 
 
 --
 -- Name: log_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.log_entries ALTER COLUMN id SET DEFAULT nextval('public.log_entries_id_seq'::regclass);
+ALTER TABLE ONLY log_entries ALTER COLUMN id SET DEFAULT nextval('log_entries_id_seq'::regclass);
 
 
 --
 -- Name: metric_data id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metric_data ALTER COLUMN id SET DEFAULT nextval('public.metric_data_id_seq'::regclass);
+ALTER TABLE ONLY metric_data ALTER COLUMN id SET DEFAULT nextval('metric_data_id_seq'::regclass);
 
 
 --
 -- Name: metrics id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metrics ALTER COLUMN id SET DEFAULT nextval('public.metrics_id_seq'::regclass);
+ALTER TABLE ONLY metrics ALTER COLUMN id SET DEFAULT nextval('metrics_id_seq'::regclass);
 
 
 --
 -- Name: traces id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.traces ALTER COLUMN id SET DEFAULT nextval('public.traces_id_seq'::regclass);
+ALTER TABLE ONLY traces ALTER COLUMN id SET DEFAULT nextval('traces_id_seq'::regclass);
 
 
 --
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
 -- Name: applications applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.applications
+ALTER TABLE ONLY applications
     ADD CONSTRAINT applications_pkey PRIMARY KEY (id);
 
 
@@ -849,7 +877,7 @@ ALTER TABLE ONLY public.applications
 -- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.ar_internal_metadata
+ALTER TABLE ONLY ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
 
 
@@ -857,7 +885,7 @@ ALTER TABLE ONLY public.ar_internal_metadata
 -- Name: backtraces backtraces_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.backtraces
+ALTER TABLE ONLY backtraces
     ADD CONSTRAINT backtraces_pkey PRIMARY KEY (id);
 
 
@@ -865,7 +893,7 @@ ALTER TABLE ONLY public.backtraces
 -- Name: database_calls database_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls
+ALTER TABLE ONLY database_calls
     ADD CONSTRAINT database_calls_pkey PRIMARY KEY (id);
 
 
@@ -873,7 +901,7 @@ ALTER TABLE ONLY public.database_calls
 -- Name: database_types database_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_types
+ALTER TABLE ONLY database_types
     ADD CONSTRAINT database_types_pkey PRIMARY KEY (id);
 
 
@@ -881,7 +909,7 @@ ALTER TABLE ONLY public.database_types
 -- Name: error_data error_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_data
+ALTER TABLE ONLY error_data
     ADD CONSTRAINT error_data_pkey PRIMARY KEY (id);
 
 
@@ -889,7 +917,7 @@ ALTER TABLE ONLY public.error_data
 -- Name: error_messages error_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_messages
+ALTER TABLE ONLY error_messages
     ADD CONSTRAINT error_messages_pkey PRIMARY KEY (id);
 
 
@@ -897,7 +925,7 @@ ALTER TABLE ONLY public.error_messages
 -- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.events
+ALTER TABLE ONLY events
     ADD CONSTRAINT events_pkey PRIMARY KEY (id);
 
 
@@ -905,7 +933,7 @@ ALTER TABLE ONLY public.events
 -- Name: hosts hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.hosts
+ALTER TABLE ONLY hosts
     ADD CONSTRAINT hosts_pkey PRIMARY KEY (id);
 
 
@@ -913,7 +941,7 @@ ALTER TABLE ONLY public.hosts
 -- Name: layers layers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.layers
+ALTER TABLE ONLY layers
     ADD CONSTRAINT layers_pkey PRIMARY KEY (id);
 
 
@@ -921,7 +949,7 @@ ALTER TABLE ONLY public.layers
 -- Name: log_entries log_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.log_entries
+ALTER TABLE ONLY log_entries
     ADD CONSTRAINT log_entries_pkey PRIMARY KEY (id);
 
 
@@ -929,7 +957,7 @@ ALTER TABLE ONLY public.log_entries
 -- Name: metric_data metric_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metric_data
+ALTER TABLE ONLY metric_data
     ADD CONSTRAINT metric_data_pkey PRIMARY KEY (id);
 
 
@@ -937,7 +965,7 @@ ALTER TABLE ONLY public.metric_data
 -- Name: metrics metrics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metrics
+ALTER TABLE ONLY metrics
     ADD CONSTRAINT metrics_pkey PRIMARY KEY (id);
 
 
@@ -945,7 +973,7 @@ ALTER TABLE ONLY public.metrics
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.schema_migrations
+ALTER TABLE ONLY schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
@@ -953,7 +981,7 @@ ALTER TABLE ONLY public.schema_migrations
 -- Name: spans spans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.spans
+ALTER TABLE ONLY spans
     ADD CONSTRAINT spans_pkey PRIMARY KEY (id);
 
 
@@ -961,7 +989,7 @@ ALTER TABLE ONLY public.spans
 -- Name: traces traces_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.traces
+ALTER TABLE ONLY traces
     ADD CONSTRAINT traces_pkey PRIMARY KEY (id);
 
 
@@ -969,7 +997,7 @@ ALTER TABLE ONLY public.traces
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.users
+ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
@@ -977,433 +1005,433 @@ ALTER TABLE ONLY public.users
 -- Name: idx_metric_data_tags; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX idx_metric_data_tags ON public.metric_data USING gin (tags jsonb_path_ops);
+CREATE INDEX idx_metric_data_tags ON metric_data USING gin (tags jsonb_path_ops);
 
 
 --
 -- Name: idx_spans_payload; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX idx_spans_payload ON public.spans USING gin (payload jsonb_path_ops);
+CREATE INDEX idx_spans_payload ON spans USING gin (payload jsonb_path_ops);
 
 
 --
 -- Name: index_applications_on_name_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_applications_on_name_and_user_id ON public.applications USING btree (name, user_id);
+CREATE UNIQUE INDEX index_applications_on_name_and_user_id ON applications USING btree (name, user_id);
 
 
 --
 -- Name: index_applications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_applications_on_user_id ON public.applications USING btree (user_id);
+CREATE INDEX index_applications_on_user_id ON applications USING btree (user_id);
 
 
 --
 -- Name: index_backtraces_on_backtraceable_type_and_backtraceable_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_backtraces_on_backtraceable_type_and_backtraceable_id ON public.backtraces USING btree (backtraceable_type, backtraceable_id);
+CREATE INDEX index_backtraces_on_backtraceable_type_and_backtraceable_id ON backtraces USING btree (backtraceable_type, backtraceable_id);
 
 
 --
 -- Name: index_database_calls_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_application_id ON public.database_calls USING btree (application_id);
+CREATE INDEX index_database_calls_on_application_id ON database_calls USING btree (application_id);
 
 
 --
 -- Name: index_database_calls_on_database_type_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_database_type_id ON public.database_calls USING btree (database_type_id);
+CREATE INDEX index_database_calls_on_database_type_id ON database_calls USING btree (database_type_id);
 
 
 --
 -- Name: index_database_calls_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_host_id ON public.database_calls USING btree (host_id);
+CREATE INDEX index_database_calls_on_host_id ON database_calls USING btree (host_id);
 
 
 --
 -- Name: index_database_calls_on_layer_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_layer_id ON public.database_calls USING btree (layer_id);
+CREATE INDEX index_database_calls_on_layer_id ON database_calls USING btree (layer_id);
 
 
 --
 -- Name: index_database_calls_on_span_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_span_id ON public.database_calls USING btree (span_id);
+CREATE INDEX index_database_calls_on_span_id ON database_calls USING btree (span_id);
 
 
 --
 -- Name: index_database_calls_on_timestamp; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_calls_on_timestamp ON public.database_calls USING btree ("timestamp");
+CREATE INDEX index_database_calls_on_timestamp ON database_calls USING btree ("timestamp");
 
 
 --
 -- Name: index_database_types_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_database_types_on_application_id ON public.database_types USING btree (application_id);
+CREATE INDEX index_database_types_on_application_id ON database_types USING btree (application_id);
 
 
 --
 -- Name: index_error_data_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_error_data_on_application_id ON public.error_data USING btree (application_id);
+CREATE INDEX index_error_data_on_application_id ON error_data USING btree (application_id);
 
 
 --
 -- Name: index_error_data_on_error_message_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_error_data_on_error_message_id ON public.error_data USING btree (error_message_id);
+CREATE INDEX index_error_data_on_error_message_id ON error_data USING btree (error_message_id);
 
 
 --
 -- Name: index_error_data_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_error_data_on_host_id ON public.error_data USING btree (host_id);
+CREATE INDEX index_error_data_on_host_id ON error_data USING btree (host_id);
 
 
 --
 -- Name: index_error_messages_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_error_messages_on_application_id ON public.error_messages USING btree (application_id);
+CREATE INDEX index_error_messages_on_application_id ON error_messages USING btree (application_id);
 
 
 --
 -- Name: index_events_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_events_on_application_id ON public.events USING btree (application_id);
+CREATE INDEX index_events_on_application_id ON events USING btree (application_id);
 
 
 --
 -- Name: index_layers_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_layers_on_application_id ON public.layers USING btree (application_id);
+CREATE INDEX index_layers_on_application_id ON layers USING btree (application_id);
 
 
 --
 -- Name: index_layers_on_name_and_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_layers_on_name_and_application_id ON public.layers USING btree (name, application_id);
+CREATE UNIQUE INDEX index_layers_on_name_and_application_id ON layers USING btree (name, application_id);
 
 
 --
 -- Name: index_log_entries_on_span_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_log_entries_on_span_id ON public.log_entries USING btree (span_id);
+CREATE INDEX index_log_entries_on_span_id ON log_entries USING btree (span_id);
 
 
 --
 -- Name: index_metric_data_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_metric_data_on_host_id ON public.metric_data USING btree (host_id);
+CREATE INDEX index_metric_data_on_host_id ON metric_data USING btree (host_id);
 
 
 --
 -- Name: index_metric_data_on_metric_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_metric_data_on_metric_id ON public.metric_data USING btree (metric_id);
+CREATE INDEX index_metric_data_on_metric_id ON metric_data USING btree (metric_id);
 
 
 --
 -- Name: index_metrics_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_metrics_on_application_id ON public.metrics USING btree (application_id);
+CREATE INDEX index_metrics_on_application_id ON metrics USING btree (application_id);
 
 
 --
 -- Name: index_spans_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_application_id ON public.spans USING btree (application_id);
+CREATE INDEX index_spans_on_application_id ON spans USING btree (application_id);
 
 
 --
 -- Name: index_spans_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_host_id ON public.spans USING btree (host_id);
+CREATE INDEX index_spans_on_host_id ON spans USING btree (host_id);
 
 
 --
 -- Name: index_spans_on_layer_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_layer_id ON public.spans USING btree (layer_id);
+CREATE INDEX index_spans_on_layer_id ON spans USING btree (layer_id);
 
 
 --
 -- Name: index_spans_on_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_parent_id ON public.spans USING btree (parent_id);
+CREATE INDEX index_spans_on_parent_id ON spans USING btree (parent_id);
 
 
 --
 -- Name: index_spans_on_timestamp; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_timestamp ON public.spans USING btree ("timestamp");
+CREATE INDEX index_spans_on_timestamp ON spans USING btree ("timestamp");
 
 
 --
 -- Name: index_spans_on_trace_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_spans_on_trace_key ON public.spans USING btree (trace_key);
+CREATE INDEX index_spans_on_trace_key ON spans USING btree (trace_key);
 
 
 --
 -- Name: index_traces_on_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_traces_on_application_id ON public.traces USING btree (application_id);
+CREATE INDEX index_traces_on_application_id ON traces USING btree (application_id);
 
 
 --
 -- Name: index_traces_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_traces_on_host_id ON public.traces USING btree (host_id);
+CREATE INDEX index_traces_on_host_id ON traces USING btree (host_id);
 
 
 --
 -- Name: index_traces_on_timestamp; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_traces_on_timestamp ON public.traces USING btree ("timestamp");
+CREATE INDEX index_traces_on_timestamp ON traces USING btree ("timestamp");
 
 
 --
 -- Name: index_traces_on_trace_key_and_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_traces_on_trace_key_and_application_id ON public.traces USING btree (trace_key, application_id);
+CREATE UNIQUE INDEX index_traces_on_trace_key_and_application_id ON traces USING btree (trace_key, application_id);
 
 
 --
 -- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
+CREATE UNIQUE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
 -- Name: index_users_on_invitation_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_invitation_token ON public.users USING btree (invitation_token);
+CREATE UNIQUE INDEX index_users_on_invitation_token ON users USING btree (invitation_token);
 
 
 --
 -- Name: index_users_on_invitations_count; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_invitations_count ON public.users USING btree (invitations_count);
+CREATE INDEX index_users_on_invitations_count ON users USING btree (invitations_count);
 
 
 --
 -- Name: index_users_on_invited_by_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_invited_by_id ON public.users USING btree (invited_by_id);
+CREATE INDEX index_users_on_invited_by_id ON users USING btree (invited_by_id);
 
 
 --
 -- Name: index_users_on_invited_by_type_and_invited_by_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_invited_by_type_and_invited_by_id ON public.users USING btree (invited_by_type, invited_by_id);
+CREATE INDEX index_users_on_invited_by_type_and_invited_by_id ON users USING btree (invited_by_type, invited_by_id);
 
 
 --
 -- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
+CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
 
 
 --
 -- Name: metrics fk_rails_011a3e569f; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metrics
-    ADD CONSTRAINT fk_rails_011a3e569f FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY metrics
+    ADD CONSTRAINT fk_rails_011a3e569f FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: database_calls fk_rails_1025ac6d1a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls
-    ADD CONSTRAINT fk_rails_1025ac6d1a FOREIGN KEY (layer_id) REFERENCES public.layers(id);
+ALTER TABLE ONLY database_calls
+    ADD CONSTRAINT fk_rails_1025ac6d1a FOREIGN KEY (layer_id) REFERENCES layers(id);
 
 
 --
 -- Name: spans fk_rails_238b63daa9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.spans
-    ADD CONSTRAINT fk_rails_238b63daa9 FOREIGN KEY (host_id) REFERENCES public.hosts(id);
+ALTER TABLE ONLY spans
+    ADD CONSTRAINT fk_rails_238b63daa9 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --
 -- Name: error_messages fk_rails_384d6fa11a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_messages
-    ADD CONSTRAINT fk_rails_384d6fa11a FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY error_messages
+    ADD CONSTRAINT fk_rails_384d6fa11a FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: traces fk_rails_3f4665e0b5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.traces
-    ADD CONSTRAINT fk_rails_3f4665e0b5 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY traces
+    ADD CONSTRAINT fk_rails_3f4665e0b5 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: database_calls fk_rails_40b3ccef67; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls
-    ADD CONSTRAINT fk_rails_40b3ccef67 FOREIGN KEY (host_id) REFERENCES public.hosts(id);
+ALTER TABLE ONLY database_calls
+    ADD CONSTRAINT fk_rails_40b3ccef67 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --
 -- Name: database_types fk_rails_40cfd232fc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_types
-    ADD CONSTRAINT fk_rails_40cfd232fc FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY database_types
+    ADD CONSTRAINT fk_rails_40cfd232fc FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: events fk_rails_5502771cf0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.events
-    ADD CONSTRAINT fk_rails_5502771cf0 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY events
+    ADD CONSTRAINT fk_rails_5502771cf0 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: traces fk_rails_6c5cd9a577; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.traces
-    ADD CONSTRAINT fk_rails_6c5cd9a577 FOREIGN KEY (host_id) REFERENCES public.hosts(id);
+ALTER TABLE ONLY traces
+    ADD CONSTRAINT fk_rails_6c5cd9a577 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --
 -- Name: error_data fk_rails_6f4ca3da14; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_data
-    ADD CONSTRAINT fk_rails_6f4ca3da14 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY error_data
+    ADD CONSTRAINT fk_rails_6f4ca3da14 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: applications fk_rails_703c720730; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.applications
-    ADD CONSTRAINT fk_rails_703c720730 FOREIGN KEY (user_id) REFERENCES public.users(id);
+ALTER TABLE ONLY applications
+    ADD CONSTRAINT fk_rails_703c720730 FOREIGN KEY (user_id) REFERENCES users(id);
 
 
 --
 -- Name: layers fk_rails_7347a524b6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.layers
-    ADD CONSTRAINT fk_rails_7347a524b6 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY layers
+    ADD CONSTRAINT fk_rails_7347a524b6 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: spans fk_rails_75ce7a410c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.spans
-    ADD CONSTRAINT fk_rails_75ce7a410c FOREIGN KEY (layer_id) REFERENCES public.layers(id);
+ALTER TABLE ONLY spans
+    ADD CONSTRAINT fk_rails_75ce7a410c FOREIGN KEY (layer_id) REFERENCES layers(id);
 
 
 --
 -- Name: spans fk_rails_9516b75a98; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.spans
-    ADD CONSTRAINT fk_rails_9516b75a98 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY spans
+    ADD CONSTRAINT fk_rails_9516b75a98 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: metric_data fk_rails_9fc5ea3242; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metric_data
-    ADD CONSTRAINT fk_rails_9fc5ea3242 FOREIGN KEY (host_id) REFERENCES public.hosts(id);
+ALTER TABLE ONLY metric_data
+    ADD CONSTRAINT fk_rails_9fc5ea3242 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --
 -- Name: metric_data fk_rails_b2e9a5a928; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.metric_data
-    ADD CONSTRAINT fk_rails_b2e9a5a928 FOREIGN KEY (metric_id) REFERENCES public.metrics(id);
+ALTER TABLE ONLY metric_data
+    ADD CONSTRAINT fk_rails_b2e9a5a928 FOREIGN KEY (metric_id) REFERENCES metrics(id);
 
 
 --
 -- Name: error_data fk_rails_b51fd68f43; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_data
-    ADD CONSTRAINT fk_rails_b51fd68f43 FOREIGN KEY (host_id) REFERENCES public.hosts(id);
+ALTER TABLE ONLY error_data
+    ADD CONSTRAINT fk_rails_b51fd68f43 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --
 -- Name: error_data fk_rails_d74ab25774; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.error_data
-    ADD CONSTRAINT fk_rails_d74ab25774 FOREIGN KEY (error_message_id) REFERENCES public.error_messages(id);
+ALTER TABLE ONLY error_data
+    ADD CONSTRAINT fk_rails_d74ab25774 FOREIGN KEY (error_message_id) REFERENCES error_messages(id);
 
 
 --
 -- Name: database_calls fk_rails_e1ffc54547; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls
-    ADD CONSTRAINT fk_rails_e1ffc54547 FOREIGN KEY (application_id) REFERENCES public.applications(id);
+ALTER TABLE ONLY database_calls
+    ADD CONSTRAINT fk_rails_e1ffc54547 FOREIGN KEY (application_id) REFERENCES applications(id);
 
 
 --
 -- Name: database_calls fk_rails_e4c11371a0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.database_calls
-    ADD CONSTRAINT fk_rails_e4c11371a0 FOREIGN KEY (database_type_id) REFERENCES public.database_types(id);
+ALTER TABLE ONLY database_calls
+    ADD CONSTRAINT fk_rails_e4c11371a0 FOREIGN KEY (database_type_id) REFERENCES database_types(id);
 
 
 --

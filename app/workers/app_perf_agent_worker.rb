@@ -26,7 +26,10 @@ class AppPerfAgentWorker < ActiveJob::Base
 
       self.data = Array(json.fetch("data"))
 
+      self.user = User.where(license_key: license_key).first
+
       self.application = Application.where(:license_key => license_key).first_or_initialize
+      self.application.user = user
       self.application.name = name
       self.application.save
 
@@ -190,10 +193,19 @@ class AppPerfAgentWorker < ActiveJob::Base
       timestamp = Time.at(_start)
       duration = _duration
 
+      span = {}
+      span[:host_id] = host.id
+      span[:layer_id] = layer.id
+      span[:timestamp] = timestamp
+      span[:duration] = _duration
+      span[:trace_key] = _trace_key
+      span[:uuid] = SecureRandom.uuid.to_s
+      span[:payload] = _opts
+
       if query
         database_type = database_types.find {|dt| dt.name == adapter }
         database_call = application.database_calls.new(
-          :uuid => SecureRandom.uuid.to_s,
+          :uuid => span[:uuid],
           :database_type_id => database_type.id,
           :host_id => host.id,
           :layer_id => layer.id,
@@ -203,19 +215,6 @@ class AppPerfAgentWorker < ActiveJob::Base
         )
         database_calls << database_call
       end
-
-      span = {}
-      if database_call
-        span[:grouping_id] = database_call.uuid.to_s
-        span[:grouping_type] = "DatabaseCall"
-      end
-      span[:host_id] = host.id
-      span[:layer_id] = layer.id
-      span[:timestamp] = timestamp
-      span[:duration] = _duration
-      span[:trace_key] = _trace_key
-      span[:uuid] = SecureRandom.uuid.to_s
-      span[:payload] = _opts
 
       if _backtrace
         backtrace = Backtrace.new

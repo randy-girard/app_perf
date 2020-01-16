@@ -3,7 +3,7 @@ require 'json'
 require 'zlib'
 require 'stringio'
 
-module API
+module Api
   class Listener < Roda
     plugin :json
     plugin :all_verbs

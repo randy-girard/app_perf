@@ -1,6 +1,6 @@
 class ErrorMessage < ApplicationRecord
-  belongs_to :application
-  belongs_to :host
+  belongs_to :application, optional: true
+  belongs_to :host, optional: true
 
   has_many :error_data
 
