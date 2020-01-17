@@ -33,7 +33,7 @@ gem 'sinatra', :require => nil
 gem "sidekiq"
 gem "redis-namespace"
 gem "activerecord-import"
-gem "app_perf_rpm", path: "../app_perf_rpm"
+gem "app_perf_rpm"
 gem "app_perf_agent"
 gem 'faker'
 gem "msgpack"

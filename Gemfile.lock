@@ -7,13 +7,6 @@ GIT
       activerecord (>= 6.0.0)
       pg_array_parser (~> 0.0.9)
 
-PATH
-  remote: ../app_perf_rpm
-  specs:
-    app_perf_rpm (0.2.4)
-      msgpack
-      opentracing
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -78,6 +71,9 @@ GEM
       msgpack
       pg
       vmstat (= 2.3.1)
+    app_perf_rpm (0.2.5)
+      msgpack
+      opentracing
     autoprefixer-rails (9.7.3)
       execjs
     bcrypt (3.1.13)
@@ -324,7 +320,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   app_perf_agent
-  app_perf_rpm!
+  app_perf_rpm
   bcrypt
   bootsnap (>= 1.1.0)
   bootstrap-sass
