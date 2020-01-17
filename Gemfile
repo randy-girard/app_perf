@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "2.6.1"
+ruby "2.6.5"
 
 gem 'dotenv-rails'
 gem "rack"
 gem "loofah"
-gem 'rails', '5.2.2.1'
+gem 'rails', '6.0.2'
 
 gem 'sass-rails'
 gem 'sassc-rails'
@@ -27,7 +27,7 @@ gem "groupdate", "3.2.1"
 gem 'calculate-all'
 gem "pg"
 gem "pg_histogram"
-gem 'postgres_ext', github: 'cerebris/postgres_ext', branch: "rails-5"
+gem 'postgres_ext', github: 'productboard/postgres_ext', branch: "rails-6"
 gem "font-awesome-rails"
 gem 'sinatra', :require => nil
 gem "sidekiq"
@@ -46,7 +46,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'factory_bot_rails'
   gem 'sqlite3'
   gem 'pry'

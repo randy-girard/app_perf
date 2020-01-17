@@ -29,6 +29,7 @@ class OpenTracingWorker < ActiveJob::Base
       name     = json.fetch("name") { nil }
       data     = Array(json.fetch("data"))
 
+      set_user(license_key)
       set_application(license_key, name)
 
       if data.present? && application.present?
@@ -41,8 +42,13 @@ class OpenTracingWorker < ActiveJob::Base
 
   private
 
+  def set_user(license_key)
+    self.user = User.where(license_key: license_key).first
+  end
+
   def set_application(license_key, name)
     self.application = Application.where(:license_key => license_key).first_or_initialize
+    self.application.user = user
     self.application.name = name
     self.application.save
   end

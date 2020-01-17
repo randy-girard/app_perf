@@ -8,7 +8,7 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET index' do
     it 'works' do
-      get :index
+      get :index, {}
       expect(response.status).to eq(200)
     end
   end
@@ -16,7 +16,7 @@ describe ApplicationsController, :type => :controller do
   # TODO: auto-generated
   describe 'GET new' do
     it 'works' do
-      get :new
+      get :new, {}
       expect(response.status).to eq(200)
     end
   end

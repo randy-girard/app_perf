@@ -1,6 +1,6 @@
 class Trace < ApplicationRecord
-  belongs_to :application
-  belongs_to :host
+  belongs_to :application, optional: true
+  belongs_to :host, optional: true
 
   has_many :spans, :primary_key => :trace_key, :foreign_key => :trace_key
   has_one  :root_span,

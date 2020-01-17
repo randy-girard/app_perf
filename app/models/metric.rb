@@ -1,8 +1,8 @@
 require 'digest/sha1'
 
 class Metric < ApplicationRecord
-  belongs_to :application
-  belongs_to :host
+  belongs_to :application, optional: true
+  belongs_to :host, optional: true
 
   has_many :metric_data, :dependent => :delete_all
 

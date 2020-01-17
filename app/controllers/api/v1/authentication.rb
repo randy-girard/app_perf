@@ -1,4 +1,4 @@
-module API
+module Api
   module V1
     module Authentication
       extend ActiveSupport::Concern

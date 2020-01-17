@@ -1,5 +1,5 @@
 class Backtrace < ApplicationRecord
-  belongs_to :backtraceable, polymorphic: true
+  belongs_to :backtraceable, polymorphic: true, optional: true
 
   serialize :backtrace, JSON
 

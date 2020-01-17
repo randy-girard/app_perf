@@ -1,5 +1,5 @@
 class Application < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :metrics, :dependent => :delete_all
   has_many :metric_data
   has_many :database_calls, :dependent => :delete_all
