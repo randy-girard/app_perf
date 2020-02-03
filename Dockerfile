@@ -1,4 +1,4 @@
-FROM ruby:2.6.1-alpine
+FROM ruby:2.6.5-alpine
 
 LABEL maintainer="Randy Girard <rgirard59@yahoo.com>"
 
