@@ -26,6 +26,10 @@ RUN bundle install --jobs 20 --retry 5 --without development test --deployment -
 
 COPY . .
 
+ENV DATABASE_URL postgres://app_perf:password@postgres:5432/app_perf?encoding=utf8&pool=5&timeout=5000
+
+RUN RAILS_ENV=production SECRET_KEY_BASE=foo bundle exec rake assets:precompile
+
 # Available (and reused) args
 # Use --build-arg PORT=5000 to use another app default port
 ARG PORT=5000
