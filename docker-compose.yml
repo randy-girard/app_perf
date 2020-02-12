@@ -1,4 +1,22 @@
-version: '2'
+version: '3.7'
+
+networks:
+  app_perf:
+
+x-base: &base
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  command: irb
+  networks:
+    - app_perf
+  volumes:
+    - '.:/app'
+  env_file:
+    - '.env.docker'
+  depends_on:
+    - 'postgres'
+    - 'redis'
 
 services:
   postgres:
@@ -10,36 +28,34 @@ services:
       - '6543:5432'
     volumes:
       - 'postgres:/var/lib/postgresql/data'
+    networks:
+      - app_perf
 
   redis:
-    image: 'redis:3.2-alpine'
+    image: 'redis:5.0.7-alpine'
     command: redis-server
     ports:
       - '5268:6379'
     volumes:
       - 'redis:/data'
+    networks:
+      - app_perf
 
   website:
-    depends_on:
-      - 'postgres'
-      - 'redis'
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+    <<: *base
+    command: bundle exec rails s -p 5000
     ports:
       - '5000:5000'
-    volumes:
-      - '.:/app'
-    env_file:
-      - '.env.docker'
-    links:
-      - 'postgres'
+
+  worker:
+    <<: *base
+    command: bundle exec sidekiq -C config/sidekiq.yml
 
   agent:
+    <<: *base
+    command: bundle exec app_perf_agent --host website:5000 --license-key e47a7331-77cd-4ea0-8be1-b4130255a3a8 -f
     depends_on:
       - 'website'
-    build: .
-    command: bundle exec app_perf_agent --host website:5000 --license-key e47a7331-77cd-4ea0-8be1-b4130255a3a8 -f
 
 volumes:
   redis:

@@ -55,6 +55,30 @@ docker-compose up
 
 Navigate to http://localhost:5000. This application is setup to report to itself so you can begin seeing information immediately!
 
+### Setup (Kubernetes)
+
+AppPerf can be easily deployed to any Kubernetes cluster using [Helm](https://helm.sh/) (both v3 and v2 supported) with the chart provided. There are a few simple steps for this:
+
+1. With Helm v3 you need to create a namespace first, i.e.:
+
+```
+kubectl create ns app-perf
+```
+
+The above is not required with Helm v2 since it creates the namespace automatically.
+
+2. Edit ./chart/values.yaml as needed with the required information, including connection strings for the Postgres and Redis databases and an optional ingress resource with TLS certificate to expose the app to the web.
+
+3. Finally you can install AppPerf with the following command:
+
+```
+helm upgrade --install \
+  --namespace app-perf \
+  -f ./chart/values.yaml \
+  app-perf \
+ ./chart
+```
+
 ### Default Login
 
 AppPerf has a sample account allowing you to check out the application

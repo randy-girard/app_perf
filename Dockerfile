@@ -1,4 +1,4 @@
-FROM ruby:2.6.1-alpine
+FROM ruby:2.6.5-alpine
 
 LABEL maintainer="Randy Girard <rgirard59@yahoo.com>"
 
@@ -25,6 +25,10 @@ RUN bundle install --jobs 20 --retry 5 --without development test --deployment -
       gem install app_perf_agent && yarn install
 
 COPY . .
+
+ENV DATABASE_URL postgres://app_perf:password@postgres:5432/app_perf?encoding=utf8&pool=5&timeout=5000
+
+RUN RAILS_ENV=production SECRET_KEY_BASE=foo bundle exec rake assets:precompile
 
 # Available (and reused) args
 # Use --build-arg PORT=5000 to use another app default port

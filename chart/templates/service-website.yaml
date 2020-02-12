@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-perf-website
+  labels:
+    app.kubernetes.io/name: app-perf-website
+    helm.sh/chart: app-perf
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  ports:
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: app-perf-website
+    app.kubernetes.io/instance: {{ .Release.Name }}

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-perf-config
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  RAILS_ENV: {{ .Values.rails_env | quote }}
+  APP_PERF_HOST: {{ .Values.app_perf_host | quote }}
+  APP_PERF_SSL: {{ .Values.tls_enabled | quote }}
+  APP_PERF_SAMPLE_RATE: {{ .Values.app_perf_sample_rate | quote }}
+  APP_PERF_FLUSH_INTERVAL: {{ .Values.app_perf_flush_interval | quote }}
+  SMTP_HOST: {{ .Values.smtp_host | quote }}
+  SMTP_PORT: {{ .Values.smtp_port | quote }}
+  SMTP_DOMAIN: {{ .Values.smtp_domain | quote }}
+  SMTP_AUTHENTICATION: {{ .Values.smtp_authentication | quote }}
+  SMTP_TLS: {{ .Values.smtp_tls | quote }}
+  RAILS_SERVE_STATIC_FILES: "true"
+  RAILS_LOG_TO_STDOUT: "true"

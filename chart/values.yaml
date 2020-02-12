@@ -1,0 +1,39 @@
+image:
+  repository: vitobotta/app-perf
+  tag: 0.0.3
+  pullPolicy: IfNotPresent
+
+website_replica_count: 1
+worker_replica_count: 1
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+  hosts:
+    - apm.mydomain.com
+  tls:
+   - secretName: app-perf-tls
+     hosts:
+       - apm.mydomain.com
+
+tls_enabled: "true"
+
+app_perf_host: http://app-perf-website
+app_perf_sample_rate: 20
+app_perf_flush_interval: 10
+
+rails_env: production
+secret_key_base: blah
+
+database_url: postgres://app_perf:password@postgres-app-perf.postgres-app-perf:5432/app_perf?encoding=utf8&pool=5&timeout=5000
+redis_url: redis://redis-master.redis:6379/0
+
+smtp_host: smtp.email.example
+smtp_port: 587
+smtp_domain: smtp.email.example
+smtp_authentication: plain
+smtp_tls: "true"
+smtp_username: blah
+smtp_password: blah
