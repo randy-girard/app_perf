@@ -1,54 +1,49 @@
+require 'securerandom'
+
 class AppPerfAgentWorker < ActiveJob::Base
   queue_as :app_perf
 
   attr_accessor :license_key,
                 :name,
                 :host,
-                :hostname,
                 :data,
                 :user,
                 :application,
                 :protocol_version
 
+  alias_attribute :jid, :job_id
+
   def perform(params, body)
     #AppPerfRpm.without_tracing do
-      json = decompress_params(body)
+      license_key      = params.fetch("license_key") { nil }
+      protocol_version = params.fetch("protocol_version") { nil }
 
-      self.license_key      = params.fetch("license_key") { nil }
-      self.protocol_version = params.fetch("protocol_version") { nil }
-      self.hostname         = json.fetch("host")
-      self.name             = json.fetch("name") { nil }
-
-      if self.license_key.nil? ||
-         self.protocol_version.nil?
+      if license_key.nil? ||
+         protocol_version.nil? ||
+         !protocol_version.to_i.eql?(3)
         return
       end
 
-      self.data = Array(json.fetch("data"))
+      json     = decompress_params(body)
+      hostname = json.fetch("host")
+      name     = json.fetch("name") { nil }
+      data     = Array(json.fetch("data"))
 
-      self.user = User.where(license_key: license_key).first
+      set_user(license_key)
+      set_application(license_key, name)
 
-      self.application = Application.where(:license_key => license_key).first_or_initialize
-      self.application.user = user
-      self.application.name = name
-      self.application.save
+      if data.present? && application.present?
+        set_host(hostname)
 
-      self.host = Host.where(:name => hostname).first_or_create
-
-      if protocol_version.to_i.eql?(2)
-        errors, remaining_data = data.partition {|d| d[0] == "error" }
-        metrics, spans = Array(remaining_data).partition {|d| d[0] == "metric" }
+        metrics, spans = Array(data).partition {|d| d[0] == "metric" }
 
         if metrics.present?
           process_metric_data(metrics)
         end
 
-        if errors.present? && application.present?
-          process_error_data(errors)
-        end
-
         if spans.present? && application.present?
-          process_version_2(spans)
+          layers = load_layers(data)
+          process_data(layers, spans)
         end
       end
     #end
@@ -56,267 +51,225 @@ class AppPerfAgentWorker < ActiveJob::Base
 
   private
 
+  def set_user(license_key)
+    self.user = User.where(license_key: license_key).first
+  end
+
+  def set_application(license_key, name)
+    self.application = Application.where(:license_key => license_key).first_or_initialize
+    self.application.user = user
+    self.application.name = name
+    self.application.save
+  end
+
+  def set_host(hostname)
+    self.host = Host.where(name: hostname).first_or_create
+  end
+
   def decompress_params(body)
     compressed_body = Base64.decode64(body)
     data = Zlib::Inflate.inflate(compressed_body)
     MessagePack.unpack(data)
   end
 
-  def load_data(data)
-    data
-      .map {|datum|
-        begin
-          _layer, _trace_key, _start, _duration, _serialized_opts = datum
-          _opts = _serialized_opts
-        rescue => ex
-          Rails.logger.error "SERIALIZATION ERROR"
-          Rails.logger.error ex.message.to_s
-          Rails.logger.error _serialized_opts.inspect
-          _opts = {}
-        end
-
-        trace_key = generate_trace_key(_trace_key)
-
-        begin
-          [_layer, trace_key, _start.to_f, _duration.to_f, _opts]
-        rescue => ex
-          Rails.logger.error "LOAD DATA ERROR"
-          Rails.logger.error "DATA: #{datum.inspect}"
-          Rails.logger.error "PARSED DATA: #{[_layer, _trace_key, _start, _duration, _serialized_opts].inspect}"
-          raise
-        end
-      }
-  end
-
   def load_layers(data)
-    existing_layers = application.layers.all
-    layer_names = data.map {|d| d[0] }.compact.uniq
-    new_layers = (layer_names - existing_layers.map(&:name)).map {|l|
-      layer = application.layers.where(:name => l).first_or_initialize
-      layer.save
-      layer
-    }
-    (new_layers + existing_layers).uniq {|l| l.name }
-  end
-
-  def load_database_types(data)
-    existing_database_types = application.database_types.all
-    database_type_names = data
-      .map {|d| d[4]["adapter"] }
-      .compact
+    data
+      .map {|datum| datum["tags"]["component"] || datum["name"] }
       .uniq
-    new_database_types = (database_type_names - existing_database_types.map(&:name)).map {|adapter|
-      database_type = application.database_types.where(
-        :name => adapter
-      ).first_or_initialize
-      database_type.save
-      database_type
-    }
-    (new_database_types + existing_database_types).uniq {|l| l.name }
-  end
-
-  def load_traces(data)
-    traces = []
-    timestamps = data
-      .group_by {|datum| datum[1] }
-      .flat_map {|trace_key, events| { trace_key => events.map {|e| e[2] }.max } }
-      .reduce({}) { |h, v| h.merge v }
-    durations = data
-      .group_by {|datum| datum[1] }
-      .flat_map {|trace_key, events| { trace_key => events.map {|e| e[3] }.max } }
-      .reduce({}) { |h, v| h.merge v }
-
-    trace_keys = data.map {|d| d[1] }.compact.uniq
-    existing_traces = application.traces.where(:trace_key => trace_keys)
-
-    trace_keys.each {|trace_key|
-      timestamp = Time.at(timestamps[trace_key])
-      duration = durations[trace_key]
-
-      trace = existing_traces.find {|t| t.trace_key == trace_key }
-      if trace.nil?
-        trace = application.traces.new(:trace_key => trace_key)
-      end
-
-      trace.host = host
-      trace.trace_key = trace_key
-
-      # Set timestamp if never set, or incoming timestamp is earlier than
-      # the oldest recorded already.
-      if trace.timestamp.nil? || trace.timestamp > timestamp
-        trace.timestamp = timestamp
-      end
-
-      # Set the duration if never set, or the incoming duration is slower
-      # than the previous.
-      if trace.duration.nil? || trace.duration < duration
-        trace.duration = duration
-      end
-
-      if trace.new_record?
-        traces << trace
-      else
-        trace.save
-      end
-    }
-    ids = Trace.import(traces).ids
-
-    application.traces.where(:trace_key => trace_keys).all
-  end
-
-  def process_version_2(data)
-    events = []
-    spans = []
-    database_calls = []
-    backtraces = []
-
-    data = load_data(data)
-    layers = load_layers(data)
-    database_types = load_database_types(data)
-    traces = load_traces(data)
-
-    data.each do |_layer, _trace_key, _start, _duration, _opts|
-      hash = {}
-
-      layer = layers.find {|l| l.name == _layer }
-
-      endpoint = nil
-      database_call = nil
-      url = _opts.fetch("url") { nil }
-      domain = _opts.fetch("domain") { nil }
-      controller = _opts.fetch("controller") { nil }
-      action = _opts.fetch("action") { nil }
-      query = _opts.fetch("query") { nil }
-      adapter = _opts.fetch("adapter") { nil }
-      _backtrace = _opts.delete("backtrace")
-
-      timestamp = Time.at(_start)
-      duration = _duration
-
-      span = {}
-      span[:host_id] = host.id
-      span[:layer_id] = layer.id
-      span[:timestamp] = timestamp
-      span[:duration] = _duration
-      span[:trace_key] = _trace_key
-      span[:uuid] = SecureRandom.uuid.to_s
-      span[:payload] = _opts
-
-      if query
-        database_type = database_types.find {|dt| dt.name == adapter }
-        database_call = application.database_calls.new(
-          :uuid => span[:uuid],
-          :database_type_id => database_type.id,
-          :host_id => host.id,
-          :layer_id => layer.id,
-          :statement => query,
-          :timestamp => timestamp,
-          :duration => _duration
-        )
-        database_calls << database_call
-      end
-
-      if _backtrace
-        backtrace = Backtrace.new
-        backtrace.backtrace = _backtrace
-        backtrace.backtraceable_id = span[:uuid]
-        backtrace.backtraceable_type = "Span"
-        backtraces << backtrace
-      end
-
-      spans << span
-    end
-
-    all_events = []
-    spans.select {|s| s[:trace_key] }.group_by {|s| s[:trace_key] }.each_pair do |trace_key, events|
-      trace = traces.find {|t| t.trace_key == trace_key }
-      next if trace.nil?
-      timestamp = events.map {|e| e[:timestamp] }.min
-      duration = events.map {|e| e[:duration] }.max
-      url = (events.find {|e| e[:payload]["url"] } || {}).fetch(:payload, {}).fetch("url") { nil }
-      domain = (events.find {|e| e[:payload]["domain"] } || {}).fetch(:payload, {}).fetch("domain") { nil }
-      controller = (events.find {|e| e[:payload]["controller"] } || {}).fetch(:payload, {}).fetch("controller") { nil }
-      action = (events.find {|e| e[:payload]["action"] } || {}).fetch(:payload, {}).fetch("action") { nil }
-      events.each { |e|
-        e[:payload]["url"] ||= url
-        e[:payload]["domain"] ||= domain
-        e[:payload]["controller"] ||= controller
-        e[:payload]["action"] ||= action
-        e[:trace_key] = trace.trace_key
+      .map {|layer|
+        layer = application.layers.where(:name => layer).first_or_initialize
+        layer.save
+        layer
       }
+  end
 
-      existing_spans = trace.spans.all
-      new_spans = events.map {|s| application.spans.new(s) }
-      all_spans = existing_spans + new_spans
-      all_spans.each {|s| s.exclusive_duration = get_exclusive_duration(s, all_spans) }
-
-      all_spans.select {|s| s.id.present? }.each(&:save)
-
-      all_events += new_spans
-    end
-
+  def process_data(layers, data)
+    data = set_exclusive_durations(data)
+    spans = build_spans(layers, data)
+    log_entries = build_log_entries(data)
+    backtraces = build_backtraces(log_entries)
+    error_datum = build_errors(log_entries)
+    database_calls = build_database_calls(spans)
+    traces = build_traces(spans)
 
     Backtrace.import(backtraces)
-    Span.import(all_events)
+    Span.import(spans)
+    LogEntry.import(log_entries)
+    ErrorDatum.import(error_datum)
     DatabaseCall.import(database_calls)
+    Trace.import(traces)
   end
 
-  def get_exclusive_duration(span, spans)
-    children_data = span_children_data(span, spans)
-    children_data.size > 0 ? children_duration(children_data) : span.duration
+  def build_backtraces(log_entries)
+    backtraces = []
+    log_entries
+      .select {|log_entry| log_entry["event"] == "backtrace" }
+      .each {|log_entry|
+        fields = log_entry["fields"]
+        _backtrace = fields["stack"] || fields[":stack"]
+        if _backtrace
+          backtrace = Backtrace.new
+          backtrace.backtrace = _backtrace
+          backtrace.backtraceable_id = log_entry.span_id
+          backtrace.backtraceable_type = "Span"
+          backtraces << backtrace
+        end
+      }
+    backtraces
   end
 
-  def span_children_data(span, spans)
-    spans
-      .select {|s| span.parent_of?(s) }
+  def build_spans(layers, data)
+    data.map {|datum|
+      span = Span.new
+      # span.id = SecureRandom.uuid.to_s
+      span.application_id = application.id
+      span.host_id = host.id
+      span.uuid = datum["id"]
+      span.operation_name = datum["name"]
+      span.trace_key = datum["traceId"]
+      span.parent_id = datum["parentId"]
+      span.name = datum["name"]
+      span.layer_id = layers.find {|l| l.name == (datum["tags"]["component"] || datum["name"]) }.id
+      span.timestamp = Time.at(datum["timestamp"].to_f)
+      span.duration = datum["duration"].to_f
+      span.payload = datum["tags"]
+      span.exclusive_duration = datum["exclusiveDuration"].to_f
+      span
+    }
   end
 
-  def children_duration(children)
-    children
-      .map {|span| span.duration.to_f / 1000 }
-      .inject(0) {|sum, x| sum + x }
+  def build_log_entries(data)
+    data.map {|datum|
+      datum["logEntries"].map {|log_data|
+        log_entry = LogEntry.new
+        log_entry.span_id = datum["id"]
+        log_entry.trace_id = datum["traceId"]
+        log_entry.event = log_data["event"] || log_data["fields"]["event"]
+        log_entry.timestamp = Time.at(log_data["timestamp"].to_f)
+        log_entry.fields = log_data["fields"]
+        log_entry
+      }
+    }.flatten
   end
 
-  def generate_trace_key(seed = nil)
-    if seed.nil?
-      Digest::SHA1.hexdigest([Time.now, rand].join)
-    else
-      Digest::SHA1.hexdigest(seed)
-    end
+  def generate_fingerprint(message, backtrace)
+    message, fingerprint = ErrorMessage.generate_fingerprint(message)
+    return message, backtrace, fingerprint
   end
 
-  def process_analytic_event_data(data)
-    analytic_event_data = []
-    data.each do |datum|
-      datum[:host_id] = host.id
-      analytic_event_data << application.analytic_event_data.new(datum)
-    end
-    AnalyticEventDatum.import(analytic_event_data)
-  end
+  def build_errors(log_entries)
+    log_entries
+      .select {|log_entry| log_entry.event == "error" }
+      .map {|log_entry|
+        error = log_entry.fields
+        message = error[":message"] || error["message"]
+        backtrace = error[":backtrace"] || error["backtrace"]
+        error_class = error[":error_class"] || error["error_class"]
+        source = error[":source"] || error["source"]
 
-  def process_error_data(data)
-    error_data = []
-    data.select {|d| d.first.eql?("error") }.each do |datum|
-      _, trace_key, timestamp, data = datum
-      message, backtrace, fingerprint = generate_fingerprint(data["message"], data["backtrace"])
+        message, backtrace, fingerprint = generate_fingerprint(message, backtrace)
 
-      error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
-      error_message.error_class ||= data["error_class"]
-      error_message.error_message ||= message
-      error_message.last_error_at = Time.now
-      error_message.save
+        error_message = application.error_messages.where(:fingerprint => fingerprint).first_or_initialize
+        error_message.error_class ||= error_class
+        error_message.error_message ||= message
+        error_message.last_error_at = Time.now
+        error_message.save
 
-      error_data << application.error_data.new do |error_datum|
+        error_datum = application.error_data.new
         error_datum.host = host
+        error_datum.span_id = log_entry.span_id
         error_datum.error_message = error_message
-        error_datum.transaction_id = trace_key
+        error_datum.transaction_id = log_entry.trace_id
         error_datum.message = message
         error_datum.backtrace = backtrace
-        error_datum.source = data["source"]
-        error_datum.timestamp = timestamp
+        error_datum.source = source
+        error_datum.timestamp = log_entry.timestamp
+        error_datum
+      }
+  end
+
+  def get_database_types(spans)
+    spans
+      .select {|span| span.payload.has_key?("db.type") }
+      .map {|span| span.tag("db.vendor") }
+      .uniq
+      .map {|adapter|
+        database_type = DatabaseType.where(
+          :name => adapter,
+          :application_id => application.id
+        ).first_or_initialize
+        database_type.application_id = application.id
+        database_type.save
+        database_type
+      }
+  end
+
+  def build_database_calls(spans)
+    database_types = get_database_types(spans)
+    spans
+      .select {|span| span.payload.has_key?("db.type") }
+      .map {|span|
+        database_type = database_types.find {|dt| dt.name == span.tag("db.vendor") }
+        database_call = DatabaseCall.new
+        database_call.database_type_id = database_type.id
+        database_call.application_id = application.id
+        database_call.span_id = span.uuid
+        database_call.host_id = host.id
+        database_call.layer_id = span.layer_id
+        database_call.statement = span.tag("db.statement")
+        database_call.timestamp = span.timestamp
+        database_call.duration = span.duration
+        database_call
+      }
+  end
+
+  def build_traces(spans)
+    spans
+      .select(&:is_root?)
+      .map {|span|
+        trace = Trace.new
+        trace.application_id = application.id
+        trace.host_id = host.id
+        trace.trace_key = span.trace_key
+        trace.timestamp = span.timestamp
+        trace.duration = span.duration
+        trace
+      }
+  end
+
+  def set_exclusive_durations(data)
+    data.map {|datum|
+      datum["exclusiveDuration"] = get_exclusive_duration(datum, data)
+      datum
+    }
+  end
+
+  def get_exclusive_duration(span, data)
+    # return the exclusive duration if we already set it on this span.
+    #return span["exclusiveDuration"] if span.has_key?("exclusiveDuration")
+
+    # does this span have any children?
+    children = span_children_data(span, data)
+    children_duration = if children.size > 0
+
+      # if the span has children, sum up the durations.
+      Array(children).inject(0) do |sum, child|
+        sum + child["duration"]
       end
+    else
+      # If the span doesn't have any children, then the exclusive duration
+      # is 0. We will subtract this from the duration later to make the
+      # exclusive duration equal to the duration.
+      0
     end
-    ErrorDatum.import(error_data)
+    span["duration"] - children_duration
+  end
+
+  def span_children_data(span, data)
+    data
+      .select {|datum| datum["id"] != span["id"] }
+      .select {|datum| datum["parentId"] != nil }
+      .select {|datum| datum["parentId"] == span["id"] }
   end
 
   def process_metric_data(data)
@@ -338,10 +291,5 @@ class AppPerfAgentWorker < ActiveJob::Base
       end
     end
     MetricDatum.import(metric_data)
-  end
-
-  def generate_fingerprint(message, backtrace)
-    message, fingerprint = ErrorMessage.generate_fingerprint(message)
-    return message, backtrace, fingerprint
   end
 end

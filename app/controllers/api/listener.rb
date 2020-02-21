@@ -18,12 +18,7 @@ module Api
 
         request.body.rewind
 
-        case params["protocol_version"].to_s
-        when "2"
-          AppPerfAgentWorker.perform_later(params, request.body.read)
-        when "3"
-          OpenTracingWorker.perform_later(params, request.body.read)
-        end
+        AppPerfAgentWorker.perform_later(params, request.body.read)
 
         status 200
 
