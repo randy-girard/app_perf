@@ -6,7 +6,7 @@ ruby "2.6.5"
 gem 'dotenv-rails'
 gem "rack"
 gem "loofah"
-gem 'rails', '6.0.2'
+gem 'rails', '6.0.3.2'
 
 gem 'sass-rails'
 gem 'sassc-rails'
