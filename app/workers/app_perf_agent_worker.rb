@@ -132,6 +132,11 @@ class AppPerfAgentWorker < ActiveJob::Base
       span.layer_id = layers.find {|l| l.name == (datum["tags"]["component"] || datum["name"]) }.id
       span.timestamp = Time.at(datum["timestamp"].to_f)
       span.duration = datum["duration"].to_f
+      if ((!datum["tags"]["db.type"].blank?) && (datum["tags"]["db.type"] == "redis"))
+        if (!datum["tags"]["db.statement"].blank?)
+          datum["tags"]["db.statement"] = 'redis query'
+        end
+      end
       span.payload = datum["tags"]
       span.exclusive_duration = datum["exclusiveDuration"].to_f
       span
