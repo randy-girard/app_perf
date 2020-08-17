@@ -34,8 +34,8 @@ describe AppPerfAgentWorker do
         span = Span.find_by_uuid(datum[0])
         expect(span.source.length).to eq(datum[1])
         expect(span.backtrace.backtrace.length).to eq(datum[2])
-        expect(span.duration).to eq(datum[3])
-        expect(span.exclusive_duration).to eq(datum[4])
+        expect(span.duration.round(10)).to eq(datum[3].round(10))
+        expect(span.exclusive_duration.round(10)).to eq(datum[4].round(10))
       end
     end
 
@@ -58,7 +58,7 @@ describe AppPerfAgentWorker do
         .and change { ErrorDatum.count }.by(1)
 
       span = Span.all.find {|span| span.tag("error") == true }
-      expect(span.duration).to eq(45.9530353546143)
+      expect(span.duration.round(10)).to eq(45.9530353546143.round(10))
       expect(span.error).to eq(ErrorDatum.last)
     end
   end
