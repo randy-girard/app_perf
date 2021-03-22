@@ -55,4 +55,4 @@ jobs:
           bundle exec rails db:migrate
           yarn --frozen-lockfile
     - name: Run tests
-      run: bundle exec rake
+      run: bundle exec rails test
