@@ -44,7 +44,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - name: Run tests
+    - name: prepare database
       env:
         RAILS_ENV: test
       run: |
@@ -54,5 +54,5 @@ jobs:
           bundle exec rails db:create
           bundle exec rails db:migrate
           yarn --frozen-lockfile
-      name: Run tests
+    - name: Run tests
       run: bundle exec rake
