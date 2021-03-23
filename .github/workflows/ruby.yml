@@ -17,6 +17,19 @@ jobs:
   test:
 
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10
+        # The postgres container requires the postgres user to be setup with a password in order to start it due to security
+        # reasons
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       matrix:
         ruby-version: ['2.7']
@@ -31,5 +44,15 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: prepare database
+      env:
+        RAILS_ENV: test
+      run: |
+          sudo apt-get -yqq install libpq-dev
+          bundle install --no-deployment --jobs 4 --retry 3
+          cp config/database.github.yml config/database.yml
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+          yarn --frozen-lockfile
     - name: Run tests
-      run: bundle exec rake
+      run: bundle exec rails spec
