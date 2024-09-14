@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@babel/preset-react": "^7.0.0",
-    "@rails/webpacker": "^4.0.1",
+    "@rails/webpacker": "^5.4.4",
     "axios": "^0.18.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "chart.js": "^2.7.3",
